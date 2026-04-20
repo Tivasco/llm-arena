@@ -484,7 +484,7 @@ async function openFolder(scenario, dirItem) {
           body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
           const resp = await fetch(`${BASE}/${path}`);
           const content = await resp.text();
-          body.innerHTML = `<iframe class="html-preview" srcdoc="${escapeForAttr(content)}"></iframe>`;
+body.innerHTML = renderHtmlPreview(content);
         } else if (type === "md") {
           breadcrumb.textContent = `${scenario.name} / ${dirItem.name} / `;
           title.textContent = el.querySelector(".file-name").textContent;
@@ -533,7 +533,7 @@ async function openFolder(scenario, dirItem) {
                 body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
                 const r = await fetch(`${BASE}/${p2}`);
                 const c = await r.text();
-                body.innerHTML = `<iframe class="html-preview" srcdoc="${escapeForAttr(c)}"></iframe>`;
+body.innerHTML = renderHtmlPreview(c);
               } else if (t2 === "md") {
                 breadcrumb.textContent += el2.querySelector(".file-name").textContent + " / ";
                 title.textContent = el2.querySelector(".file-name").textContent;
@@ -599,7 +599,7 @@ function renderFileList(items, path) {
         body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
         const r = await fetch(`${BASE}/${p}`);
         const c = await r.text();
-        body.innerHTML = `<iframe class="html-preview" srcdoc="${escapeForAttr(c)}"></iframe>`;
+        body.innerHTML = renderHtmlPreview(c);
       } else if (t === "md") {
         breadcrumb.textContent += el.querySelector(".file-name").textContent + " / ";
         title.textContent = el.querySelector(".file-name").textContent;
@@ -642,7 +642,7 @@ function renderFileList(items, path) {
               body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
               const r = await fetch(`${BASE}/${p2}`);
               const c = await r.text();
-              body.innerHTML = `<iframe class="html-preview" srcdoc="${escapeForAttr(c)}"></iframe>`;
+        body.innerHTML = renderHtmlPreview(c);
             } else if (t2 === "md") {
               breadcrumb.textContent += el2.querySelector(".file-name").textContent + " / ";
               title.textContent = el2.querySelector(".file-name").textContent;
@@ -672,8 +672,10 @@ function renderFileList(items, path) {
   });
 }
 
-function escapeForAttr(s) {
-  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '');
+function renderHtmlPreview(content) {
+  const blob = new Blob([content], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  return `<iframe class="html-preview" src="${url}" sandbox="allow-scripts allow-same-origin"></iframe>`;
 }
 
 // ── Open a top-level file directly ──
@@ -695,7 +697,7 @@ async function openFile(scenario, fileItem) {
   if (isHtml) {
     const resp = await fetch(`${BASE}/${fileItem.path}`);
     const content = await resp.text();
-    body.innerHTML = `<iframe class="html-preview" srcdoc="${escapeForAttr(content)}"></iframe>`;
+    body.innerHTML = renderHtmlPreview(content);
   } else if (isMd) {
     const resp = await fetch(`${BASE}/${fileItem.path}`);
     const content = await resp.text();
