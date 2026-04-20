@@ -1,0 +1,1320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A* Pathfinding Visualizer</title>
+
+  <!--
+    =================================================================
+    SINGLE-FILE PROTOTYPE — zero external dependencies
+    A* Pathfinding Visualizer with interactive grid, animated algorithm,
+    and comprehensive stats. All state managed through a single update()
+    function; canvas rendering via requestAnimationFrame loop.
+    =================================================================
+  -->
+
+  <style>
+    /* ================================================================
+       CSS — design tokens (dark theme for pathfinding visualization)
+       ================================================================ */
+    :root {
+      /* Palette — dark theme with distinct cell colors */
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface-raised: #252936;
+      --border: #333a4d;
+      --text: #e8eaed;
+      --text-muted: #8b92a5;
+
+      /* Cell colors — intuitive and visually distinct */
+      --cell-empty: #2a2f3d;
+      --cell-wall: #1e222c;
+      --cell-start: #22c55e;
+      --cell-end: #ef4444;
+      --cell-weight: #d97706;
+      --cell-open: #3b82f6;
+      --cell-closed: #6366f1;
+      --cell-path: #fbbf24;
+
+      /* Spacing (8px grid) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+
+      /* Typography */
+      --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+
+      /* Motion */
+      --dur-fast: 100ms;
+      --dur-normal: 150ms;
+      --ease-out: ease-out;
+
+      /* Canvas dimensions */
+      --cell-size: 24px;
+    }
+
+    /* ================================================================
+       CSS — reset
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* ================================================================
+       CSS — layout
+       ================================================================ */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-4);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: var(--space-5);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 var(--space-2) 0;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* ================================================================
+       CSS — canvas wrapper (responsive)
+       ================================================================ */
+    .canvas-wrapper {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: var(--space-3);
+      margin-bottom: var(--space-4);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: crosshair;
+    }
+
+    /* ================================================================
+       CSS — controls panel
+       ================================================================ */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .controls-left {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .btn {
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: var(--space-2) var(--space-4);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition:
+        background var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out);
+    }
+
+    .btn:hover {
+      background: var(--border);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--cell-open);
+      outline-offset: 2px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--cell-open);
+      border-color: var(--cell-open);
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    /* Speed slider */
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .speed-control label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--text);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* ================================================================
+       CSS — stats panel
+       ================================================================ */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+    }
+
+    .stat {
+      background: var(--surface);
+      border-radius: 6px;
+      padding: var(--space-3);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* ================================================================
+       CSS — message bar (no path found, etc.)
+       ================================================================ */
+    .message {
+      background: var(--surface);
+      border-radius: 6px;
+      padding: var(--space-3);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--cell-end);
+    }
+
+    .message.success {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--cell-start);
+    }
+
+    /* ================================================================
+       CSS — legend
+       ================================================================ */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-top: var(--space-3);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    /* ================================================================
+       CSS — responsive (375px floor)
+       ================================================================ */
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 1.25rem; }
+    }
+
+    @media (max-width: 400px) {
+      .controls { flex-direction: column; }
+      .controls-left, .controls-right { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <!-- Header -->
+    <header>
+      <h1>A* Pathfinding Visualizer</h1>
+      <p class="subtitle">Click and drag to draw walls &bull; Right-click to erase &bull; Drag nodes to reposition</p>
+    </header>
+
+    <!-- Canvas (30x20 grid) -->
+    <div class="canvas-wrapper">
+      <canvas id="grid" width="720" height="480"></canvas>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-start)"></span>Start</div>
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-end)"></span>End</div>
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-wall)"></span>Wall</div>
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-weight)"></span>Weight (5x)</div>
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-open)"></span>Open Set</div>
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-closed)"></span>Visited</div>
+      <div class="legend-item"><span class="legend-color" style="background: var(--cell-path)"></span>Path</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="controls-left">
+        <button class="btn btn-primary" data-action="visualize">Visualize</button>
+        <button class="btn" data-action="clearPath">Clear Path</button>
+        <button class="btn" data-action="clearAll">Clear All</button>
+        <button class="btn" data-action="randomMaze">Random Maze</button>
+      </div>
+      <div class="controls-right">
+        <div class="speed-control">
+          <label>Speed</label>
+          <input type="range" min="1" max="20" value="10" data-bind="speed">
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" data-stat="steps">0</div>
+        <div class="stat-label">Steps</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-stat="visited">0</div>
+        <div class="stat-label">Cells Visited</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-stat="pathLength">—</div>
+        <div class="stat-label">Path Cost</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-stat="elapsed">0 ms</div>
+        <div class="stat-label">Elapsed Time</div>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="message" data-message>Ready to visualize</div>
+  </main>
+
+  <script>
+    // ================================================================
+    // JS — state (single source of truth)
+    // All grid data, algorithm state, and UI state live here.
+    // ================================================================
+    const COLS = 30;
+    const ROWS = 20;
+
+    // Cell types
+    const EMPTY = 0;
+    const WALL = 1;
+    const WEIGHT = 2;
+
+    // Node cost for weighted terrain (5x normal)
+    const WEIGHT_COST = 5;
+
+    // Canvas color map (hex — Canvas ctx.fillStyle doesn't resolve CSS vars)
+    const COLORS = {
+      empty:  '#2a2f3d',
+      wall:   '#1e222c',
+      start:  '#22c55e',
+      end:    '#ef4444',
+      weight: '#d97706',
+      open:   '#3b82f6',
+      closed: '#6366f1',
+      path:   '#fbbf24'
+    };
+
+    // A* node structure stored in priority queue
+    class ANode {
+      constructor(x, y, g, h, parent) {
+        this.x = x;
+        this.y = y;
+        // g = actual cost from start to this node
+        this.g = g;
+        // h = heuristic (estimated cost from this node to goal)
+        this.h = h;
+        // f = total estimated cost (g + h)
+        this.f = g + h;
+        this.parent = parent; // reference to previous node in optimal path
+      }
+    }
+
+    const state = {
+      // Grid: 2D array of cell types (EMPTY, WALL, WEIGHT)
+      grid: [],
+
+      // Special nodes
+      startX: 1,
+      startY: 10,
+      endX: 28,
+      endY: 10,
+
+      // Interaction state
+      isDrawing: false,
+      drawMode: 'wall',  // 'wall' or 'erase'
+      isDragging: false,
+      dragType: null,    // 'start', 'end', or null
+      shiftHeld: false,
+
+      // Animation state
+      isVisualizing: false,
+      animationId: null,
+      openSet: [],       // min-heap of ANode objects
+      closedSet: new Set(),
+      path: [],          // final path coordinates
+
+      // Stats
+      steps: 0,
+      cellsVisited: 0,
+      pathLength: null,
+      elapsedMs: 0,
+
+      // UI
+      speed: 10,         // steps per frame (1-20)
+      message: 'Ready to visualize',
+      messageType: ''    // '', 'error', 'success'
+    };
+
+    // ================================================================
+    // JS — grid initialization
+    // Initialize empty grid and set default start/end positions.
+    // ================================================================
+    function initGrid() {
+      state.grid = [];
+      for (let y = 0; y < ROWS; y++) {
+        state.grid[y] = [];
+        for (let x = 0; x < COLS; x++) {
+          state.grid[y][x] = EMPTY;
+        }
+      }
+
+      // Set default start (green) and end (red) positions
+      state.startX = 1;
+      state.startY = Math.floor(ROWS / 2);
+      state.endX = COLS - 2;
+      state.endY = Math.floor(ROWS / 2);
+    }
+
+    // ================================================================
+    // JS — min-heap priority queue for A* open set
+    // Using a binary min-heap gives O(log n) insert and extract-min,
+    // which is critical for A* performance on larger grids.
+    //
+    // WHY MIN-HEAP: A* requires always expanding the node with
+    // lowest f-score (estimated total cost). Without a proper priority
+    // queue, we'd have to scan the entire open set each time — O(n)
+    // per expansion instead of O(log n).
+    //
+    // The heap maintains nodes sorted by f-score, so the node most
+    // likely to lead to an optimal path is always processed first.
+    // ================================================================
+    class MinHeap {
+      constructor() {
+        this.heap = [];
+      }
+
+      // Insert node, maintain min-heap property
+      insert(node) {
+        this.heap.push(node);
+        this.bubbleUp(this.heap.length - 1);
+      }
+
+      // Extract minimum (node with lowest f-score)
+      extractMin() {
+        if (this.heap.length === 0) return null;
+        const min = this.heap[0];
+        const last = this.heap.pop();
+        if (this.heap.length > 0) {
+          this.heap[0] = last;
+          this.bubbleDown(0);
+        }
+        return min;
+      }
+
+      // Check if heap has nodes
+      isEmpty() {
+        return this.heap.length === 0;
+      }
+
+      // Get node at index (for comparison with existing set entries)
+      get(index) {
+        return this.heap[index];
+      }
+
+      // Get size
+      size() {
+        return this.heap.length;
+      }
+
+      // Bubble up to maintain min-heap property
+      bubbleUp(index) {
+        while (index > 0) {
+          const parent = Math.floor((index - 1) / 2);
+          if (this.heap[parent].f <= this.heap[index].f) break;
+          [this.heap[parent], this.heap[index]] = [this.heap[index], this.heap[parent]];
+          index = parent;
+        }
+      }
+
+      // Bubble down to maintain min-heap property
+      bubbleDown(index) {
+        const length = this.heap.length;
+        while (true) {
+          let left = 2 * index + 1;
+          let right = 2 * index + 2;
+          let smallest = index;
+
+          if (left < length && this.heap[left].f < this.heap[smallest].f) {
+            smallest = left;
+          }
+          if (right < length && this.heap[right].f < this.heap[smallest].f) {
+            smallest = right;
+          }
+          if (smallest === index) break;
+
+          [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+          index = smallest;
+        }
+      }
+
+      // Clear heap
+      clear() {
+        this.heap = [];
+      }
+    }
+
+    // ================================================================
+    // JS — A* pathfinding algorithm
+    //
+    // CORE ALGORITHM:
+    // 1. Start with only the start node in the open set (min-heap)
+    // 2. Repeatedly extract the node with lowest f-score from open set
+    // 3. If it's the goal, reconstruct path via parent pointers and return
+    // 4. Otherwise, add it to closed set (we've fully processed it)
+    // 5. For each neighbor: if in closed set or is wall, skip
+    //    Otherwise calculate g (cost from start) and h (heuristic to goal)
+    //    If new path to neighbor is better than any previous, update it
+    //
+    // HEURISTIC (Manhattan distance): h(x,y) = |x - goalX| + |y - goalY|
+    // This is admissible because it never overestimates the actual cost
+    // (no diagonals = movement costs are 1 or 5 per step, never less)
+    //
+    // ANODE RATIONALE: We store g, h, f separately because:
+    // - f determines processing order (must be lowest to expand first)
+    // - g is needed to calculate neighbor's g via: neighbor.g = node.g + cost
+    // - h is needed to verify optimality and for path reconstruction logic
+    //
+    // WEIGHTED vs UNWEIGHTED CELLS:
+    // - Empty cells: movement cost = 1
+    // - Weight cells (sand): movement cost = 5 (5x slower to traverse)
+    //
+    // The algorithm naturally handles weighted cells because the g-cost
+    // accumulates properly. Shortest path may avoid weights if a valid
+    // alternative exists, or use them if necessary (e.g., maze corridors).
+    //
+    // SAFETY CHECKS:
+    // - If open set becomes empty before reaching goal, no path exists
+    //   (this happens when walls completely block all routes)
+    //
+    // ANIMATION INTEGRATION:
+    // The algorithm is designed to run step-by-step via requestAnimationFrame.
+    // Each call to astarStep() processes ONE node (or multiple if speed > 1),
+    // allowing the visualization to show the frontier expansion over time.
+    // ================================================================
+    function astarReset() {
+      state.openSet = new MinHeap();
+      state.closedSet = new Set();
+      state.path = [];
+      state.steps = 0;
+      state.cellsVisited = 0;
+      state.pathLength = null;
+
+      const startNode = new ANode(
+        state.startX,
+        state.startY,
+        0,                                      // g = 0 at start
+        manhattanDistance(state.startX, state.startY, state.endX, state.endY),
+        null                                     // no parent (start of path)
+      );
+      state.openSet.insert(startNode);
+
+      return true; // ready to run
+    }
+
+    function manhattanDistance(x1, y1, x2, y2) {
+      // Heuristic: minimum cost assuming no obstacles
+      return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+    function coordKey(x, y) {
+      return `${x},${y}`;
+    }
+
+    function getMoveCost(x, y) {
+      // Return movement cost for entering cell (x,y)
+      if (state.grid[y][x] === WEIGHT) return WEIGHT_COST;
+      return 1; // empty or wall (wall handled separately)
+    }
+
+    function astarStep() {
+      if (state.openSet.isEmpty()) {
+        // No path exists — open set exhausted without finding goal
+        return { done: true, found: false };
+      }
+
+      // Extract node with lowest f-score (optimal expansion order)
+      const current = state.openSet.extractMin();
+
+      // Skip if already processed (handled via closed set check below)
+      const currentKey = coordKey(current.x, current.y);
+      if (state.closedSet.has(currentKey)) {
+        // Node was already processed — continue to next iteration
+        return { done: false, found: false };
+      }
+
+      // Mark as visited (closed set)
+      state.closedSet.add(currentKey);
+      state.cellsVisited++;
+
+      // Check if we've reached the goal
+      if (current.x === state.endX && current.y === state.endY) {
+        // Path found! Reconstruct via parent pointers
+        const path = [];
+        let node = current;
+        while (node !== null) {
+          path.unshift({ x: node.x, y: node.y });
+          node = node.parent;
+        }
+        state.pathLength = current.g; // total path cost
+        return { done: true, found: true, path };
+      }
+
+      // Explore neighbors (4-directional: up, down, left, right)
+      const neighbors = [
+        { x: current.x, y: current.y - 1 },     // up
+        { x: current.x + 1, y: current.y },     // right
+        { x: current.x, y: current.y + 1 },     // down
+        { x: current.x - 1, y: current.y }      // left
+      ];
+
+      for (const neighbor of neighbors) {
+        const { x, y } = neighbor;
+
+        // Validate bounds
+        if (x < 0 || x >= COLS || y < 0 || y >= ROWS) continue;
+
+        // Skip if wall (impassable)
+        if (state.grid[y][x] === WALL) continue;
+
+        // Skip if already in closed set (fully processed)
+        const neighborKey = coordKey(x, y);
+        if (state.closedSet.has(neighborKey)) continue;
+
+        // Calculate costs
+        const moveCost = getMoveCost(x, y);
+        const g = current.g + moveCost;                          // actual cost from start
+        const h = manhattanDistance(x, y, state.endX, state.endY); // heuristic to goal
+        const f = g + h;
+
+        // Create node and add to open set (heap handles ordering)
+        const neighborNode = new ANode(x, y, g, h, current);
+        state.openSet.insert(neighborNode);
+      }
+
+      return { done: false, found: false };
+    }
+
+    // ================================================================
+    // JS — renderer (canvas drawing)
+    //
+    // The grid is rendered cell-by-cell with distinct colors for:
+    // - Empty (dark)
+    // - Wall (darker, no border visible)
+    // - Weight/Weighted terrain (sand-colored)
+    // - Start node (green, distinct glow)
+    // - End node (red, distinct glow)
+    //
+    // Algorithm state visualization (overlays on grid):
+    // - Open set nodes: blue tint (frontier — candidates to explore)
+    // - Closed set nodes: indigo tint (already explored)
+    // - Final path: gold/yellow highlight (the shortest route)
+    //
+    // Render order matters: we draw base cells first, then overlays,
+    // ensuring the path and special nodes always appear on top.
+    //
+    // Cell size is calculated dynamically to fill canvas width,
+    // maintaining a 3:2 aspect ratio (30x20 grid).
+    // ================================================================
+    function render() {
+      const canvas = document.getElementById('grid');
+      const ctx = canvas.getContext('2d');
+
+      // Calculate cell size based on canvas dimensions
+      const cellW = canvas.width / COLS;
+      const cellH = canvas.height / ROWS;
+
+      // Helper to get cell type key (used to index into COLORS hex map)
+      function getCellTypeKey(x, y) {
+        if (x === state.startX && y === state.startY) return 'start';
+        if (x === state.endX && y === state.endY)   return 'end';
+        const type = state.grid[y][x];
+        if (type === WALL)  return 'wall';
+        if (type === WEIGHT) return 'weight';
+        return 'empty';
+      }
+
+      // Helper to draw a single cell
+      function drawCell(x, y, color) {
+        const px = x * cellW;
+        const py = y * cellH;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(px, py, cellW - 1, cellH - 1);
+      }
+
+      // Draw all base cells
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          drawCell(x, y, COLORS[getCellTypeKey(x, y)]);
+        }
+      }
+
+      // Draw algorithm overlays (open set, closed set, path)
+      if (state.isVisualizing || state.path.length > 0) {
+        // Closed set (visited nodes — behind open set and path)
+        for (let y = 0; y < ROWS; y++) {
+          for (let x = 0; x < COLS; x++) {
+            const key = coordKey(x, y);
+            if (state.closedSet.has(key)) {
+              // Skip start and end nodes
+              if ((x === state.startX && y === state.startY) ||
+                  (x === state.endX && y === state.endY)) continue;
+              drawCell(x, y, COLORS.closed);
+            }
+          }
+        }
+
+        // Open set (frontier nodes)
+        for (let i = 0; i < state.openSet.size(); i++) {
+          const node = state.openSet.get(i);
+          // Skip start and end nodes
+          if ((node.x === state.startX && node.y === state.startY) ||
+              (node.x === state.endX && node.y === state.endY)) continue;
+          drawCell(node.x, node.y, COLORS.open);
+        }
+
+        // Final path (overlays everything except start/end markers)
+        if (state.path.length > 0) {
+          ctx.fillStyle = COLORS.path;
+          for (const cell of state.path) {
+            // Skip start and end — they're drawn separately as distinct markers
+            if ((cell.x === state.startX && cell.y === state.startY) ||
+                (cell.x === state.endX && cell.y === state.endY)) continue;
+            const px = cell.x * cellW;
+            const py = cell.y * cellH;
+            ctx.fillRect(px, py, cellW - 1, cellH - 1);
+          }
+        }
+      }
+
+      // Draw start marker (distinct green with subtle border)
+      ctx.fillStyle = COLORS.start;
+      const startPx = state.startX * cellW;
+      const startPy = state.startY * cellH;
+      ctx.fillRect(startPx, startPy, cellW - 1, cellH - 1);
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(startPx + 1.5, startPy + 1.5, cellW - 4, cellH - 4);
+
+      // Draw end marker (distinct red with subtle border)
+      ctx.fillStyle = COLORS.end;
+      const endPx = state.endX * cellW;
+      const endPy = state.endY * cellH;
+      ctx.fillRect(endPx, endPy, cellW - 1, cellH - 1);
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(endPx + 1.5, endPy + 1.5, cellW - 4, cellH - 4);
+    }
+
+    // ================================================================
+    // JS — stats update (DOM bindings)
+    // Update stat display elements based on current state.
+    // ================================================================
+    function updateStats() {
+      document.querySelector('[data-stat="steps"]').textContent = state.steps;
+      document.querySelector('[data-stat="visited"]').textContent = state.cellsVisited;
+      document.querySelector('[data-stat="pathLength"]').textContent =
+        state.pathLength !== null ? state.pathLength : '—';
+      document.querySelector('[data-stat="elapsed"]').textContent =
+        `${state.elapsedMs} ms`;
+    }
+
+    function updateMessage() {
+      const el = document.querySelector('[data-message]');
+      el.textContent = state.message;
+      el.className = 'message';
+      if (state.messageType) {
+        el.classList.add(state.messageType);
+      }
+    }
+
+    // ================================================================
+    // JS — animation loop
+    //
+    // The visualization runs via requestAnimationFrame, processing
+    // multiple A* steps per frame based on the speed slider (1-20).
+    //
+    // WHY requestAnimationFrame: It synchronizes with the display
+    // refresh rate (typically 60fps), ensuring smooth animation and
+    // preventing UI jank. We only advance the algorithm during the
+    // callback, so the browser remains responsive between steps.
+    //
+    // TIMING: Each frame processes 'speed' nodes, then re-renders
+    // and updates stats. The algorithm is complete when astarStep()
+    // returns { done: true }. At that point we stop the animation
+    // and display the appropriate message (path found or not found).
+    //
+    // The loop continues until:
+    // - Path is found (display success message with path length)
+    // - No path exists (open set exhausted, display error)
+    //
+    // STATE MANAGEMENT: We maintain 'isVisualizing' to prevent
+    // multiple simultaneous animation loops and to enable the
+    // "Clear Path" button to halt visualization mid-progress.
+    // ================================================================
+    let lastFrameTime = 0;
+
+    function animationLoop(timestamp) {
+      if (!state.isVisualizing) return;
+
+      // Throttle to ~30fps for smooth visuals (every 33ms)
+      if (timestamp - lastFrameTime < 33) {
+        state.animationId = requestAnimationFrame(animationLoop);
+        return;
+      }
+      lastFrameTime = timestamp;
+
+      // Process multiple steps per frame based on speed (1-20)
+      const stepsPerFrame = state.speed;
+      let found = false;
+
+      for (let i = 0; i < stepsPerFrame && state.isVisualizing; i++) {
+        if (state.openSet.isEmpty()) break;
+
+        const result = astarStep();
+        state.steps++;
+
+        if (result.done) {
+          found = result.found;
+          // Assign the reconstructed path so it persists after animation stops
+          if (result.path) state.path = result.path;
+          state.isVisualizing = false;
+          cancelAnimationFrame(state.animationId);
+          break;
+        }
+      }
+
+      // Re-render and update stats
+      render();
+      updateStats();
+
+      if (state.isVisualizing) {
+        state.animationId = requestAnimationFrame(animationLoop);
+      } else {
+        // Animation complete — show result message
+        if (found) {
+          state.message = `Path found! Cost: ${state.pathLength} units`;
+          state.messageType = 'success';
+        } else {
+          state.message = 'No path exists — all routes are blocked!';
+          state.messageType = 'error';
+        }
+        updateMessage();
+      }
+    }
+
+    function startVisualization() {
+      // Stop any existing animation
+      if (state.animationId) {
+        cancelAnimationFrame(state.animationId);
+      }
+
+      // Reset algorithm state and begin fresh
+      const startTime = performance.now();
+      astarReset();
+
+      // Update timing after reset (cellsVisited counted during steps)
+      const checkVisit = () => {
+        if (!state.isVisualizing) return;
+        state.elapsedMs = Math.round(performance.now() - startTime);
+      };
+
+      // Start animation loop
+      state.isVisualizing = true;
+      state.message = 'Running A* algorithm...';
+      state.messageType = '';
+      updateMessage();
+
+      lastFrameTime = 0;
+      state.animationId = requestAnimationFrame(animationLoop);
+    }
+
+    // ================================================================
+    // JS — random maze generation (recursive division)
+    //
+    // Generates a randomized maze using recursive subdivision:
+    // 1. Start with all empty cells inside the border
+    // 2. Randomly divide space with walls (horizontal or vertical)
+    // 3. Create passages in each wall to allow paths
+    // 4. Recurse on sub-regions until regions are too small
+    //
+    // WHY RECURSIVE DIVISION: It creates organic-feeling mazes with
+    // multiple valid paths and dead ends, making for interesting
+    // pathfinding visualization. The algorithm guarantees a path
+    // exists (start and end remain in different regions separated
+    // by walls with passages).
+    //
+    // MAZE INTEGRITY: We ensure start and end positions remain
+    // accessible by only placing internal walls, not overwriting
+    // the start/end cells or their immediate neighbors.
+    //
+    // After generation, we reset algorithm state so the user can
+    // immediately visualize or manually modify the maze.
+    // ================================================================
+    function generateRandomMaze() {
+      initGrid();
+
+      const margin = 1; // Don't place walls on start/end area
+
+      function recursiveDivide(x, y, width, height) {
+        // Base case: region too small to divide
+        if (width < 3 || height < 3) return;
+
+        // Choose orientation: horizontal or vertical
+        const horizontal = Math.random() < 0.5;
+
+        if (horizontal) {
+          // Horizontal wall — must have height >= 3
+          if (height < 3) return;
+
+          // Randomly place wall (leave at least 1 row gap from edges)
+          const wallY = y + 1 + Math.floor(Math.random() * (height - 2));
+          // Random passage position
+          const passageX = x + Math.floor(Math.random() * width);
+
+          // Draw wall (except at passage)
+          for (let wx = x; wx < x + width; wx++) {
+            // Skip passage
+            if (wx === passageX) continue;
+            // Don't overwrite start/end area margins
+            if (state.startY >= y && state.startY <= y + height - 1 &&
+                Math.abs(wx - state.startX) < margin) continue;
+            if (state.endY >= y && state.endY <= y + height - 1 &&
+                Math.abs(wx - state.endX) < margin) continue;
+
+            // Only draw in middle rows (not border)
+            if (wallY > y && wallY < y + height - 1) {
+              state.grid[wallY][wx] = WALL;
+            }
+          }
+
+          // Recurse on top and bottom regions (excluding wall row)
+          const newHeight = wallY - y;
+          recursiveDivide(x, y, width, newHeight);
+
+          const remainingHeight = (y + height - 1) - wallY;
+          recursiveDivide(x, wallY + 1, width, remainingHeight);
+
+        } else {
+          // Vertical wall — must have width >= 3
+          if (width < 3) return;
+
+          // Randomly place wall (leave at least 1 column gap from edges)
+          const wallX = x + 1 + Math.floor(Math.random() * (width - 2));
+          // Random passage position
+          const passageY = y + Math.floor(Math.random() * height);
+
+          // Draw wall (except at passage)
+          for (let wy = y; wy < y + height; wy++) {
+            // Skip passage
+            if (wy === passageY) continue;
+            // Don't overwrite start/end area margins
+            if (state.startX >= x && state.startX <= x + width - 1 &&
+                Math.abs(wy - state.startY) < margin) continue;
+            if (state.endX >= x && state.endX <= x + width - 1 &&
+                Math.abs(wy - state.endY) < margin) continue;
+
+            // Only draw in middle columns (not border)
+            if (wallX > x && wallX < x + width - 1) {
+              state.grid[wy][wallX] = WALL;
+            }
+          }
+
+          // Recurse on left and right regions (excluding wall column)
+          const newWidth = wallX - x;
+          recursiveDivide(x, y, newWidth, height);
+
+          const remainingWidth = (x + width - 1) - wallX;
+          recursiveDivide(wallX + 1, y, remainingWidth, height);
+        }
+      }
+
+      // Start recursive division (leave 1-cell border)
+      recursiveDivide(1, 1, COLS - 2, ROWS - 2);
+
+      // Reset algorithm state
+      astarReset();
+      render();
+      updateStats();
+    }
+
+    // ================================================================
+    // JS — clear functions
+    //
+    // CLEAR PATH: Resets only algorithm state (open/closed sets, stats)
+    // while preserving all walls, weights, and start/end positions.
+    //
+    // CLEAR ALL: Completely resets grid to empty state. Re-initializes
+    // start/end at default positions and clears all algorithm state.
+    // ================================================================
+    function clearPath() {
+      if (state.isVisualizing) {
+        state.isVisualizing = false;
+        cancelAnimationFrame(state.animationId);
+      }
+
+      state.openSet = new MinHeap();
+      state.closedSet.clear();
+      state.path = [];
+      state.steps = 0;
+      state.cellsVisited = 0;
+      state.pathLength = null;
+      state.elapsedMs = 0;
+
+      // Re-render to show grid without algorithm overlays
+      render();
+      updateStats();
+
+      state.message = 'Path cleared — ready to visualize';
+      state.messageType = '';
+      updateMessage();
+    }
+
+    function clearAll() {
+      if (state.isVisualizing) {
+        state.isVisualizing = false;
+        cancelAnimationFrame(state.animationId);
+      }
+
+      initGrid();
+
+      state.openSet = new MinHeap();
+      state.closedSet.clear();
+      state.path = [];
+      state.steps = 0;
+      state.cellsVisited = 0;
+      state.pathLength = null;
+      state.elapsedMs = 0;
+
+      render();
+      updateStats();
+
+      state.message = 'Grid cleared — ready to visualize';
+      state.messageType = '';
+      updateMessage();
+    }
+
+    // ================================================================
+    // JS — interaction handling
+    //
+    // DRAWING WALLS: Left-click-drag draws walls (impassable cells).
+    //
+    // ERASING: Right-click-drag erases walls back to empty.
+    //
+    // DRAGGING NODES: Start (green) and End (red) nodes can be
+    // repositioned by dragging. The node follows the cursor, and
+    // is placed on mouse-up.
+    //
+    // SHIFT + DRAW: Creates weighted terrain (cost = 5) instead
+    // of walls. Visually distinct sand-color to indicate cost.
+    //
+    // CANVAS COORDINATE MAPPING: We calculate which grid cell
+    // corresponds to the mouse position using canvas dimensions.
+    // The canvas fills its container responsively, so we use
+    // getBoundingClientRect() to convert mouse coordinates correctly.
+    //
+    // OVERLAP HANDLING: If user clicks on start/end node area,
+    // we initiate drag mode instead of drawing. The algorithm
+    // state is reset when nodes are moved to ensure valid path.
+    //
+    // INTERRUPTING VISUALIZATION: Any user interaction during
+    // visualization (drawing, dragging) halts the animation and
+    // clears path state. This lets users modify the grid without
+    // stale visualization results.
+    // ================================================================
+    function canvasCoords(e) {
+      const canvas = document.getElementById('grid');
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const x = Math.floor((e.clientX - rect.left) * scaleX / (canvas.width / COLS));
+      const y = Math.floor((e.clientY - rect.top) * scaleY / (canvas.height / ROWS));
+
+      return { x, y };
+    }
+
+    function handleCanvasMouseDown(e) {
+      e.preventDefault();
+
+      // Stop any running visualization
+      if (state.isVisualizing) {
+        state.isVisualizing = false;
+        cancelAnimationFrame(state.animationId);
+      }
+
+      const { x, y } = canvasCoords(e);
+
+      // Check if clicking on start or end node
+      const isStart = (x === state.startX && y === state.startY);
+      const isEnd = (x === state.endX && y === state.endY);
+
+      if (isStart) {
+        state.isDragging = true;
+        state.dragType = 'start';
+      } else if (isEnd) {
+        state.isDragging = true;
+        state.dragType = 'end';
+      } else {
+        // Start drawing (left-click = wall, right-click = erase)
+        state.isDrawing = true;
+        state.drawMode = (e.button === 2 || e.ctrlKey) ? 'erase' : 'wall';
+        applyDraw(x, y);
+      }
+    }
+
+    function handleCanvasMouseMove(e) {
+      if (state.isDragging) {
+        // Drag node — will finalize on mouseup
+        return;
+      }
+
+      if (state.isDrawing) {
+        const { x, y } = canvasCoords(e);
+        applyDraw(x, y);
+      }
+    }
+
+    function handleCanvasMouseUp(e) {
+      if (state.isDragging && state.dragType !== null) {
+        // Finalize node drag
+        const { x, y } = canvasCoords(e);
+
+        if (state.dragType === 'start') {
+          // Don't allow placing start on end or wall
+          if (x !== state.endX || y !== state.endY) {
+            if (state.grid[y][x] !== WALL) {
+              state.startX = x;
+              state.startY = y;
+            }
+          }
+        } else if (state.dragType === 'end') {
+          // Don't allow placing end on start or wall
+          if (x !== state.startX || y !== state.startY) {
+            if (state.grid[y][x] !== WALL) {
+              state.endX = x;
+              state.endY = y;
+            }
+          }
+        }
+
+        // Clear path when nodes are moved
+        clearPath();
+      }
+
+      state.isDragging = false;
+      state.dragType = null;
+      state.isDrawing = false;
+    }
+
+    function applyDraw(x, y) {
+      // Bounds check
+      if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return;
+
+      // Don't draw over start/end nodes
+      if (x === state.startX && y === state.startY) return;
+      if (x === state.endX && y === state.endY) return;
+
+      // Set cell type based on draw mode and shift key
+      if (state.drawMode === 'erase') {
+        state.grid[y][x] = EMPTY;
+      } else if (state.shiftHeld) {
+        // Shift + draw: weighted terrain
+        state.grid[y][x] = WEIGHT;
+      } else {
+        // Normal draw: wall
+        state.grid[y][x] = WALL;
+      }
+
+      render();
+    }
+
+    // ================================================================
+    // JS — events (event delegation)
+    //
+    // Button actions mapped via data-action attributes:
+    // - visualize: Run A* algorithm with animation
+    // - clearPath: Reset only path/algorithm state (keep grid)
+    // - clearAll: Clear entire grid to empty
+    // - randomMaze: Generate randomized maze via recursive division
+    //
+    // Keyboard modifier tracking:
+    // - Shift key for weighted terrain drawing (data-shift-held)
+    //
+    // Slider binding via data-bind="speed" updates state.speed directly.
+    // ================================================================
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-action]');
+      if (!el) return;
+
+      const action = el.dataset.action;
+      switch (action) {
+        case 'visualize':
+          if (!state.isVisualizing) startVisualization();
+          break;
+        case 'clearPath':
+          clearPath();
+          break;
+        case 'clearAll':
+          clearAll();
+          break;
+        case 'randomMaze':
+          generateRandomMaze();
+          state.message = 'Random maze generated — click Visualize!';
+          state.messageType = '';
+          updateMessage();
+          break;
+      }
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      const canvas = e.target.closest('#grid');
+      if (!canvas) return;
+      handleCanvasMouseDown(e);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      const canvas = e.target.closest('#grid');
+      if (!canvas || !state.isDrawing) return;
+      handleCanvasMouseMove(e);
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (state.isDrawing || state.isDragging) {
+        handleCanvasMouseUp(e);
+      }
+    });
+
+    document.addEventListener('mouseleave', (e) => {
+      // Stop drawing when mouse leaves canvas
+      if (state.isDrawing || state.isDragging) {
+        handleCanvasMouseUp(e);
+      }
+    });
+
+    document.addEventListener('contextmenu', (e) => {
+      // Prevent context menu on canvas
+      const canvas = e.target.closest('#grid');
+      if (canvas) {
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Shift') state.shiftHeld = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Shift') state.shiftHeld = false;
+    });
+
+    document.addEventListener('input', (e) => {
+      const el = e.target.closest('[data-bind]');
+      if (!el) return;
+      state[el.dataset.bind] = parseInt(el.value, 10);
+    });
+
+    // ================================================================
+    // JS — init (first render after DOM ready)
+    //
+    // Initialize grid, reset algorithm state, and render initial frame.
+    // The canvas is ready to accept user interaction immediately.
+    // ================================================================
+    function init() {
+      initGrid();
+      astarReset();
+      render();
+      updateStats();
+      updateMessage();
+    }
+
+    init();
+  </script>
+</body>
+</html>

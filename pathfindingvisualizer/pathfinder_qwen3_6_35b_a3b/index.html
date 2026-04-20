@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A* Pathfinding Visualizer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-tertiary: #16213e;
+    --bg-card: #1e1e36;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #6366f1;
+    --accent-hover: #818cf8;
+    --accent-glow: rgba(99, 102, 241, 0.3);
+    --border: #2d2d44;
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --info: #60a5fa;
+    --wall: #2d2d44;
+    --weighted: #c9a96e;
+    --open: #3b82f6;
+    --closed: #1e40af;
+    --path: #f59e0b;
+    --cell-size: 28px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 12px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--info));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin-top: 4px;
+  }
+
+  .main-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 16px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* Canvas wrapper for responsive sizing */
+  .canvas-wrapper {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* No-path overlay */
+  .no-path-msg {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 16px 28px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    pointer-events: none;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    animation: pulse-fade 2s ease-in-out infinite;
+  }
+
+  .no-path-msg.visible { display: block; }
+
+  @keyframes pulse-fade {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+
+  /* Controls bar */
+  .controls {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .btn {
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .btn:hover { background: var(--border); border-color: var(--text-muted); }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  .btn-danger {
+    background: transparent;
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .btn-danger:hover { background: rgba(248,113,113,0.1); }
+
+  /* Speed slider */
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+  }
+
+  .slider-group label {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .slider-group input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+  }
+
+  .slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px var(--accent-glow);
+  }
+
+  .slider-group input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px var(--accent-glow);
+  }
+
+  .speed-val {
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  /* Stats panel */
+  .stats {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Legend */
+  .legend {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    padding: 8px 16px 0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+  }
+
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
+
+  /* Keyboard hint */
+  .hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 4px 0 0;
+  }
+
+  .hint kbd {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: inherit;
+    font-size: 0.68rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>A* Pathfinding Visualizer</h1>
+  <p>Interactive A* search with real-time animation — left-click to draw walls, right-click to erase, Shift+draw for weighted terrain</p>
+</header>
+
+<div class="main-container">
+  <div class="canvas-wrapper">
+    <canvas id="gridCanvas"></canvas>
+    <div class="no-path-msg" id="noPathMsg">No path exists between start and end nodes.</div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-primary" id="btnVisualize">▶ Visualize</button>
+    <div class="slider-group">
+      <label for="speedSlider">Speed</label>
+      <input type="range" id="speedSlider" min="1" max="20" value="5">
+      <span class="speed-val" id="speedVal">5</span>
+    </div>
+    <button class="btn" id="btnClearPath">Clear Path</button>
+    <button class="btn btn-danger" id="btnClearAll">Clear All</button>
+    <button class="btn" id="btnMaze">Random Maze</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-item">
+      <span class="stat-label">Steps</span>
+      <span class="stat-value" id="statSteps">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Cells Visited</span>
+      <span class="stat-value" id="statVisited">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Path Cost</span>
+      <span class="stat-value" id="statCost">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Time</span>
+      <span class="stat-value" id="statTime">0 ms</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:#4ade80"></span>Start</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#f87171"></span>End</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#2d2d44"></span>Wall</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#c9a96e"></span>Weighted</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#3b82f6"></span>Open</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#1e40af"></span>Closed</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#f59e0b"></span>Path</div>
+  </div>
+
+  <p class="hint">
+    <kbd>Left-drag</kbd> Draw walls &nbsp;·&nbsp;
+    <kbd>Right-drag</kbd> Erase &nbsp;·&nbsp;
+    <kbd>Shift+drag</kbd> Weighted terrain &nbsp;·&nbsp;
+    Drag start/end nodes to reposition
+  </p>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─────────────────────────────────────────────
+  // CONSTANTS
+  // ─────────────────────────────────────────────
+  const COLS = 30;
+  const ROWS = 20;
+
+  // Cell type identifiers
+  const EMPTY = 0;
+  const WALL = 1;
+  const START = 2;
+  const END_NODE = 3;
+  const WEIGHTED = 4;
+
+  // Algorithm visualization states (overlay on top of cell type)
+  const VIS_EMPTY = 0;
+  const VIS_OPEN = 1;
+  const VIS_CLOSED = 2;
+  const VIS_PATH = 3;
+
+  // Cell weights for path cost calculation
+  const WEIGHT_EMPTY = 1;
+  const WEIGHT_WEIGHTED = 5;
+
+  // ─────────────────────────────────────────────
+  // MIN-HEAP PRIORITY QUEUE
+  // ─────────────────────────────────────────────
+  // A* requires efficiently retrieving the node with the lowest f-score.
+  // A binary min-heap gives O(log n) insert and extract-min operations,
+  // which is critical for performance on larger grids.
+  // f-score = g-score (actual cost from start) + h-score (heuristic estimate to goal).
+  // The heap orders nodes by f-score so A* always expands the most promising node first.
+  class MinHeap {
+    constructor() {
+      this.heap = [];
+    }
+
+    get size() { return this.heap.length; }
+
+    get isEmpty() { return this.heap.length === 0; }
+
+    // Peek at the node with the lowest f-score without removing it.
+    peek() { return this.heap[0]; }
+
+    // Insert a node and restore the heap property by bubbling up.
+    push(node) {
+      this.heap.push(node);
+      this._bubbleUp(this.heap.length - 1);
+    }
+
+    // Remove and return the node with the lowest f-score.
+    // After removal, restore the heap property by bubbling down.
+    pop() {
+      if (this.isEmpty) return null;
+      const top = this.heap[0];
+      const last = this.heap.pop();
+      if (this.heap.length > 0) {
+        this.heap[0] = last;
+        this._bubbleDown(0);
+      }
+      return top;
+    }
+
+    // Remove a specific node by reference (used when updating f-scores).
+    remove(node) {
+      const idx = this.heap.indexOf(node);
+      if (idx === -1) return;
+      const last = this.heap.pop();
+      if (idx === this.heap.length) return; // was the last element
+      this.heap[idx] = last;
+      this._bubbleUp(idx);
+      this._bubbleDown(idx);
+    }
+
+    // Check if a node is in the heap (needed for efficient open-set lookups).
+    // Compares by (col, row) identity rather than object reference.
+    has(node) {
+      return this.heap.some(n => n.col === node.col && n.row === node.row);
+    }
+
+    // Restore heap property upward after insertion or update.
+    _bubbleUp(idx) {
+      while (idx > 0) {
+        const parentIdx = (idx - 1) >> 1;
+        const parent = this.heap[parentIdx];
+        if (this.heap[idx].f >= parent.f) break;
+        [this.heap[idx], this.heap[parentIdx]] = [this.heap[parentIdx], this.heap[idx]];
+        idx = parentIdx;
+      }
+    }
+
+    // Restore heap property downward after removal.
+    _bubbleDown(idx) {
+      const len = this.heap.length;
+      while (true) {
+        let smallest = idx;
+        const left = 2 * idx + 1;
+        const right = 2 * idx + 2;
+        if (left < len && this.heap[left].f < this.heap[smallest].f) smallest = left;
+        if (right < len && this.heap[right].f < this.heap[smallest].f) smallest = right;
+        if (smallest === idx) break;
+        [this.heap[idx], this.heap[smallest]] = [this.heap[smallest], this.heap[idx]];
+        idx = smallest;
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // GRID MODULE
+  // ─────────────────────────────────────────────
+  // Manages the 2D grid: cell creation, wall/weighted placement,
+  // and random maze generation via recursive division.
+  const Grid = {
+    // Create a fresh grid with all empty cells
+    create() {
+      const grid = [];
+      for (let r = 0; r < ROWS; r++) {
+        const row = [];
+        for (let c = 0; c < COLS; c++) {
+          row.push({ type: EMPTY, vis: VIS_EMPTY });
+        }
+        grid.push(row);
+      }
+      return grid;
+    },
+
+    // Set a cell to wall type
+    setWall(grid, col, row) {
+      if (this._inBounds(col, row) && grid[row][col].type !== START && grid[row][col].type !== END_NODE) {
+        grid[row][col].type = WALL;
+        grid[row][col].vis = VIS_EMPTY;
+      }
+    },
+
+    // Set a cell to weighted terrain
+    setWeighted(grid, col, row) {
+      if (this._inBounds(col, row) && grid[row][col].type !== START && grid[row][col].type !== END_NODE) {
+        grid[row][col].type = WEIGHTED;
+        grid[row][col].vis = VIS_EMPTY;
+      }
+    },
+
+    // Erase a cell back to empty
+    erase(grid, col, row) {
+      if (this._inBounds(col, row)) {
+        const cell = grid[row][col];
+        if (cell.type !== START && cell.type !== END_NODE) {
+          cell.type = EMPTY;
+          cell.vis = VIS_EMPTY;
+        }
+      }
+    },
+
+    // Check if coordinates are within grid bounds
+    _inBounds(col, row) {
+      return col >= 0 && col < COLS && row >= 0 && row < ROWS;
+    },
+
+    // Get cell weight for path cost calculation.
+    // A* uses this to determine the actual traversal cost of entering a cell.
+    getWeight(grid, col, row) {
+      if (!this._inBounds(col, row)) return Infinity;
+      const cell = grid[row][col];
+      if (cell.type === WALL) return Infinity; // impassable
+      if (cell.type === WEIGHTED) return WEIGHT_WEIGHTED;
+      return WEIGHT_EMPTY;
+    },
+
+    // Generate a random maze using the recursive division algorithm.
+    // The algorithm works by recursively carving passages through walls:
+    // 1. Start with a fully-walled grid.
+    // 2. Pick a region, carve a horizontal and vertical wall through it.
+    // 3. Leave a random gap in each wall for passage.
+    // 4. Recurse on the sub-regions created by the walls.
+    // This produces a perfect maze (no loops, all cells reachable).
+    randomMaze() {
+      // Fill grid with walls first
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          state.grid[r][c].type = WALL;
+          state.grid[r][c].vis = VIS_EMPTY;
+        }
+      }
+
+      // Recursive division: carve passages through wall regions
+      const divide = (minCol, maxCol, minRow, maxRow, isHorizontal, depth) => {
+        const width = maxCol - minCol + 1;
+        const height = maxRow - minRow + 1;
+
+        // Base case: region too small to divide
+        if (width < 3 || height < 3) return;
+        if (depth <= 0) return;
+
+        if (isHorizontal && height >= 3) {
+          // Carve a horizontal wall with a gap
+          const wallRow = minRow + Math.floor(Math.random() * height);
+          const gapCol = minCol + Math.floor(Math.random() * width);
+
+          for (let c = minCol; c <= maxCol; c++) {
+            if (c !== gapCol) {
+              state.grid[wallRow][c].type = WALL;
+              state.grid[wallRow][c].vis = VIS_EMPTY;
+            }
+          }
+
+          // Recurse on top and bottom sub-regions
+          divide(minCol, maxCol, minRow, wallRow - 1, true, depth - 1);
+          divide(minCol, maxCol, wallRow + 1, maxRow, true, depth - 1);
+        } else if (!isHorizontal && width >= 3) {
+          // Carve a vertical wall with a gap
+          const wallCol = minCol + Math.floor(Math.random() * width);
+          const gapRow = minRow + Math.floor(Math.random() * height);
+
+          for (let r = minRow; r <= maxRow; r++) {
+            if (r !== gapRow) {
+              state.grid[r][wallCol].type = WALL;
+              state.grid[r][wallCol].vis = VIS_EMPTY;
+            }
+          }
+
+          // Recurse on left and right sub-regions
+          divide(minCol, wallCol - 1, minRow, maxRow, false, depth - 1);
+          divide(wallCol + 1, maxCol, minRow, maxRow, false, depth - 1);
+        }
+      };
+
+      // Start with the full grid, alternating orientation each level
+      divide(0, COLS - 1, 0, ROWS - 1, Math.random() > 0.5, 6);
+
+      // Ensure start and end cells are cleared
+      state.grid[state.start.row][state.start.col].type = START;
+      state.grid[state.end.row][state.end.col].type = END_NODE;
+    },
+
+    // Reset algorithm visualization states (keeps walls/weights intact)
+    clearVis(grid) {
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          grid[r][c].vis = VIS_EMPTY;
+        }
+      }
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // HEURISTIC MODULE
+  // ─────────────────────────────────────────────
+  // Manhattan distance is used as the heuristic because diagonal movement
+  // is not allowed. It provides an admissible heuristic (never overestimates)
+  // for 4-directional grid movement, guaranteeing A* finds the optimal path.
+  // h(n) = |col_n - col_goal| + |row_n - row_goal|
+  const Heuristic = {
+    manhattan(col1, row1, col2, row2) {
+      return Math.abs(col1 - col2) + Math.abs(row1 - row2);
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // A* ALGORITHM MODULE
+  // ─────────────────────────────────────────────
+  // A* finds the shortest path by combining:
+  //   g(n) = actual cost from start to node n (tracked via cameFrom map)
+  //   h(n) = estimated cost from n to goal (Manhattan distance heuristic)
+  //   f(n) = g(n) + h(n) = total estimated cost through n
+  //
+  // The algorithm expands nodes in order of increasing f-score. This greedy
+  // approach, combined with the admissible heuristic, guarantees optimality:
+  // the first time we reach the goal, it is via the shortest possible path.
+  //
+  // Animation support: instead of running the full algorithm at once,
+  // we expose a `step()` method that processes one iteration of the main
+  // loop. The renderer calls this repeatedly to animate the search.
+  const Algorithm = {
+    // Initialize algorithm state for a new search
+    init(grid, startCol, startRow, endCol, endRow) {
+      const openSet = new MinHeap();
+      const key = (c, r) => r * COLS + c;
+
+      // g-score: actual cost from start to each node (Infinity = unvisited)
+      const gScore = new Map();
+      // f-score: g-score + heuristic estimate to goal
+      const fScore = new Map();
+      // cameFrom: for reconstructing the final path
+      const cameFrom = new Map();
+
+      const startKey = key(startCol, startRow);
+      gScore.set(startKey, 0);
+      const hStart = Heuristic.manhattan(startCol, startRow, endCol, endRow);
+      fScore.set(startKey, hStart);
+
+      // Create the start node and push it onto the open-set priority queue.
+      // A* always explores the node with the lowest f-score first, ensuring
+      // the search prioritizes cells that are both close to the start and
+      // estimated to be close to the goal.
+      const startNode = { col: startCol, row: startRow, f: hStart, g: 0 };
+      openSet.push(startNode);
+
+      // Mark start cell as visited so it won't be re-added to the open set.
+      // The end cell must NOT be marked closed here — it needs to be discoverable
+      // as a neighbor of other cells during the search.
+      grid[startRow][startCol].vis = VIS_CLOSED;
+
+      return { openSet, gScore, fScore, cameFrom, endCol, endRow, key };
+    },
+
+    // Execute one step of the A* algorithm.
+    // Returns 'running' if more steps are needed, 'done' if path found, 'none' if no path.
+    step(grid, state) {
+      const { openSet, gScore, fScore, cameFrom, endCol, endRow, key } = state;
+
+      // If open set is empty, no path exists
+      if (openSet.isEmpty) {
+        return { result: 'none', algorithmState: state };
+      }
+
+      // Pop the node with the lowest f-score from the priority queue.
+      // This is the core of A*'s greedy search: always expand the node
+      // that appears most promising based on current knowledge.
+      const current = openSet.pop();
+
+      // Check if we've reached the goal
+      if (current.col === endCol && current.row === endRow) {
+        // Reconstruct the shortest path by backtracking through cameFrom.
+        // Each node in the path points to its predecessor with the lowest
+        // total cost, so following these links from goal to start gives
+        // the optimal path in reverse order.
+        const path = [];
+        let nodeKey = key(endCol, endRow);
+        while (nodeKey !== undefined && cameFrom.has(nodeKey)) {
+          const c = nodeKey % COLS;
+          const r = Math.floor(nodeKey / COLS);
+          path.push({ col: c, row: r });
+          nodeKey = cameFrom.get(nodeKey);
+        }
+        // Mark path cells for visualization
+        for (const p of path) {
+          grid[p.row][p.col].vis = VIS_PATH;
+        }
+        return { result: 'done', algorithmState: state, path };
+      }
+
+      // Mark current node as closed (visited/explored)
+      grid[current.row][current.col].vis = VIS_CLOSED;
+
+      // Explore neighbors in 4 cardinal directions (no diagonal movement).
+      // For each neighbor, we calculate the tentative g-score (cost to reach
+      // it through the current node). If this is better than any previously
+      // found path to that neighbor, we update its scores and add it to the
+      // open set for future exploration.
+      const neighbors = [
+        { col: current.col, row: current.row - 1 }, // up
+        { col: current.col, row: current.row + 1 }, // down
+        { col: current.col - 1, row: current.row }, // left
+        { col: current.col + 1, row: current.row }, // right
+      ];
+
+      for (const neighbor of neighbors) {
+        if (!Grid._inBounds(neighbor.col, neighbor.row)) continue;
+
+        const nKey = key(neighbor.col, neighbor.row);
+        const wallWeight = Grid.getWeight(grid, neighbor.col, neighbor.row);
+        if (wallWeight === Infinity) continue; // skip walls
+
+        const tentativeG = gScore.get(key(current.col, current.row)) + wallWeight;
+
+        // If neighbor is already in closed set, skip it (already optimally explored)
+        if (grid[neighbor.row][neighbor.col].vis === VIS_CLOSED) continue;
+
+        const existingG = gScore.get(nKey);
+        // Update if this is a better path or the neighbor hasn't been seen yet
+        if (existingG === undefined || tentativeG < existingG) {
+          cameFrom.set(nKey, key(current.col, current.row));
+          gScore.set(nKey, tentativeG);
+
+          const h = Heuristic.manhattan(neighbor.col, neighbor.row, endCol, endRow);
+          const f = tentativeG + h;
+
+          // If neighbor is already in open set, update its f-score
+          if (openSet.has({ col: neighbor.col, row: neighbor.row })) {
+            // Rebuild heap entry with updated f-score
+            const existingNode = openSet.heap.find(n => n.col === neighbor.col && n.row === neighbor.row);
+            if (existingNode) {
+              existingNode.f = f;
+              existingNode.g = tentativeG;
+              // Re-heapify to maintain order
+              openSet._bubbleUp(openSet.heap.indexOf(existingNode));
+            }
+          } else {
+            // Add new neighbor to open set with its f-score as priority
+            openSet.push({ col: neighbor.col, row: neighbor.row, f, g: tentativeG });
+          }
+
+          // Mark as open for visualization
+          grid[neighbor.row][neighbor.col].vis = VIS_OPEN;
+        }
+      }
+
+      return { result: 'running', algorithmState: state };
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // RENDERER MODULE
+  // ─────────────────────────────────────────────
+  // Handles all Canvas drawing: cells, start/end nodes, and algorithm
+  // visualization states. Uses the cell size calculated from the container
+  // width to keep the canvas responsive.
+  const Renderer = {
+    canvas: null,
+    ctx: null,
+    cellSize: 0,
+    gridOffsetX: 0,
+    gridOffsetY: 0,
+
+    init(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d');
+      this._resize();
+      window.addEventListener('resize', () => this._resize());
+    },
+
+    // Recalculate cell size and canvas dimensions based on container width
+    _resize() {
+      const wrapper = this.canvas.parentElement;
+      const containerWidth = wrapper.clientWidth;
+      const availableHeight = Math.min(containerWidth * (ROWS / COLS), window.innerHeight * 0.55);
+
+      this.cellSize = Math.floor(containerWidth / COLS);
+      // Ensure cells are at least 12px and at most 40px
+      this.cellSize = Math.max(12, Math.min(40, this.cellSize));
+
+      const canvasWidth = this.cellSize * COLS;
+      const canvasHeight = this.cellSize * ROWS;
+
+      // Handle high-DPI displays for crisp rendering
+      const dpr = window.devicePixelRatio || 1;
+      this.canvas.width = canvasWidth * dpr;
+      this.canvas.height = canvasHeight * dpr;
+      this.canvas.style.width = canvasWidth + 'px';
+      this.canvas.style.height = canvasHeight + 'px';
+
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.gridOffsetX = 0;
+      this.gridOffsetY = 0;
+    },
+
+    // Draw the entire grid with current state
+    draw(grid, state) {
+      const ctx = this.ctx;
+      const cs = this.cellSize;
+
+      ctx.clearRect(0, 0, COLS * cs, ROWS * cs);
+
+      // Draw grid cells
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = grid[r][c];
+          this._drawCell(ctx, c, r, cs, cell);
+        }
+      }
+
+      // Draw grid lines (subtle)
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 0.5;
+      for (let c = 0; c <= COLS; c++) {
+        ctx.beginPath();
+        ctx.moveTo(c * cs, 0);
+        ctx.lineTo(c * cs, ROWS * cs);
+        ctx.stroke();
+      }
+      for (let r = 0; r <= ROWS; r++) {
+        ctx.beginPath();
+        ctx.moveTo(0, r * cs);
+        ctx.lineTo(COLS * cs, r * cs);
+        ctx.stroke();
+      }
+
+      // Draw start and end labels
+      ctx.font = `bold ${Math.max(8, cs * 0.55)}px -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Start label
+      ctx.fillStyle = '#fff';
+      ctx.fillText('S', state.start.col * cs + cs / 2, state.start.row * cs + cs / 2);
+
+      // End label
+      ctx.fillText('E', state.end.col * cs + cs / 2, state.end.row * cs + cs / 2);
+    },
+
+    // Draw a single cell based on its type and visualization state
+    _drawCell(ctx, col, row, cs, cell) {
+      const x = col * cs;
+      const y = row * cs;
+      const gap = 1; // gap between cells for visual separation
+
+      let fillColor;
+
+      // Visualization state takes priority over cell type
+      switch (cell.vis) {
+        case VIS_OPEN:
+          fillColor = '#3b82f6'; // blue — frontier
+          break;
+        case VIS_CLOSED:
+          fillColor = '#1e40af'; // dark blue — visited
+          break;
+        case VIS_PATH:
+          fillColor = '#f59e0b'; // gold — final path
+          break;
+        default:
+          switch (cell.type) {
+            case WALL:
+              fillColor = '#2d2d44';
+              break;
+            case START:
+              fillColor = '#4ade80';
+              break;
+            case END_NODE:
+              fillColor = '#f87171';
+              break;
+            case WEIGHTED:
+              fillColor = '#c9a96e';
+              break;
+            default:
+              fillColor = '#1a1a2e'; // empty
+          }
+      }
+
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(x + gap, y + gap, cs - gap * 2, cs - gap * 2);
+
+      // Add subtle border for walls and weighted cells
+      if (cell.type === WALL || cell.type === WEIGHTED) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(x + gap, y + gap, cs - gap * 2, cs - gap * 2);
+      }
+
+      // Add subtle glow effect for path cells
+      if (cell.vis === VIS_PATH) {
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = cs * 0.3;
+        ctx.fillStyle = fillColor;
+        ctx.fillRect(x + gap, y + gap, cs - gap * 2, cs - gap * 2);
+        ctx.shadowBlur = 0;
+      }
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // UI / STATE MODULE
+  // ─────────────────────────────────────────────
+  // Central state object and UI event handlers. All mutable state lives here
+  // to avoid global variable pollution. The state object is the single source
+  // of truth for the application's current configuration and algorithm state.
+  const state = {
+    grid: Grid.create(),
+    start: { col: 3, row: Math.floor(ROWS / 2) },
+    end: { col: COLS - 4, row: Math.floor(ROWS / 2) },
+    algorithmState: null, // null when idle, object when running
+    animFrameId: null,
+    isRunning: false,
+    stepsPerFrame: 5,
+    totalSteps: 0,
+    cellsVisited: 0,
+    pathCost: 0,
+    startTime: 0,
+    elapsedTime: 0,
+    noPathMessage: null,
+    // Drag state for mouse interactions
+    dragState: null, // { type: 'draw'|'erase'|'weighted'|'start'|'end', col, row }
+  };
+
+  // DOM element references
+  const $ = (sel) => document.querySelector(sel);
+  const canvas = $('#gridCanvas');
+  const btnVisualize = $('#btnVisualize');
+  const speedSlider = $('#speedSlider');
+  const speedVal = $('#speedVal');
+  const btnClearPath = $('#btnClearPath');
+  const btnClearAll = $('#btnClearAll');
+  const btnMaze = $('#btnMaze');
+  const statSteps = $('#statSteps');
+  const statVisited = $('#statVisited');
+  const statCost = $('#statCost');
+  const statTime = $('#statTime');
+  const noPathMsg = $('#noPathMsg');
+
+  // Initialize renderer
+  Renderer.init(canvas);
+
+  // ─────────────────────────────────────────────
+  // MOUSE / TOUCH INTERACTION
+  // ─────────────────────────────────────────────
+  function getCellFromEvent(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const col = Math.floor(x / Renderer.cellSize);
+    const row = Math.floor(y / Renderer.cellSize);
+    return { col, row };
+  }
+
+  function isOnStart(col, row) {
+    return col === state.start.col && row === state.start.row;
+  }
+
+  function isOnEnd(col, row) {
+    return col === state.end.col && row === state.end.row;
+  }
+
+  function handleCellAction(col, row) {
+    if (!Grid._inBounds(col, row)) return;
+
+    // Don't allow drawing on start/end
+    if (isOnStart(col, row) || isOnEnd(col, row)) return;
+
+    const cell = state.grid[row][col];
+
+    if (state.dragState.type === 'draw') {
+      // Left-click drag: draw walls (skip if already wall)
+      if (cell.type !== WALL && cell.type !== WEIGHTED) {
+        cell.type = WALL;
+        cell.vis = VIS_EMPTY;
+      }
+    } else if (state.dragState.type === 'erase') {
+      // Right-click drag: erase walls (skip start/end)
+      if (cell.type !== START && cell.type !== END_NODE) {
+        cell.type = EMPTY;
+        cell.vis = VIS_EMPTY;
+      }
+    } else if (state.dragState.type === 'weighted') {
+      // Shift+drag: create weighted terrain
+      if (cell.type !== WALL && cell.type !== WEIGHTED) {
+        cell.type = WEIGHTED;
+        cell.vis = VIS_EMPTY;
+      }
+    }
+
+    Renderer.draw(state.grid, state);
+  }
+
+  function handleDragStart(col, row) {
+    if (isOnStart(col, row)) {
+      state.dragState = { type: 'start', col, row };
+      canvas.style.cursor = 'grabbing';
+    } else if (isOnEnd(col, row)) {
+      state.dragState = { type: 'end', col, row };
+      canvas.style.cursor = 'grabbing';
+    } else if (state.dragState && state.dragState.type !== 'draw' && state.dragState.type !== 'erase' && state.dragState.type !== 'weighted') {
+      // Continue previous drag action
+    } else {
+      // Default: left-click draws walls
+      state.dragState = { type: 'draw', col, row };
+    }
+  }
+
+  function handleDragMove(col, row) {
+    if (!state.dragState) return;
+
+    if (state.dragState.type === 'start' || state.dragState.type === 'end') {
+      // Reposition start or end node
+      if (Grid._inBounds(col, row) && !isOnStart(col, row) && !isOnEnd(col, row)) {
+        const cell = state.grid[row][col];
+        if (cell.type === WALL || cell.type === WEIGHTED) {
+          // Clear the cell where the node is being placed
+          cell.type = EMPTY;
+          cell.vis = VIS_EMPTY;
+        }
+
+        if (state.dragState.type === 'start') {
+          // Clear old start position
+          state.grid[state.start.row][state.start.col].type = EMPTY;
+          state.grid[state.start.row][state.start.col].vis = VIS_EMPTY;
+          state.start.col = col;
+          state.start.row = row;
+          state.grid[row][col].type = START;
+        } else {
+          // Clear old end position
+          state.grid[state.end.row][state.end.col].type = EMPTY;
+          state.grid[state.end.row][state.end.col].vis = VIS_EMPTY;
+          state.end.col = col;
+          state.end.row = row;
+          state.grid[row][col].type = END_NODE;
+        }
+      }
+    } else {
+      handleCellAction(col, row);
+    }
+  }
+
+  function handleDragEnd() {
+    state.dragState = null;
+    canvas.style.cursor = 'crosshair';
+  }
+
+  // Mouse event handlers
+  canvas.addEventListener('mousedown', (e) => {
+    if (state.isRunning) return;
+    e.preventDefault();
+    const { col, row } = getCellFromEvent(e);
+    handleDragStart(col, row);
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!state.dragState || state.isRunning) return;
+    const { col, row } = getCellFromEvent(e);
+    handleDragMove(col, row);
+  });
+
+  canvas.addEventListener('mouseup', handleDragEnd);
+  canvas.addEventListener('mouseleave', handleDragEnd);
+
+  // Touch event handlers (for mobile/tablet support)
+  canvas.addEventListener('touchstart', (e) => {
+    if (state.isRunning) return;
+    e.preventDefault();
+    const { col, row } = getCellFromEvent(e);
+    // On touch, default to drawing walls
+    state.dragState = { type: 'draw', col, row };
+  });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (!state.dragState || state.isRunning) return;
+    e.preventDefault();
+    const { col, row } = getCellFromEvent(e);
+    handleDragMove(col, row);
+  });
+
+  canvas.addEventListener('touchend', handleDragEnd);
+
+  // Right-click context menu prevention on canvas
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // ─────────────────────────────────────────────
+  // ANIMATION LOOP
+  // ─────────────────────────────────────────────
+  // The animation loop repeatedly calls Algorithm.step() to advance the A*
+  // search one iteration per frame. The number of steps per frame is
+  // controlled by the speed slider (1-20), allowing the user to watch
+  // the search unfold from slow exploration to near-instant results.
+  function animationLoop() {
+    if (!state.isRunning) return;
+
+    const steps = state.stepsPerFrame;
+    let lastResult = null;
+
+    // Process up to `steps` iterations of the A* algorithm
+    for (let i = 0; i < steps; i++) {
+      if (!state.algorithmState) break;
+      lastResult = Algorithm.step(state.grid, state.algorithmState);
+
+      if (lastResult.result === 'done') {
+        // Path found — calculate cost and finalize
+        state.isRunning = false;
+        state.pathCost = state.algorithmState.gScore.get(
+          state.algorithmState.key(state.end.col, state.end.row)
+        );
+        state.elapsedTime = performance.now() - state.startTime;
+        updateStats();
+        showNoPath(false);
+        updateButtons();
+        Renderer.draw(state.grid, state);
+        state.animFrameId = null;
+        return;
+      }
+
+      if (lastResult.result === 'none') {
+        // No path exists
+        state.isRunning = false;
+        state.elapsedTime = performance.now() - state.startTime;
+        updateStats();
+        showNoPath(true);
+        updateButtons();
+        Renderer.draw(state.grid, state);
+        state.animFrameId = null;
+        return;
+      }
+
+      state.totalSteps++;
+      state.cellsVisited++;
+    }
+
+    // Update stats during animation
+    updateStats();
+
+    // Redraw the grid to show the latest algorithm state
+    Renderer.draw(state.grid, state);
+
+    // Continue the animation loop
+    state.animFrameId = requestAnimationFrame(animationLoop);
+  }
+
+  // ─────────────────────────────────────────────
+  // UI EVENT HANDLERS
+  // ─────────────────────────────────────────────
+  function updateStats() {
+    statSteps.textContent = state.totalSteps.toLocaleString();
+    statVisited.textContent = state.cellsVisited.toLocaleString();
+    statCost.textContent = state.pathCost > 0 ? state.pathCost.toLocaleString() : '—';
+    statTime.textContent = state.elapsedTime > 0 ? Math.round(state.elapsedTime) + ' ms' : '0 ms';
+  }
+
+  function showNoPath(show) {
+    noPathMsg.classList.toggle('visible', show);
+  }
+
+  function updateButtons() {
+    btnVisualize.disabled = state.isRunning;
+    btnClearPath.disabled = state.isRunning;
+    btnClearAll.disabled = state.isRunning;
+    btnMaze.disabled = state.isRunning;
+  }
+
+  function resetStats() {
+    state.totalSteps = 0;
+    state.cellsVisited = 0;
+    state.pathCost = 0;
+    state.elapsedTime = 0;
+    updateStats();
+    showNoPath(false);
+  }
+
+  // Visualize button: start A* animation
+  btnVisualize.addEventListener('click', () => {
+    if (state.isRunning) return;
+
+    // Clear previous algorithm state
+    state.algorithmState = Algorithm.init(
+      state.grid,
+      state.start.col, state.start.row,
+      state.end.col, state.end.row
+    );
+
+    state.isRunning = true;
+    state.totalSteps = 0;
+    state.cellsVisited = 0;
+    state.pathCost = 0;
+    state.elapsedTime = 0;
+    state.startTime = performance.now();
+
+    updateButtons();
+    updateStats();
+    showNoPath(false);
+
+    // Start and end cells are already marked in Algorithm.init
+
+    state.animFrameId = requestAnimationFrame(animationLoop);
+  });
+
+  // Clear Path button: reset algorithm state, keep walls/weights
+  btnClearPath.addEventListener('click', () => {
+    if (state.isRunning) return;
+    Grid.clearVis(state.grid);
+    state.algorithmState = null;
+    state.isRunning = false;
+    state.animFrameId = null;
+    resetStats();
+    updateButtons();
+    Renderer.draw(state.grid, state);
+  });
+
+  // Clear All button: reset everything
+  btnClearAll.addEventListener('click', () => {
+    if (state.isRunning) return;
+    state.grid = Grid.create();
+    state.grid[state.start.row][state.start.col].type = START;
+    state.grid[state.end.row][state.end.col].type = END_NODE;
+    state.algorithmState = null;
+    state.isRunning = false;
+    state.animFrameId = null;
+    resetStats();
+    updateButtons();
+    showNoPath(false);
+    Renderer.draw(state.grid, state);
+  });
+
+  // Random Maze button
+  btnMaze.addEventListener('click', () => {
+    if (state.isRunning) return;
+    Grid.randomMaze();
+    state.algorithmState = null;
+    state.isRunning = false;
+    state.animFrameId = null;
+    resetStats();
+    updateButtons();
+    showNoPath(false);
+    Renderer.draw(state.grid, state);
+  });
+
+  // Speed slider
+  speedSlider.addEventListener('input', () => {
+    state.stepsPerFrame = parseInt(speedSlider.value, 10);
+    speedVal.textContent = speedSlider.value;
+  });
+
+  // ─────────────────────────────────────────────
+  // INITIAL DRAW
+  // ─────────────────────────────────────────────
+  Renderer.draw(state.grid, state);
+  updateButtons();
+
+})();
+</script>
+</body>
+</html>
