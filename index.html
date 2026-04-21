@@ -183,6 +183,49 @@
   /* ── HTML Preview ── */
   .html-preview { width: 100%; height: 100%; border: none; }
 
+  /* ── HTML Full-Page Preview ── */
+  .html-view {
+    display: none;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+  }
+  .html-view.active { display: flex; }
+  .html-view-toolbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+    flex-shrink: 0;
+  }
+  .html-view-toolbar .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }
+  .html-view-toolbar .back-btn:hover { background: var(--bg-hover); }
+  .html-view-toolbar .file-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex: 1;
+    text-align: center;
+  }
+  .html-view-toolbar .file-label strong { color: var(--text); }
+  .html-view-iframe {
+    flex: 1;
+    border: none;
+    background: #fff;
+  }
+
   /* ── Empty State ── */
   .empty-state {
     display: flex; flex-direction: column; align-items: center;
@@ -230,6 +273,13 @@
 
 <div class="container">
   <div class="scenario-grid" id="scenarioGrid"></div>
+  <div class="html-view" id="htmlView">
+    <div class="html-view-toolbar">
+      <button class="back-btn" id="htmlViewBack">← Back</button>
+      <span class="file-label" id="htmlViewLabel"><strong></strong></span>
+    </div>
+    <iframe class="html-view-iframe" id="htmlViewIframe" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
 </div>
 
 <div class="footer">
@@ -548,7 +598,7 @@ body.innerHTML = renderHtmlPreview(c);
                 const parentPath = parts.join("/");
                 const parentResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${parentPath}?ref=${BRANCH}`);
                 const parentItems = await parentResp.json();
-                renderFileList(parentItems, parentPath);
+                renderFileList(parentItems, parentPath, currentScenario);
               }
             });
           });
@@ -559,7 +609,7 @@ body.innerHTML = renderHtmlPreview(c);
           const parentPath = parts.join("/");
           const parentResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${parentPath}?ref=${BRANCH}`);
           const parentItems = await parentResp.json();
-          renderFileList(parentItems, parentPath);
+          renderFileList(parentItems, parentPath, currentScenario);
         }
       });
     });
@@ -569,7 +619,7 @@ body.innerHTML = renderHtmlPreview(c);
   }
 }
 
-function renderFileList(items, path) {
+function renderFileList(items, path, scenario) {
   const body = document.getElementById("detailBody");
   let html = `<div class="file-list" style="padding:20px;">`;
   for (const item of items) {
@@ -578,13 +628,13 @@ function renderFileList(items, path) {
     const isHtml = ext === "html";
     const isMd = ext === "md";
     if (isDir) {
-      html += `<div class="file-item" data-path="${path}/${item.name}"><span class="file-icon">📁</span><span class="file-name">${item.name}</span></div>`;
+      html += `<div class="file-item" data-path="${path}/${item.name}" data-scenario="${scenario?.key || ''}"><span class="file-icon">📁</span><span class="file-name">${item.name}</span></div>`;
     } else if (isHtml) {
-      html += `<div class="file-item" data-path="${path}/${item.name}" data-type="html"><span class="file-icon">🌐</span><span class="file-name">${item.name}</span><span class="file-badge html">HTML</span></div>`;
+      html += `<div class="file-item" data-path="${path}/${item.name}" data-type="html" data-scenario="${scenario?.key || ''}"><span class="file-icon">🌐</span><span class="file-name">${item.name}</span><span class="file-badge html">HTML</span></div>`;
     } else if (isMd) {
-      html += `<div class="file-item" data-path="${path}/${item.name}" data-type="md"><span class="file-icon">📄</span><span class="file-name">${item.name}</span><span class="file-badge md">MD</span></div>`;
+      html += `<div class="file-item" data-path="${path}/${item.name}" data-type="md" data-scenario="${scenario?.key || ''}"><span class="file-icon">📄</span><span class="file-name">${item.name}</span><span class="file-badge md">MD</span></div>`;
     } else {
-      html += `<div class="file-item" data-path="${path}/${item.name}"><span class="file-icon">📎</span><span class="file-name">${item.name}</span></div>`;
+      html += `<div class="file-item" data-path="${path}/${item.name}" data-scenario="${scenario?.key || ''}"><span class="file-icon">📎</span><span class="file-name">${item.name}</span></div>`;
     }
   }
   html += `</div>`;
@@ -594,12 +644,8 @@ function renderFileList(items, path) {
       const p = el.dataset.path;
       const t = el.dataset.type;
       if (t === "html") {
-        breadcrumb.textContent += el.querySelector(".file-name").textContent + " / ";
-        title.textContent = el.querySelector(".file-name").textContent;
-        body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
-        const r = await fetch(`${BASE}/${p}`);
-        const c = await r.text();
-        body.innerHTML = renderHtmlPreview(c);
+        // Open HTML files full-page instead of in the detail panel
+        openHtmlFullPage(currentScenario, { name: el.querySelector(".file-name").textContent, path: p });
       } else if (t === "md") {
         breadcrumb.textContent += el.querySelector(".file-name").textContent + " / ";
         title.textContent = el.querySelector(".file-name").textContent;
@@ -621,13 +667,13 @@ function renderFileList(items, path) {
           const isHtml = ext === "html";
           const isMd = ext === "md";
           if (isDir) {
-            subHtml += `<div class="file-item" data-path="${p}/${item.name}"><span class="file-icon">📁</span><span class="file-name">${item.name}</span></div>`;
+            subHtml += `<div class="file-item" data-path="${p}/${item.name}" data-scenario="${currentScenario?.key || ''}"><span class="file-icon">📁</span><span class="file-name">${item.name}</span></div>`;
           } else if (isHtml) {
-            subHtml += `<div class="file-item" data-path="${p}/${item.name}" data-type="html"><span class="file-icon">🌐</span><span class="file-name">${item.name}</span><span class="file-badge html">HTML</span></div>`;
+            subHtml += `<div class="file-item" data-path="${p}/${item.name}" data-type="html" data-scenario="${currentScenario?.key || ''}"><span class="file-icon">🌐</span><span class="file-name">${item.name}</span><span class="file-badge html">HTML</span></div>`;
           } else if (isMd) {
-            subHtml += `<div class="file-item" data-path="${p}/${item.name}" data-type="md"><span class="file-icon">📄</span><span class="file-name">${item.name}</span><span class="file-badge md">MD</span></div>`;
+            subHtml += `<div class="file-item" data-path="${p}/${item.name}" data-type="md" data-scenario="${currentScenario?.key || ''}"><span class="file-icon">📄</span><span class="file-name">${item.name}</span><span class="file-badge md">MD</span></div>`;
           } else {
-            subHtml += `<div class="file-item" data-path="${p}/${item.name}"><span class="file-icon">📎</span><span class="file-name">${item.name}</span></div>`;
+            subHtml += `<div class="file-item" data-path="${p}/${item.name}" data-scenario="${currentScenario?.key || ''}"><span class="file-icon">📎</span><span class="file-name">${item.name}</span></div>`;
           }
         }
         subHtml += `</div>`;
@@ -637,12 +683,7 @@ function renderFileList(items, path) {
             const p2 = el2.dataset.path;
             const t2 = el2.dataset.type;
             if (t2 === "html") {
-              breadcrumb.textContent += el2.querySelector(".file-name").textContent + " / ";
-              title.textContent = el2.querySelector(".file-name").textContent;
-              body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
-              const r = await fetch(`${BASE}/${p2}`);
-              const c = await r.text();
-        body.innerHTML = renderHtmlPreview(c);
+              openHtmlFullPage(currentScenario, { name: el2.querySelector(".file-name").textContent, path: p2 });
             } else if (t2 === "md") {
               breadcrumb.textContent += el2.querySelector(".file-name").textContent + " / ";
               title.textContent = el2.querySelector(".file-name").textContent;
@@ -656,18 +697,18 @@ function renderFileList(items, path) {
               const parentPath = parts.join("/");
               const parentResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${parentPath}?ref=${BRANCH}`);
               const parentItems = await parentResp.json();
-              renderFileList(parentItems, parentPath);
-            }
-          });
-        });
-      } else {
-        const parts = p.split("/");
-        parts.pop();
-        const parentPath = parts.join("/");
-        const parentResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${parentPath}?ref=${BRANCH}`);
-        const parentItems = await parentResp.json();
-        renderFileList(parentItems, parentPath);
-      }
+               renderFileList(parentItems, parentPath, currentScenario);
+             }
+           });
+         });
+       } else {
+         const parts = p.split("/");
+         parts.pop();
+         const parentPath = parts.join("/");
+         const parentResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${parentPath}?ref=${BRANCH}`);
+         const parentItems = await parentResp.json();
+         renderFileList(parentItems, parentPath, currentScenario);
+       }
     });
   });
 }
@@ -678,8 +719,58 @@ function renderHtmlPreview(content) {
   return `<iframe class="html-preview" src="${url}" sandbox="allow-scripts allow-same-origin"></iframe>`;
 }
 
+// ── Open HTML file full-page ──
+let currentHtmlViewScenario = null;
+
+function openHtmlFullPage(scenario, fileItem) {
+  const grid = document.getElementById("scenarioGrid");
+  const htmlView = document.getElementById("htmlView");
+  const iframe = document.getElementById("htmlViewIframe");
+  const label = document.getElementById("htmlViewLabel");
+
+  currentHtmlViewScenario = scenario;
+
+  grid.style.display = "none";
+  htmlView.classList.add("active");
+  label.innerHTML = `<strong>${scenario.name}</strong> &nbsp;/&nbsp; ${fileItem.name}`;
+
+  // Load the HTML file into the iframe
+  fetch(`${BASE}/${fileItem.path}`)
+    .then(r => r.text())
+    .then(content => {
+      const blob = new Blob([content], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      iframe.src = url;
+    })
+    .catch(() => {
+      iframe.srcdoc = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8b949e;font-family:sans-serif;">Failed to load file</div>`;
+    });
+}
+
+function closeHtmlView() {
+  const grid = document.getElementById("scenarioGrid");
+  const htmlView = document.getElementById("htmlView");
+  const iframe = document.getElementById("htmlViewIframe");
+
+  htmlView.classList.remove("active");
+  iframe.src = "about:blank";
+  currentHtmlViewScenario = null;
+  grid.style.display = "";
+}
+
+// ── Back button ──
+document.getElementById("htmlViewBack").addEventListener("click", closeHtmlView);
+
 // ── Open a top-level file directly ──
 async function openFile(scenario, fileItem) {
+  const ext = fileItem.name.split(".").pop();
+  const isHtml = ext === "html";
+
+  if (isHtml) {
+    openHtmlFullPage(scenario, fileItem);
+    return;
+  }
+
   const panel = document.getElementById("detailPanel");
   const body = document.getElementById("detailBody");
   const title = document.getElementById("detailTitle");
@@ -690,15 +781,9 @@ async function openFile(scenario, fileItem) {
   body.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
   panel.classList.add("open");
 
-  const ext = fileItem.name.split(".").pop();
-  const isHtml = ext === "html";
   const isMd = ext === "md";
 
-  if (isHtml) {
-    const resp = await fetch(`${BASE}/${fileItem.path}`);
-    const content = await resp.text();
-    body.innerHTML = renderHtmlPreview(content);
-  } else if (isMd) {
+  if (isMd) {
     const resp = await fetch(`${BASE}/${fileItem.path}`);
     const content = await resp.text();
     body.innerHTML = `<div class="md-viewer">${renderMarkdown(content)}</div>`;
@@ -708,6 +793,36 @@ async function openFile(scenario, fileItem) {
 // ── Close panel ──
 document.getElementById("detailClose").addEventListener("click", () => {
   document.getElementById("detailPanel").classList.remove("open");
+});
+document.getElementById("detailPanel").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    document.getElementById("detailPanel").classList.remove("open");
+  }
+});
+}
+
+function closeHtmlView() {
+  const grid = document.getElementById("scenarioGrid");
+  const htmlView = document.getElementById("htmlView");
+  const iframe = document.getElementById("htmlViewIframe");
+
+  htmlView.classList.remove("active");
+  iframe.src = "about:blank";
+  currentHtmlViewScenario = null;
+  grid.style.display = "";
+}
+
+// ── Back button ──
+document.getElementById("htmlViewBack").addEventListener("click", closeHtmlView);
+
+// ── Close panel ──
+document.getElementById("detailClose").addEventListener("click", () => {
+  document.getElementById("detailPanel").classList.remove("open");
+});
+document.getElementById("detailPanel").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    document.getElementById("detailPanel").classList.remove("open");
+  }
 });
 document.getElementById("detailPanel").addEventListener("click", (e) => {
   if (e.target === e.currentTarget) {
