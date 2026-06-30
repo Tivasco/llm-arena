@@ -97,6 +97,23 @@ def hub_doors():
         problems.append("index.html: no .door cards")
     return problems
 
+@check
+def links_resolve():
+    """Every internal href/src points to an existing file."""
+    ref = re.compile(r'\b(?:href|src)\s*=\s*["\']([^"\']+)["\']', re.I)
+    problems = []
+    for p in html_files():
+        for m in ref.finditer(read(p)):
+            tgt = m.group(1).split("#")[0].split("?")[0]
+            if not tgt or tgt.startswith(("http://", "https://", "//", "mailto:", "data:")):
+                continue
+            fp = (ROOT / tgt.lstrip("/")) if tgt.startswith("/") else (p.parent / tgt)
+            if tgt.endswith("/") or fp.is_dir():
+                fp = fp / "index.html"
+            if not fp.exists():
+                problems.append(f"{p.relative_to(ROOT)}: dead link {tgt!r}")
+    return problems
+
 def main():
     failed = 0
     for fn in CHECKS:
