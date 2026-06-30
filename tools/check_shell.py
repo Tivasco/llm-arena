@@ -82,6 +82,21 @@ def chrome_contract():
             problems.append(f"{p.relative_to(ROOT)}: missing chrome.js script")
     return problems
 
+@check
+def hub_doors():
+    """index.html is a hub with exactly the two pillar doors."""
+    idx = ROOT / "index.html"
+    if not idx.exists():
+        return ["index.html missing"]
+    txt = read(idx)
+    problems = []
+    for href in ('href="/benchmarks/"', 'href="/arena/"'):
+        if href not in txt:
+            problems.append(f"index.html: missing door {href}")
+    if 'class="door"' not in txt:
+        problems.append("index.html: no .door cards")
+    return problems
+
 def main():
     failed = 0
     for fn in CHECKS:

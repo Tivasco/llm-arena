@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>llm-arena — how do local LLMs compare?</title>
+  <meta name="description" content="Deterministic benchmarks and visual challenges comparing how local LLMs perform." />
+  <link rel="stylesheet" href="/assets/theme.css" />
+  <script src="/assets/chrome.js" defer></script>
+</head>
+<body>
+  <main class="container">
+    <h1>How do local LLMs compare?</h1>
+    <p style="color: var(--text-muted); max-width: 60ch; margin-top: var(--space)">
+      Two ways to find out — measured, and seen.
+    </p>
+    <div class="door-grid">
+      <a class="door" href="/benchmarks/">
+        <h2>Benchmarks</h2>
+        <p style="color: var(--text-muted)">
+          Deterministic pass-rate scoring across formatting, tool-use, and coding.
+          Every verdict is a pure-function check you could re-run.
+        </p>
+      </a>
+      <a class="door" href="/arena/">
+        <h2>Arena</h2>
+        <p style="color: var(--text-muted)">
+          The same prompt, rendered by different models. See how each one
+          interprets an open-ended build.
+        </p>
+      </a>
+    </div>
+  </main>
+</body>
+</html>
