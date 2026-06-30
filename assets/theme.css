@@ -12,32 +12,32 @@
 @font-face {
   font-family: "Inter";
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/assets/fonts/inter-400.woff2") format("woff2");
+  src: url("fonts/inter-400.woff2") format("woff2");
 }
 @font-face {
   font-family: "Inter";
   font-style: normal; font-weight: 500; font-display: swap;
-  src: url("/assets/fonts/inter-500.woff2") format("woff2");
+  src: url("fonts/inter-500.woff2") format("woff2");
 }
 @font-face {
   font-family: "Inter";
   font-style: normal; font-weight: 600; font-display: swap;
-  src: url("/assets/fonts/inter-600.woff2") format("woff2");
+  src: url("fonts/inter-600.woff2") format("woff2");
 }
 @font-face {
   font-family: "Inter";
   font-style: normal; font-weight: 700; font-display: swap;
-  src: url("/assets/fonts/inter-700.woff2") format("woff2");
+  src: url("fonts/inter-700.woff2") format("woff2");
 }
 @font-face {
   font-family: "JetBrains Mono";
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/assets/fonts/jetbrains-mono-400.woff2") format("woff2");
+  src: url("fonts/jetbrains-mono-400.woff2") format("woff2");
 }
 @font-face {
   font-family: "JetBrains Mono";
   font-style: normal; font-weight: 600; font-display: swap;
-  src: url("/assets/fonts/jetbrains-mono-600.woff2") format("woff2");
+  src: url("fonts/jetbrains-mono-600.woff2") format("woff2");
 }
 
 /* ── Tokens ───────────────────────────────────────────────────────────────
@@ -542,6 +542,16 @@ main.container { flex: 1 0 auto; padding-top: clamp(40px, 7vw, 84px); }
   .door-grid .door { opacity: 0; animation: rise 0.66s var(--ease-out) forwards; }
   .door-grid .door:nth-child(1) { animation-delay: 0.4s; }
   .door-grid .door:nth-child(2) { animation-delay: 0.5s; }
+}
+
+/* Reduced motion: suppress all animation/transition + the hover/active
+   transforms (the load keyframes above are already gated). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .door:hover, .door:focus-visible,
+  .tile:hover,
+  .door:hover .door__arrow, .door:focus-visible .door__arrow,
+  .btn:active, .site-nav a:active { transform: none; }
 }
 
 /* ── Responsive niceties ─────────────────────────────────────────────────*/

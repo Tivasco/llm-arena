@@ -72,13 +72,15 @@ def no_cdn():
 
 @check
 def chrome_contract():
-    """Every page links theme.css and includes chrome.js."""
+    """Every page links theme.css and includes chrome.js (base-relative, optional ../)."""
+    theme_rx  = re.compile(r'href\s*=\s*["\'](?:\.\./)*assets/theme\.css["\']')
+    chrome_rx = re.compile(r'src\s*=\s*["\'](?:\.\./)*assets/chrome\.js["\']')
     problems = []
     for p in html_files():
         txt = read(p)
-        if 'href="/assets/theme.css"' not in txt:
+        if theme_rx.search(txt) is None:
             problems.append(f"{p.relative_to(ROOT)}: missing theme.css link")
-        if 'src="/assets/chrome.js"' not in txt:
+        if chrome_rx.search(txt) is None:
             problems.append(f"{p.relative_to(ROOT)}: missing chrome.js script")
     return problems
 
@@ -90,7 +92,7 @@ def hub_doors():
         return ["index.html missing"]
     txt = read(idx)
     problems = []
-    for href in ('href="/benchmarks/"', 'href="/arena/"'):
+    for href in ('href="benchmarks/"', 'href="arena/"'):
         if href not in txt:
             problems.append(f"index.html: missing door {href}")
     if 'class="door"' not in txt:
@@ -112,6 +114,67 @@ def links_resolve():
                 fp = fp / "index.html"
             if not fp.exists():
                 problems.append(f"{p.relative_to(ROOT)}: dead link {tgt!r}")
+    return problems
+
+CSS_URL = re.compile(r'url\(\s*["\']?([^"\')]+?)["\']?\s*\)', re.I)
+
+@check
+def no_root_absolute():
+    """No INTERNAL ref starts with a single '/' — those 404 under a project subpath.
+    External '//host' and 'scheme://' refs are fine (they don't start with a lone '/')."""
+    href_src = re.compile(r'\b(?:href|src)\s*=\s*["\']([^"\']+)["\']', re.I)
+    def root_abs(v): return v.startswith("/") and not v.startswith("//")
+    problems = []
+    for p in html_files():
+        for m in href_src.finditer(read(p)):
+            v = m.group(1)
+            if root_abs(v):
+                problems.append(f"{p.relative_to(ROOT)}: root-absolute ref {v!r}")
+    for p in css_files():
+        for m in CSS_URL.finditer(read(p)):
+            v = m.group(1).strip()
+            if root_abs(v):
+                problems.append(f"{p.relative_to(ROOT)}: root-absolute url() {v!r}")
+    return problems
+
+@check
+def chrome_nav():
+    """chrome.js builds the primary nav base-aware (links_resolve can't see it);
+    assert each base-relative ref is present AND its on-disk target exists."""
+    js = ROOT / "assets" / "chrome.js"
+    if not js.exists():
+        return ["assets/chrome.js missing"]
+    txt = read(js)
+    problems = []
+    # (base-relative ref expected in chrome.js, on-disk target it must resolve to)
+    nav = [
+        ("../", ROOT),                                  # brand → site base
+        ("../benchmarks/", ROOT / "benchmarks" / "index.html"),
+        ("../arena/", ROOT / "arena" / "index.html"),
+        ("../about.html", ROOT / "about.html"),
+    ]
+    for rel, target in nav:
+        if rel not in txt:
+            problems.append(f"chrome.js: missing nav ref {rel!r}")
+        if not target.exists():
+            problems.append(f"chrome.js: nav target for {rel!r} missing on disk")
+    return problems
+
+@check
+def font_refs_resolve():
+    """Every url() in theme.css resolves (relative to assets/) to a real file —
+    a dangling font ref would otherwise pass silently."""
+    theme = ROOT / "assets" / "theme.css"
+    if not theme.exists():
+        return ["assets/theme.css missing"]
+    problems = []
+    for m in CSS_URL.finditer(read(theme)):
+        v = m.group(1).strip()
+        if v.startswith(("http://", "https://", "//", "data:")):
+            continue
+        fp = (ROOT / v.lstrip("/")) if v.startswith("/") else (theme.parent / v)
+        if not fp.exists():
+            problems.append(f"theme.css: dangling url({v!r})")
     return problems
 
 def main():
