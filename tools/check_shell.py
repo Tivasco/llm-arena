@@ -26,6 +26,46 @@ def repo_skeleton():
             problems.append(f"missing {rel}")
     return problems
 
+REQUIRED_TOKENS = [
+    "--bg", "--surface", "--text", "--text-muted", "--border", "--accent",
+    "--verdict-go", "--verdict-warn", "--verdict-stop",
+    "--font-sans", "--font-mono", "--maxw", "--radius", "--space",
+]
+REQUIRED_SELECTORS = [
+    ".container", ".site-header", ".site-nav", ".site-footer",
+    ".door-grid", ".door", ".chip", ".table", ".panel",
+]
+
+@check
+def theme_contract():
+    """theme.css defines every locked token and component selector."""
+    theme = ROOT / "assets" / "theme.css"
+    if not theme.exists():
+        return ["assets/theme.css missing"]
+    txt = read(theme)
+    problems = []
+    for tok in REQUIRED_TOKENS:
+        if re.search(rf"{re.escape(tok)}\s*:", txt) is None:
+            problems.append(f"theme.css: token {tok} not defined")
+    for sel in REQUIRED_SELECTORS:
+        if re.search(rf"(^|[,\s}}]){re.escape(sel)}([\s,{{:.>])", txt, re.M) is None:
+            problems.append(f"theme.css: selector {sel} not defined")
+    return problems
+
+@check
+def no_cdn():
+    """No external (CDN) resources: every href/src/url() must be local."""
+    res = re.compile(r'\b(?:href|src)\s*=\s*["\'](?:https?:)?//', re.I)
+    url = re.compile(r'url\(\s*["\']?(?:https?:)?//', re.I)
+    problems = []
+    for p in html_files():
+        for m in res.finditer(read(p)):
+            problems.append(f"{p.relative_to(ROOT)}: external href/src {m.group(0)!r}")
+    for p in list(css_files()) + list(html_files()):
+        for m in url.finditer(read(p)):
+            problems.append(f"{p.relative_to(ROOT)}: external url() {m.group(0)!r}")
+    return problems
+
 def main():
     failed = 0
     for fn in CHECKS:
