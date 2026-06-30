@@ -6,7 +6,9 @@
     const header = document.createElement("header");
     header.className = "site-header";
     header.innerHTML =
-      '<a href="/" style="color:var(--text);text-decoration:none;font-weight:700">llm-arena</a>' +
+      '<a class="brand" href="/">' +
+      '<span class="brand__mark" aria-hidden="true"></span>llm-arena' +
+      "</a>" +
       '<nav class="site-nav">' +
       '<a href="/benchmarks/">Benchmarks</a>' +
       '<a href="/arena/">Arena</a>' +
@@ -18,7 +20,7 @@
     footer.className = "site-footer";
     footer.innerHTML =
       'Deterministic local-LLM evaluations &amp; visual challenges · ' +
-      '<a href="https://github.com/Tivasco/llm-arena" style="color:var(--text-muted)">source</a>';
+      '<a href="https://github.com/Tivasco/llm-arena">source</a>';
     document.body.append(footer);
   }
   if (document.readyState === "loading") {

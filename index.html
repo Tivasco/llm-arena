@@ -10,24 +10,45 @@
 </head>
 <body>
   <main class="container">
-    <h1>How do local LLMs compare?</h1>
-    <p style="color: var(--text-muted); max-width: 60ch; margin-top: var(--space)">
-      Two ways to find out — measured, and seen.
-    </p>
+    <section class="hero">
+      <span class="eyebrow reveal" data-d="1">Local-LLM proving ground · v2.0</span>
+      <h1 class="reveal" data-d="2">How do local LLMs <em>compare</em>?</h1>
+      <p class="lede reveal" data-d="3">
+        Two ways to find out — <strong>measured</strong>, and <strong>seen</strong>.
+        One a deterministic scoreboard, the other an open-ended build rendered
+        by every model. Pick a door.
+      </p>
+      <ul class="legend reveal" data-d="4" aria-label="Verdict scale">
+        <li><span class="dot dot--go"></span>Pass</li>
+        <li><span class="dot dot--warn"></span>Partial</li>
+        <li><span class="dot dot--stop"></span>Fail</li>
+      </ul>
+    </section>
+
     <div class="door-grid">
       <a class="door" href="/benchmarks/">
-        <h2>Benchmarks</h2>
-        <p style="color: var(--text-muted)">
+        <span class="door__top">
+          <span class="door__index">01</span>
+          <span class="door__kicker">Measured</span>
+        </span>
+        <h2 class="door__title">Benchmarks</h2>
+        <p class="door__desc">
           Deterministic pass-rate scoring across formatting, tool-use, and coding.
           Every verdict is a pure-function check you could re-run.
         </p>
+        <span class="door__enter">Enter the lab <span class="door__arrow" aria-hidden="true">→</span></span>
       </a>
       <a class="door" href="/arena/">
-        <h2>Arena</h2>
-        <p style="color: var(--text-muted)">
+        <span class="door__top">
+          <span class="door__index">02</span>
+          <span class="door__kicker">Seen</span>
+        </span>
+        <h2 class="door__title">Arena</h2>
+        <p class="door__desc">
           The same prompt, rendered by different models. See how each one
-          interprets an open-ended build.
+          interprets an open-ended build, side by side.
         </p>
+        <span class="door__enter">Enter the gallery <span class="door__arrow" aria-hidden="true">→</span></span>
       </a>
     </div>
   </main>

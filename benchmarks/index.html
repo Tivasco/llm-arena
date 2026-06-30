@@ -9,8 +9,50 @@
 </head>
 <body>
   <main class="container">
-    <h1>Benchmarks</h1>
-    <p style="color: var(--text-muted)">Deterministic leaderboard coming soon.</p>
+    <section class="hero">
+      <span class="eyebrow reveal" data-d="1">Pillar 01 · Measured</span>
+      <h1 class="reveal" data-d="2">Benchmarks</h1>
+      <p class="lede reveal" data-d="3">
+        Deterministic pass-rate scoring across three pillars. Every cell is a
+        <strong>pure-function check</strong> over the model's output — re-runnable,
+        no judge. The leaderboard is on its way.
+      </p>
+    </section>
+
+    <div class="section">
+      <span class="eyebrow">The battery</span>
+      <div class="panel" style="margin-top: calc(var(--space) * 2); overflow-x: auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Pillar</th>
+              <th>What it checks</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Formatting</td>
+              <td>Structural &amp; voice constraints on text output</td>
+              <td><span class="chip chip--accent">Wiring up</span></td>
+            </tr>
+            <tr>
+              <td>Tool-use</td>
+              <td>Correctness of returned tool calls &amp; agentic chains</td>
+              <td><span class="chip chip--accent">Wiring up</span></td>
+            </tr>
+            <tr>
+              <td>Coding</td>
+              <td>Typed challenges, sandboxed tests, static rules</td>
+              <td><span class="chip chip--accent">Wiring up</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mono" style="color: var(--text-faint); font-size: 0.74rem; letter-spacing: 0.1em; margin-top: calc(var(--space) * 2)">
+        // leaderboard coming soon
+      </p>
+    </div>
   </main>
 </body>
 </html>
