@@ -54,16 +54,32 @@ def theme_contract():
 
 @check
 def no_cdn():
-    """No external (CDN) resources: every href/src/url() must be local."""
-    res = re.compile(r'\b(?:href|src)\s*=\s*["\'](?:https?:)?//', re.I)
-    url = re.compile(r'url\(\s*["\']?(?:https?:)?//', re.I)
+    """No external (CDN) *resources*. Plain <a href> navigation may be external."""
+    # external href on <link>, or external src on <script>/<img>/<source>
+    link = re.compile(r'<link\b[^>]*\bhref\s*=\s*["\'](?:https?:)?//', re.I)
+    src  = re.compile(r'<(?:script|img|source)\b[^>]*\bsrc\s*=\s*["\'](?:https?:)?//', re.I)
+    url  = re.compile(r'url\(\s*["\']?(?:https?:)?//', re.I)
     problems = []
     for p in html_files():
-        for m in res.finditer(read(p)):
-            problems.append(f"{p.relative_to(ROOT)}: external href/src {m.group(0)!r}")
+        txt = read(p)
+        for rx, label in ((link, "external <link>"), (src, "external src")):
+            for m in rx.finditer(txt):
+                problems.append(f"{p.relative_to(ROOT)}: {label} {m.group(0)!r}")
     for p in list(css_files()) + list(html_files()):
         for m in url.finditer(read(p)):
             problems.append(f"{p.relative_to(ROOT)}: external url() {m.group(0)!r}")
+    return problems
+
+@check
+def chrome_contract():
+    """Every page links theme.css and includes chrome.js."""
+    problems = []
+    for p in html_files():
+        txt = read(p)
+        if 'href="/assets/theme.css"' not in txt:
+            problems.append(f"{p.relative_to(ROOT)}: missing theme.css link")
+        if 'src="/assets/chrome.js"' not in txt:
+            problems.append(f"{p.relative_to(ROOT)}: missing chrome.js script")
     return problems
 
 def main():
