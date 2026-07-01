@@ -86,15 +86,15 @@ def chrome_contract():
 
 @check
 def hub_doors():
-    """index.html is a hub with exactly the two pillar doors."""
+    """index.html is a hub linking the Benchmarks pillar door.
+    (The Arena door is temporarily unlinked; the arena/ scaffold still exists.)"""
     idx = ROOT / "index.html"
     if not idx.exists():
         return ["index.html missing"]
     txt = read(idx)
     problems = []
-    for href in ('href="benchmarks/"', 'href="arena/"'):
-        if href not in txt:
-            problems.append(f"index.html: missing door {href}")
+    if 'href="benchmarks/"' not in txt:
+        problems.append('index.html: missing door href="benchmarks/"')
     if 'class="door"' not in txt:
         problems.append("index.html: no .door cards")
     return problems
@@ -147,10 +147,10 @@ def chrome_nav():
     txt = read(js)
     problems = []
     # (base-relative ref expected in chrome.js, on-disk target it must resolve to)
+    # Arena is temporarily unlinked from the nav (scaffold kept in arena/).
     nav = [
         ("../", ROOT),                                  # brand → site base
         ("../benchmarks/", ROOT / "benchmarks" / "index.html"),
-        ("../arena/", ROOT / "arena" / "index.html"),
         ("../about.html", ROOT / "about.html"),
     ]
     for rel, target in nav:

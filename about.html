@@ -12,12 +12,12 @@
   <main class="container">
     <section class="hero">
       <span class="eyebrow reveal" data-d="1">About</span>
-      <h1 class="reveal" data-d="2">Two readings of the <em>same</em> question.</h1>
+      <h1 class="reveal" data-d="2">How I measure <em>local</em> LLMs.</h1>
       <p class="lede reveal" data-d="3">
-        llm-arena compares how locally-runnable LLMs perform, two ways: a
-        <strong>deterministic benchmark</strong> whose every verdict is a
-        pure-function check, and a <strong>visual arena</strong> where the same
-        open-ended prompt is rendered by different models.
+        llm-arena measures how locally-runnable LLMs perform with a
+        <strong>deterministic benchmark</strong>: every verdict is a
+        pure-function check over the model's output, so you can re-run it and
+        get the same number.
       </p>
     </section>
 
@@ -27,11 +27,10 @@
         <h3 style="margin-bottom: calc(var(--space) * 2)">No judge, only checks</h3>
         <p style="color: var(--text-muted); max-width: 62ch">
           Benchmark scoring is intentionally boring: each task is graded by a
-          pure function over the model's output — no LLM-as-a-judge, nothing you
-          can't re-run yourself and get the same number. The arena is the
-          opposite register, qualitative and visual, but the prompt is held
-          fixed so the only variable is the model. Methodology detail lands with
-          each pillar.
+          pure function over the model's output. No LLM-as-a-judge, nothing you
+          can't re-run yourself and get the same number. Every model runs the
+          same battery, and a gold reference must pass every check before any
+          model is scored against it.
         </p>
       </div>
     </div>

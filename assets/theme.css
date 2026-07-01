@@ -339,6 +339,9 @@ main.container { flex: 1 0 auto; padding-top: clamp(40px, 7vw, 84px); }
   gap: clamp(18px, 2.4vw, 28px);
   margin-top: var(--space-section);
 }
+/* A lone door (while the Arena is temporarily unlinked) shouldn't stretch
+   full-width — cap it so it reads as a card. No effect once two doors return. */
+.door:only-child { max-width: 520px; }
 .door {
   position: relative;
   overflow: hidden;
