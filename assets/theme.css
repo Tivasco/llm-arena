@@ -815,10 +815,24 @@ body.panel-open { overflow: hidden; }
 .ex-results { display: flex; align-items: center; gap: calc(var(--space) * 1.5); padding: 0 clamp(20px, 2.6vw, 28px) calc(var(--space) * 1.5); }
 .ex-count { min-width: 8ch; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.66rem; letter-spacing: 0.02em; color: var(--text-muted); white-space: nowrap; }
 .hm { display: flex; flex-wrap: wrap; gap: 3px; }
-.hm-cell { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
+.hm-cell { position: relative; width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
 .hm-go   { background: color-mix(in srgb, var(--verdict-go) 52%, var(--card));   border-color: color-mix(in srgb, var(--verdict-go) 60%, var(--border)); }
 .hm-stop { background: color-mix(in srgb, var(--verdict-stop) 42%, var(--card)); border-color: color-mix(in srgb, var(--verdict-stop) 52%, var(--border)); }
 .hm-none { background: var(--surface); }
+/* Instant styled tooltip (replaces the browser's delayed native title) */
+.hm-cell:hover { z-index: 5; }
+.hm-cell[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+  white-space: nowrap; padding: 5px 9px; border-radius: var(--radius-sm);
+  background: var(--text); color: var(--bg);
+  font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.02em; line-height: 1.2;
+  box-shadow: var(--shadow-2); pointer-events: none; z-index: 10;
+}
+.hm-cell[data-tip]:hover::before {
+  content: ""; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: var(--text); pointer-events: none; z-index: 10;
+}
 
 /* ── Setup: config matrix + checks catalog ──────────────────────────────── */
 /* Scoped to #view so this never bleeds into the shell's shared .panel on

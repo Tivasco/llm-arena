@@ -223,9 +223,11 @@ async function mountExercises() {
         const arr = results && results[it.id];
         const resultsStrip = arr ? el("div", { class: "ex-results" },
           el("span", { class: "ex-count" }, `${arr.filter(x => x === true).length}/${arr.filter(x => x != null).length} passed`),
-          el("div", { class: "hm" }, ...arr.map((val, i) => el("span", {
-            class: "hm-cell " + (val === true ? "hm-go" : val === false ? "hm-stop" : "hm-none"),
-            title: `${models[i].label} — ${val === true ? "pass" : val === false ? "fail" : "—"}` })))) : null;
+          el("div", { class: "hm" }, ...arr.map((val, i) => {
+            const tip = `${models[i].label} — ${val === true ? "pass" : val === false ? "fail" : "—"}`;
+            return el("span", { class: "hm-cell " + (val === true ? "hm-go" : val === false ? "hm-stop" : "hm-none"),
+              "data-tip": tip, "aria-label": tip });
+          }))) : null;
         const body = el("div", { class: "ex-body", style: "display:none" },
           el("div", { class: "ex-prompt" }, it.prompt),
           el("div", { class: "ex-crit" }, ...crit, ...rules, gold));
