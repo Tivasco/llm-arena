@@ -91,6 +91,7 @@ function closePanel() {
   document.body.classList.remove("panel-open");
 }
 function openPanel(title, body) {
+  if (_escHandler) { document.removeEventListener("keydown", _escHandler); _escHandler = null; }
   const root = document.getElementById("panel-root");
   root.innerHTML = "";
   const overlay = el("div", { class: "panel-overlay", onclick: (e) => { if (e.target === overlay) closePanel(); } },
@@ -130,7 +131,31 @@ async function openDrill(row, tier) {
     openPanel(title, el("p", {}, "Could not load detail: " + e.message));
   }
 }
-async function openCard() {}
+let MODELS = null;
+async function openCard(model, variant) {
+  if (!MODELS) MODELS = await fetchJSON("data/models.json");
+  const m = MODELS.models.find(x => x.id === model.replace(/\//g, "-") && x.variant === variant)
+        || MODELS.models.find(x => x.lmstudio_id === model && x.variant === variant);
+  if (!m) { openPanel(model, el("p", {}, "No card for this model.")); return; }
+  const spec = m.quantization
+    ? el("div", { class: "mc-specs" },
+        ...[["publisher", m.publisher], ["arch", m.arch], ["quant", m.quantization], ["format", m.format],
+            ["context", m.max_context_length], ["modality", m.modality],
+            ["capabilities", (m.capabilities || []).join(", ")]]
+          .filter(([, v]) => v != null && v !== "")
+          .map(([k, v]) => el("div", { class: "mc-spec" }, el("span", { class: "mc-k" }, k), el("span", {}, String(v)))))
+    : el("p", { class: "mc-nospec" }, "run-derived only (no LM Studio match)");
+  const st = m.stats || {};
+  openPanel(`${m.label}`, el("div", { class: "mc" },
+    el("p", { class: "mc-fam" }, [m.family, m.size].filter(Boolean).join(" · ")),
+    spec,
+    el("div", { class: "mc-stats" },
+      el("span", {}, `median ${st.median_latency_ms} ms`),
+      el("span", {}, `${st.n_calls} calls`),
+      el("span", {}, `truncation ${Math.round((st.truncation_rate || 0) * 100)}%`),
+      el("span", {}, `errors ${Math.round((st.error_rate || 0) * 100)}%`)),
+    el("p", { class: "mc-lastrun", style: "color:var(--text-muted)" }, `last run ${m.last_run}`)));
+}
 async function mountExercises() { document.getElementById("view").innerHTML = "<p>Exercises — coming next.</p>"; }
 async function mountSetup() { document.getElementById("view").innerHTML = "<p>Setup — coming next.</p>"; }
 
