@@ -156,8 +156,46 @@ async function openCard(model, variant) {
       el("span", {}, `errors ${Math.round((st.error_rate || 0) * 100)}%`)),
     el("p", { class: "mc-lastrun", style: "color:var(--text-muted)" }, `last run ${m.last_run}`)));
 }
-async function mountExercises() { document.getElementById("view").innerHTML = "<p>Exercises — coming next.</p>"; }
-async function mountSetup() { document.getElementById("view").innerHTML = "<p>Setup — coming next.</p>"; }
+async function mountExercises() {
+  const v = document.getElementById("view"); v.innerHTML = "";
+  try {
+    const ex = await fetchJSON("data/exercises.json");
+    for (const ds of ex.datasets) {
+      const items = ds.items.map(it => {
+        const crit = (it.checks || []).map(c =>
+          el("span", { class: "chip", title: c.desc || "" }, c.name + (c.params && Object.keys(c.params).length ? " " + JSON.stringify(c.params) : "")));
+        const rules = (it.rules || []).map(r => el("span", { class: "chip" }, r.rule + (r.value ? " " + JSON.stringify(r.value) : "")));
+        const gold = it.gold_passes === true ? el("span", { class: "chip v-go" }, "gold ✓")
+                   : it.gold_passes === false ? el("span", { class: "chip v-stop" }, "gold ✗") : null;
+        const head = el("div", { class: "ex-head", onclick: (e) => { const b = e.currentTarget.nextElementSibling; b.style.display = b.style.display === "none" ? "" : "none"; } },
+          el("span", { class: "ex-id" }, it.id),
+          el("span", { class: "ex-meta" }, [it.category, (it.difficulty ?? it.level) != null ? "L" + (it.difficulty ?? it.level) : null].filter(Boolean).join(" · ")));
+        const body = el("div", { class: "ex-body", style: "display:none" },
+          el("div", { class: "ex-prompt" }, it.prompt),
+          el("div", { class: "ex-crit" }, ...crit, ...rules, gold));
+        return el("div", { class: "ex-item" }, head, body);
+      });
+      v.append(el("div", { class: "panel ex-ds" }, el("h3", {}, `${ds.label} — ${ds.n_items} items`), ...items));
+    }
+  } catch (e) { v.innerHTML = `<p class="panel">Could not load exercises: ${e.message}</p>`; }
+}
+async function mountSetup() {
+  const v = document.getElementById("view"); v.innerHTML = "";
+  try {
+    const s = await fetchJSON("data/setup.json");
+    const matrix = el("table", { class: "table" },
+      el("thead", {}, el("tr", {}, ...["model", "variant", "reasoning_effort", "temperature", "top_p", "top_k", "deadline_s"].map(h => el("th", {}, h)))),
+      el("tbody", {}, ...s.config_matrix.map(r => el("tr", {},
+        ...[r.model, r.variant, r.reasoning_effort, r.temperature, r.top_p, r.top_k, r.call_deadline_s].map(x => el("td", {}, x == null ? "—" : String(x)))))));
+    const checks = el("div", { class: "setup-checks" },
+      ...s.checks.map(c => el("div", { class: "setup-check" },
+        el("span", { class: "chip" }, c.name), el("span", { class: "sc-fam" }, c.tier_family), el("span", { class: "sc-desc" }, c.desc || ""))));
+    v.append(
+      el("div", { class: "panel" }, el("h3", {}, "Environment"), el("p", {}, s.environment.summary)),
+      el("div", { class: "panel" }, el("h3", {}, "Run config"), matrix),
+      el("div", { class: "panel" }, el("h3", {}, `Checks & rules (${s.checks.length})`), checks));
+  } catch (e) { v.innerHTML = `<p class="panel">Could not load setup: ${e.message}</p>`; }
+}
 
 async function boot() {
   try {
