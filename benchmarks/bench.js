@@ -84,8 +84,46 @@ function renderTabs() {
     nav.append(el("button", { class: "bench-tab", "data-tab": t.id, onclick: () => selectTab(t.id) }, t.label));
 }
 
-// stubs replaced in later tasks
-async function openDrill() {}
+function closePanel() { document.getElementById("panel-root").innerHTML = ""; document.body.classList.remove("panel-open"); }
+function openPanel(title, body) {
+  const root = document.getElementById("panel-root");
+  root.innerHTML = "";
+  const overlay = el("div", { class: "panel-overlay", onclick: (e) => { if (e.target === overlay) closePanel(); } },
+    el("div", { class: "panel bench-panel", role: "dialog" },
+      el("div", { class: "panel-head" }, el("h3", {}, title), el("button", { class: "btn panel-close", onclick: closePanel }, "✕")),
+      el("div", { class: "panel-body" }, body)));
+  root.append(overlay);
+  document.body.classList.add("panel-open");
+  document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { closePanel(); document.removeEventListener("keydown", esc); } });
+}
+function itemRow(it) {
+  const failed = it.pass === false;
+  const head = el("div", { class: `di-head ${failed ? "di-fail" : "di-pass"}`, onclick: (e) => {
+    const body = e.currentTarget.nextSibling; body.style.display = body.style.display === "none" ? "" : "none";
+  } },
+    el("span", { class: `chip ${failed ? "v-stop" : "v-go"}` }, failed ? "FAIL" : "pass"),
+    el("span", { class: "di-id" }, it.id),
+    el("span", { class: "di-meta" }, [it.category, it.difficulty != null ? "L" + it.difficulty : null].filter(Boolean).join(" · ")));
+  const failedChecks = (it.checks || []).filter(c => c.passed === false);
+  const body = el("div", { class: "di-body", style: failed ? "" : "display:none" },
+    el("div", { class: "di-prompt" }, el("b", {}, "prompt "), it.prompt),
+    el("div", { class: "di-output" }, el("b", {}, "output "), it.output),
+    failedChecks.length ? el("div", { class: "di-checks" }, el("b", {}, "failed "),
+      ...failedChecks.map(c => el("span", { class: "chip v-stop", title: c.detail || "" }, c.name))) : null);
+  return el("div", { class: "di-item" }, head, body);
+}
+async function openDrill(row, tier) {
+  const title = `${row.label} · ${tier.job}`;
+  try {
+    const d = await fetchJSON("data/" + row.scores[tier.id].detail);
+    const nFail = d.items.filter(i => i.pass === false).length;
+    openPanel(title, el("div", {},
+      el("p", { class: "di-summary" }, `${d.items.length - nFail}/${d.items.length} passed — ${nFail} failure${nFail === 1 ? "" : "s"} shown expanded`),
+      ...d.items.slice().sort((a, b) => (a.pass === b.pass ? 0 : a.pass ? 1 : -1)).map(itemRow)));
+  } catch (e) {
+    openPanel(title, el("p", {}, "Could not load detail: " + e.message));
+  }
+}
 async function openCard() {}
 async function mountExercises() { document.getElementById("view").innerHTML = "<p>Exercises — coming next.</p>"; }
 async function mountSetup() { document.getElementById("view").innerHTML = "<p>Setup — coming next.</p>"; }
