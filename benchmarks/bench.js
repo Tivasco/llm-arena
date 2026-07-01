@@ -19,6 +19,18 @@ function el(tag, attrs = {}, ...kids) {
   for (const kid of kids) if (kid != null) n.append(kid.nodeType ? kid : document.createTextNode(kid));
   return n;
 }
+// Makes a non-button element keyboard-operable as a button: adds role/tabindex,
+// the click handler, and Enter/Space activation. `extra` merges extra attrs
+// (e.g. aria-haspopup, aria-label). Used for the table cells / accordion heads
+// that must stay <td>/<div> for layout but need to be real controls (WCAG 2.1.1 / 4.1.2).
+function activatable(handler, extra = {}) {
+  return {
+    role: "button", tabindex: "0",
+    onclick: handler,
+    onkeydown: (e) => { if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); handler(e); } },
+    ...extra,
+  };
+}
 function verdictClass(rate, buckets) {
   if (rate >= buckets.automate) return "v-go";
   if (rate >= buckets.supervise) return "v-warn";
@@ -38,13 +50,15 @@ function leaderboardRows() {
 }
 function renderLeaderboard() {
   const b = BOARD;
+  const sortBy = (id) => activatable(() => { sortTier = id; mountLeaderboard(); }, { "aria-label": `Sort by ${id}` });
   const head = el("tr", {},
-    el("th", { class: "lb-model", onclick: () => { sortTier = "overall"; mountLeaderboard(); } }, "Model"),
-    ...b.tiers.map(t => el("th", { class: "lb-tier", title: t.job, onclick: () => { sortTier = t.id; mountLeaderboard(); } },
+    el("th", { class: "lb-model", ...sortBy("overall") }, "Model"),
+    ...b.tiers.map(t => el("th", { class: "lb-tier", title: t.job, ...sortBy(t.id) },
       el("div", { class: "lb-tier-label" }, t.label), el("div", { class: "lb-tier-job" }, t.job))),
-    el("th", { onclick: () => { sortTier = "overall"; mountLeaderboard(); } }, "Overall"));
+    el("th", { ...sortBy("overall") }, "Overall"));
   const body = leaderboardRows().map(row => el("tr", {},
-    el("td", { class: "lb-model", onclick: () => openCard(row.model, row.variant) },
+    el("td", { class: "lb-model", ...activatable(() => openCard(row.model, row.variant),
+        { "aria-haspopup": "dialog", "aria-label": `Model card: ${row.label}` }) },
       el("div", {}, row.label),
       el("div", { class: "lb-sub" }, [row.family, row.size].filter(Boolean).join(" · "))),
     ...b.tiers.map(t => {
@@ -52,7 +66,9 @@ function renderLeaderboard() {
       if (!c) return el("td", { class: "lb-cell v-none" }, "—");
       return el("td", { class: `lb-cell ${verdictClass(c.rate, b.verdict_buckets)}${c.borderline ? " lb-borderline" : ""}`,
         title: `${Math.round(c.rate*100)}%${c.borderline ? " · borderline" : ""}`,
-        onclick: () => openDrill(row, t) }, `${c.pass}/${c.total}`);
+        ...activatable(() => openDrill(row, t),
+          { "aria-haspopup": "dialog", "aria-label": `${row.label} ${t.label}: ${c.pass} of ${c.total} passed — open details` }) },
+        `${c.pass}/${c.total}`);
     }),
     el("td", { class: "lb-cell lb-overall" }, `${Math.round(row.overall.rate*100)}%`)));
   return el("table", { class: "table lb" }, el("thead", {}, head), el("tbody", {}, ...body));
@@ -84,30 +100,48 @@ function renderTabs() {
     nav.append(el("button", { class: "bench-tab", "data-tab": t.id, onclick: () => selectTab(t.id) }, t.label));
 }
 
-let _escHandler = null;
+let _panelKeydown = null, _lastFocus = null;
 function closePanel() {
-  if (_escHandler) { document.removeEventListener("keydown", _escHandler); _escHandler = null; }
+  if (_panelKeydown) { document.removeEventListener("keydown", _panelKeydown); _panelKeydown = null; }
   document.getElementById("panel-root").innerHTML = "";
   document.body.classList.remove("panel-open");
+  if (_lastFocus && typeof _lastFocus.focus === "function") _lastFocus.focus();
+  _lastFocus = null;
 }
 function openPanel(title, body) {
-  if (_escHandler) { document.removeEventListener("keydown", _escHandler); _escHandler = null; }
+  if (_panelKeydown) { document.removeEventListener("keydown", _panelKeydown); _panelKeydown = null; }
+  _lastFocus = document.activeElement;
   const root = document.getElementById("panel-root");
   root.innerHTML = "";
-  const overlay = el("div", { class: "panel-overlay", onclick: (e) => { if (e.target === overlay) closePanel(); } },
-    el("div", { class: "panel bench-panel", role: "dialog" },
-      el("div", { class: "panel-head" }, el("h3", {}, title), el("button", { class: "btn panel-close", onclick: closePanel }, "✕")),
-      el("div", { class: "panel-body" }, body)));
+  const closeBtn = el("button", { class: "btn panel-close", type: "button", "aria-label": "Close", onclick: closePanel }, "✕");
+  const dialog = el("div", { class: "panel bench-panel", role: "dialog", "aria-modal": "true", "aria-labelledby": "bench-panel-title" },
+    el("div", { class: "panel-head" }, el("h3", { id: "bench-panel-title" }, title), closeBtn),
+    el("div", { class: "panel-body" }, body));
+  const overlay = el("div", { class: "panel-overlay", onclick: (e) => { if (e.target === overlay) closePanel(); } }, dialog);
   root.append(overlay);
   document.body.classList.add("panel-open");
-  _escHandler = (e) => { if (e.key === "Escape") closePanel(); };
-  document.addEventListener("keydown", _escHandler);
+  _panelKeydown = (e) => {
+    if (e.key === "Escape") { closePanel(); return; }
+    if (e.key === "Tab") {
+      const f = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  };
+  document.addEventListener("keydown", _panelKeydown);
+  closeBtn.focus();
 }
 function itemRow(it) {
   const failed = it.pass === false;
-  const head = el("div", { class: `di-head ${failed ? "di-fail" : "di-pass"}`, onclick: (e) => {
-    const body = e.currentTarget.nextElementSibling; body.style.display = body.style.display === "none" ? "" : "none";
-  } },
+  const head = el("div", { class: `di-head ${failed ? "di-fail" : "di-pass"}`, "aria-expanded": failed ? "true" : "false",
+    ...activatable((e) => {
+      const body = e.currentTarget.nextElementSibling;
+      const show = body.style.display === "none";
+      body.style.display = show ? "" : "none";
+      e.currentTarget.setAttribute("aria-expanded", show ? "true" : "false");
+    }) },
     el("span", { class: `chip ${failed ? "v-stop" : "v-go"}` }, failed ? "FAIL" : "pass"),
     el("span", { class: "di-id" }, it.id),
     el("span", { class: "di-meta" }, [it.category, it.difficulty != null ? "L" + it.difficulty : null].filter(Boolean).join(" · ")));
@@ -167,7 +201,13 @@ async function mountExercises() {
         const rules = (it.rules || []).map(r => el("span", { class: "chip" }, r.rule + (r.value ? " " + JSON.stringify(r.value) : "")));
         const gold = it.gold_passes === true ? el("span", { class: "chip v-go" }, "gold ✓")
                    : it.gold_passes === false ? el("span", { class: "chip v-stop" }, "gold ✗") : null;
-        const head = el("div", { class: "ex-head", onclick: (e) => { const b = e.currentTarget.nextElementSibling; b.style.display = b.style.display === "none" ? "" : "none"; } },
+        const head = el("div", { class: "ex-head", "aria-expanded": "false",
+          ...activatable((e) => {
+            const b = e.currentTarget.nextElementSibling;
+            const show = b.style.display === "none";
+            b.style.display = show ? "" : "none";
+            e.currentTarget.setAttribute("aria-expanded", show ? "true" : "false");
+          }) },
           el("span", { class: "ex-id" }, it.id),
           el("span", { class: "ex-meta" }, [it.category, (it.difficulty ?? it.level) != null ? "L" + (it.difficulty ?? it.level) : null].filter(Boolean).join(" · ")));
         const body = el("div", { class: "ex-body", style: "display:none" },

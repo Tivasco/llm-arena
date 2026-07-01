@@ -672,6 +672,18 @@ main.container { flex: 1 0 auto; padding-top: clamp(40px, 7vw, 84px); }
 .lb-borderline::after { content: " ◐"; opacity: 0.6; font-size: 0.72em; }
 .lb-overall { color: var(--text); background: var(--surface); font-weight: 700; cursor: default; }
 
+/* Keyboard focus for the interactive cells / accordion heads (outline renders
+   on border-collapse cells where box-shadow does not). */
+.lb thead th:focus-visible,
+.lb-cell:focus-visible,
+.lb-model:focus-visible,
+.di-head:focus-visible,
+.ex-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
 /* ── Overlay panels (drill-down proof + model card) ─────────────────────── */
 body.panel-open { overflow: hidden; }
 .panel-overlay {
