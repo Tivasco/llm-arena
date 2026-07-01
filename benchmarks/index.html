@@ -4,56 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Benchmarks — llm-arena</title>
+  <meta name="description" content="Deterministic pass-rate scoring of local LLMs across formatting, tool-use, and coding." />
   <link rel="stylesheet" href="../assets/theme.css" />
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <script src="../assets/chrome.js" defer></script>
+  <script src="bench.js" defer></script>
 </head>
 <body>
   <main class="container">
-    <section class="hero">
-      <span class="eyebrow reveal" data-d="1">Pillar 01 · Measured</span>
-      <h1 class="reveal" data-d="2">Benchmarks</h1>
-      <p class="lede reveal" data-d="3">
-        Deterministic pass-rate scoring across three pillars. Every cell is a
-        <strong>pure-function check</strong> over the model's output — re-runnable,
-        no judge. The leaderboard is on its way.
-      </p>
-    </section>
-
-    <div class="section">
-      <span class="eyebrow">The battery</span>
-      <div class="panel" style="margin-top: calc(var(--space) * 2); overflow-x: auto">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Pillar</th>
-              <th>What it checks</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Formatting</td>
-              <td>Structural &amp; voice constraints on text output</td>
-              <td><span class="chip chip--accent">Wiring up</span></td>
-            </tr>
-            <tr>
-              <td>Tool-use</td>
-              <td>Correctness of returned tool calls &amp; agentic chains</td>
-              <td><span class="chip chip--accent">Wiring up</span></td>
-            </tr>
-            <tr>
-              <td>Coding</td>
-              <td>Typed challenges, sandboxed tests, static rules</td>
-              <td><span class="chip chip--accent">Wiring up</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="mono" style="color: var(--text-faint); font-size: 0.74rem; letter-spacing: 0.1em; margin-top: calc(var(--space) * 2)">
-        // leaderboard coming soon
-      </p>
-    </div>
+    <p class="eyebrow">Deterministic benchmarks</p>
+    <h1>How do local LLMs compare?</h1>
+    <p id="board-meta" style="color:var(--text-muted)"></p>
+    <nav id="tabs" class="bench-tabs" aria-label="Benchmark views"></nav>
+    <section id="view"></section>
+    <div id="panel-root"></div>
   </main>
 </body>
 </html>

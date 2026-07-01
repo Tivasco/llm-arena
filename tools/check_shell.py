@@ -177,6 +177,33 @@ def font_refs_resolve():
             problems.append(f"theme.css: dangling url({v!r})")
     return problems
 
+@check
+def bench_page():
+    """The benchmarks page wires bench.js + has committed board data."""
+    idx = ROOT / "benchmarks" / "index.html"
+    problems = []
+    if not idx.exists(): return ["benchmarks/index.html missing"]
+    txt = read(idx)
+    if 'src="bench.js"' not in txt: problems.append("benchmarks/index.html: missing bench.js")
+    if not (ROOT / "benchmarks" / "bench.js").exists(): problems.append("benchmarks/bench.js missing")
+    if not (ROOT / "benchmarks" / "data" / "board.json").exists(): problems.append("benchmarks/data/board.json missing")
+    return problems
+
+@check
+def js_no_external_or_root_fetch():
+    """bench.js must fetch only relative same-origin paths (no CDN, no root-absolute)."""
+    import re
+    problems = []
+    for p in ROOT.rglob("*.js"):
+        txt = read(p)
+        for m in re.finditer(r'fetch\(\s*["\'](/?)(https?:)?(//)?', txt):
+            lead, scheme, slashes = m.group(1), m.group(2), m.group(3)
+            if scheme or slashes:
+                problems.append(f"{p.relative_to(ROOT)}: external fetch {m.group(0)!r}")
+            elif lead == "/":
+                problems.append(f"{p.relative_to(ROOT)}: root-absolute fetch {m.group(0)!r}")
+    return problems
+
 def main():
     failed = 0
     for fn in CHECKS:
