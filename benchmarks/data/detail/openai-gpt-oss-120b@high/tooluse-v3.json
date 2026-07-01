@@ -1,0 +1,798 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "variant": "high",
+  "tier": "tooluse-v3",
+  "run_name": "openai/gpt-oss-120b+effort=high@2026-06-29T22:22:49Z",
+  "config": {
+    "reasoning_effort": "high",
+    "temperature": 0,
+    "seed": null,
+    "top_p": null,
+    "top_k": null,
+    "call_deadline_s": null,
+    "request_timeout_s": null,
+    "max_tokens_floor": null
+  },
+  "items": [
+    {
+      "id": "tooluse-v3:ask-convert-amount",
+      "category": "ask",
+      "difficulty": 8,
+      "prompt": "Convert my dollars to euros.",
+      "expected": {
+        "checks": [
+          "no_tool_call"
+        ]
+      },
+      "output": "Sure! How many US\u202fdollars would you like to convert to euros?",
+      "latency_ms": 3679.7,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 215,
+      "checks": [
+        {
+          "name": "no_tool_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:ask-reminder-time",
+      "category": "ask",
+      "difficulty": 8,
+      "prompt": "Remind me to call the dentist.",
+      "expected": {
+        "checks": [
+          "no_tool_call"
+        ]
+      },
+      "output": "Sure! When would you like to be reminded to call the dentist?",
+      "latency_ms": 2164.3,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 114,
+      "checks": [
+        {
+          "name": "no_tool_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:ask-flight-origin",
+      "category": "ask",
+      "difficulty": 8,
+      "prompt": "Book me a flight to Berlin next Friday.",
+      "expected": {
+        "checks": [
+          "no_tool_call"
+        ]
+      },
+      "output": "Sure! I see you\u2019d like to fly to Berlin on **Friday,\u202fJuly\u202f3\u202f2026**.  \n\nCould you let me know:\n\n1. **Your departure city (or the airport you\u2019d like to fly from)**\n2. **Preferred travel class** \u2013 economy, business, or first  \n\nOnce I have those details, I\u2019ll go ahead and book the flight for you.",
+      "latency_ms": 16493,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 1061,
+      "checks": [
+        {
+          "name": "no_tool_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:ask-weather-city",
+      "category": "ask",
+      "difficulty": 8,
+      "prompt": "What's the weather right now?",
+      "expected": {
+        "checks": [
+          "no_tool_call"
+        ]
+      },
+      "output": "I\u2019m happy to look that up for you! Could you let me know which city or location you\u2019d like the current weather for?",
+      "latency_ms": 2790.2,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 155,
+      "checks": [
+        {
+          "name": "no_tool_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:recover-unrecoverable",
+      "category": "recovery",
+      "difficulty": 8,
+      "prompt": "What's the stock price of Globex Corp?",
+      "expected": {
+        "checks": [
+          "step0:called_tool:get_stock",
+          "step0:tool_args_match:get_stock",
+          "step0:single_call"
+        ]
+      },
+      "output": null,
+      "latency_ms": 3945.8,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 232,
+      "checks": [
+        {
+          "name": "step0:called_tool:get_stock",
+          "passed": false,
+          "detail": "get_stock not called; got []"
+        },
+        {
+          "name": "step0:tool_args_match:get_stock",
+          "passed": false,
+          "detail": "no call to get_stock"
+        },
+        {
+          "name": "step0:single_call",
+          "passed": false,
+          "detail": "0 tool calls (want 1)"
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "tooluse-v3:recover-ratelimit",
+      "category": "recovery",
+      "difficulty": 8,
+      "prompt": "What's Apple's stock price?",
+      "expected": {
+        "checks": [
+          "final:no_tool_call",
+          "step0:single_call",
+          "final:answer_contains",
+          "step0:called_tool:get_stock",
+          "step1:called_tool:get_stock",
+          "step1:single_call",
+          "step1:tool_args_match:get_stock",
+          "step0:tool_args_match:get_stock"
+        ]
+      },
+      "output": "Apple\u2019s stock (ticker\u202fAAPL) is currently trading at **$190 per share**.  Keep in mind that stock prices fluctuate throughout the day, so the price may change shortly after this quote.",
+      "latency_ms": 6952.2,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 364,
+      "checks": [
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_stock",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:recover-fix-ticker",
+      "category": "recovery",
+      "difficulty": 8,
+      "prompt": "What's Tesla's stock price?",
+      "expected": {
+        "checks": [
+          "final:no_tool_call",
+          "step0:called_tool:get_stock",
+          "step0:tool_args_match:get_stock",
+          "step1:single_call",
+          "final:answer_contains",
+          "step1:tool_args_match:get_stock",
+          "step1:called_tool:get_stock",
+          "step0:single_call"
+        ]
+      },
+      "output": "Tesla (NASDAQ\u202f:\u202fTSLA) is currently trading at **$283 per share**. Keep in mind that stock prices fluctuate throughout the day, so it\u2019s a good idea to check a real\u2011time market source if you need the most up\u2011to\u2011date figure.",
+      "latency_ms": 10814.599999999999,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 607,
+      "checks": [
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:recover-retry",
+      "category": "recovery",
+      "difficulty": 8,
+      "prompt": "What's the weather in Lisbon?",
+      "expected": {
+        "checks": [
+          "step0:single_call",
+          "step1:tool_args_match:get_weather",
+          "step1:single_call",
+          "step0:tool_args_match:get_weather",
+          "final:no_tool_call",
+          "final:answer_contains",
+          "step0:called_tool:get_weather",
+          "step1:called_tool:get_weather"
+        ]
+      },
+      "output": "It\u2019s currently raining in Lisbon. If you need more details (temperature, forecast for later today, etc.), just let me know and I can look that up for you!",
+      "latency_ms": 7388.400000000001,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 372,
+      "checks": [
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:chain-3hop-launch-temp",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "What's the temperature at the next rocket launch site, in Fahrenheit?",
+      "expected": {
+        "checks": [
+          "final:no_tool_call",
+          "step1:tool_args_match:get_weather",
+          "step2:tool_args_match:convert_temperature",
+          "step0:single_call",
+          "final:answer_contains",
+          "step1:single_call",
+          "step0:tool_args_match:get_next_launch",
+          "step1:called_tool:get_weather",
+          "step0:called_tool:get_next_launch",
+          "step2:single_call",
+          "step2:called_tool:convert_temperature"
+        ]
+      },
+      "output": "The temperature at the next launch site (Boca\u202fChica) is **86\u202f\u00b0F**.",
+      "latency_ms": 11971.6,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 646,
+      "checks": [
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step2:tool_args_match:convert_temperature",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_next_launch",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_next_launch",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step2:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step2:called_tool:convert_temperature",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:chain-order-convert",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "What is order #4471's total, in euros?",
+      "expected": {
+        "checks": [
+          "final:answer_contains",
+          "final:no_tool_call",
+          "step1:called_tool:convert_currency",
+          "step0:called_tool:get_order",
+          "step0:tool_args_match:get_order",
+          "step1:single_call",
+          "step1:tool_args_match:convert_currency",
+          "step0:single_call"
+        ]
+      },
+      "output": "Order\u202f#4471\u2019s total comes out to **\u20ac222**.",
+      "latency_ms": 6144.1,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 305,
+      "checks": [
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:convert_currency",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_order",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_order",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:convert_currency",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:chain-capital-population",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "What's the population of the capital of Spain?",
+      "expected": {
+        "checks": [
+          "final:no_tool_call",
+          "step1:tool_args_match:get_population",
+          "step1:called_tool:get_population",
+          "step1:single_call",
+          "final:answer_contains",
+          "step0:called_tool:get_capital",
+          "step0:single_call",
+          "step0:tool_args_match:get_capital"
+        ]
+      },
+      "output": "Spain\u2019s capital is\u202fMadrid, which has a population of roughly **3.2\u202fmillion people** (about 3.2\u202fM).",
+      "latency_ms": 7448.8,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 395,
+      "checks": [
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_population",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_population",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": false,
+          "detail": "'3.2 million' not in answer"
+        },
+        {
+          "name": "step0:called_tool:get_capital",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_capital",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "tooluse-v3:chain-user-orders",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "How many orders does the user Alice have?",
+      "expected": {
+        "checks": [
+          "final:no_tool_call",
+          "step0:single_call",
+          "step1:called_tool:get_user_orders",
+          "final:answer_contains",
+          "step0:tool_args_match:lookup_user",
+          "step1:single_call",
+          "step0:called_tool:lookup_user",
+          "step1:tool_args_match:get_user_orders"
+        ]
+      },
+      "output": "Alice has\u202f3\u202forders.",
+      "latency_ms": 7557.7,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 403,
+      "checks": [
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_user_orders",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:lookup_user",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:lookup_user",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_user_orders",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:chain-capital-time",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "What time is it in the capital of Australia?",
+      "expected": {
+        "checks": [
+          "step0:tool_args_match:get_capital",
+          "step0:called_tool:get_capital",
+          "step0:single_call"
+        ]
+      },
+      "output": null,
+      "latency_ms": 7353.1,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 458,
+      "checks": [
+        {
+          "name": "step0:tool_args_match:get_capital",
+          "passed": false,
+          "detail": "no call to get_capital"
+        },
+        {
+          "name": "step0:called_tool:get_capital",
+          "passed": false,
+          "detail": "get_capital not called; got ['get_time']"
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "tooluse-v3:chain-hq-weather",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "What's the weather at Hooli's headquarters?",
+      "expected": {
+        "checks": [
+          "step1:tool_args_match:get_weather",
+          "step0:tool_args_match:get_company_hq",
+          "step1:called_tool:get_weather",
+          "step1:single_call",
+          "step0:single_call",
+          "final:answer_contains",
+          "final:no_tool_call",
+          "step0:called_tool:get_company_hq"
+        ]
+      },
+      "output": "It\u2019s currently foggy at Hooli\u2019s headquarters in Santa\u202fClara.",
+      "latency_ms": 9687.5,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 543,
+      "checks": [
+        {
+          "name": "step1:tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_company_hq",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_company_hq",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "tooluse-v3:chain-launch-weather",
+      "category": "chaining",
+      "difficulty": 8,
+      "prompt": "What's the weather at the next rocket launch site?",
+      "expected": {
+        "checks": [
+          "step0:tool_args_match:get_next_launch",
+          "final:answer_contains",
+          "step1:called_tool:get_weather",
+          "step1:tool_args_match:get_weather",
+          "final:no_tool_call",
+          "step0:called_tool:get_next_launch",
+          "step1:single_call",
+          "step0:single_call"
+        ]
+      },
+      "output": "The next scheduled launch is set for **Boca\u202fChica**. According to the latest weather data, it\u2019s currently **sunny** there.",
+      "latency_ms": 10388.8,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 592,
+      "checks": [
+        {
+          "name": "step0:tool_args_match:get_next_launch",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_next_launch",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    }
+  ]
+}

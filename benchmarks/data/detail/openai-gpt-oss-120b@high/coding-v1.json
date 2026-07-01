@@ -1,0 +1,271 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "variant": "high",
+  "tier": "coding-v1",
+  "run_name": "openai/gpt-oss-120b+effort=high@2026-06-29T22:30:28Z",
+  "config": {
+    "reasoning_effort": "high",
+    "temperature": 0,
+    "seed": null,
+    "top_p": null,
+    "top_k": null,
+    "call_deadline_s": null,
+    "request_timeout_s": null,
+    "max_tokens_floor": null
+  },
+  "items": [
+    {
+      "id": "coding-v1:persistent-vector",
+      "category": "runtime",
+      "difficulty": 5,
+      "prompt": "Write TypeScript. Implement and `export class PersistentVector<T>` \u2014 an IMMUTABLE\n(persistent) vector with structural sharing, with this API:\n  static empty<T>(): PersistentVector<T>\n  get size(): number\n  get(i: number): T          // throws on out-of-range\n  push(value: T): PersistentVector<T>   // returns a NEW vector; the original is unchanged\n`push` must NOT mutate the receiver, and must be sub-linear (it will be called 100,000+ times \u2014\ndo NOT copy the whole backing array on every push; use a tree with structural sharing).\nRules: generic, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "type_check"
+        ]
+      },
+      "output": {
+        "detail": {
+          "error": "queue_timeout",
+          "message": "Client slot ('interactive') unavailable after 60.0s.",
+          "model": "openai/gpt-oss-120b",
+          "client": "interactive"
+        }
+      },
+      "latency_ms": 60016.1,
+      "http_status": 429,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "type_check",
+          "passed": false,
+          "detail": "{\"detail\":{\"error\":\"queue_timeout\",\"message\":\"Client slot ('interactive') unavailable after 60.0s.\",\"model\":\"openai/gpt-oss-120b\",\"client\":\"interactive\"}}"
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:json-parse",
+      "category": "runtime",
+      "difficulty": 4,
+      "prompt": "Write TypeScript. Implement and `export function parse(s: string): Json` \u2014 a recursive-descent\nparser for a JSON subset (objects, arrays, strings with \\\" \\\\ \\/ \\n \\t \\r \\b \\f and \\uXXXX escapes,\nnumbers incl. negatives/decimals/exponents, true, false, null, and insignificant whitespace).\nAlso `export type Json`. On malformed input (trailing commas, unquoted keys, single quotes,\ntruncated input, trailing garbage) it MUST throw.\nRules: do NOT use JSON.parse, do NOT use eval, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "type_check"
+        ]
+      },
+      "output": "HTTPConnectionPool(host='[redacted]', port=8080): Read timed out. (read timeout=180)",
+      "latency_ms": 180018.5,
+      "http_status": 0,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "type_check",
+          "passed": false,
+          "detail": "HTTPConnectionPool(host='[redacted]', port=8080): Read timed out. (read timeout=180)"
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:parse-query",
+      "category": "type-level",
+      "difficulty": 3,
+      "prompt": "Write TypeScript. Implement and `export` a TYPE (not a function) `ParseQuery<S extends string>`\nthat parses a URL query string literal into an object type at COMPILE TIME:\n  ParseQuery<\"a=1\">          => { a: \"1\" }\n  ParseQuery<\"a=1&b=2\">      => { a: \"1\"; b: \"2\" }\n  ParseQuery<\"x=hi&y=lo&z=1\"> => { x: \"hi\"; y: \"lo\"; z: \"1\" }\n  ParseQuery<\"\">             => {}\nUse template-literal types + recursion. This is type-level only \u2014 no runtime code, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rules",
+          "rule:no_any",
+          "rule:banned_substring",
+          "type_check",
+          "rule:required_export"
+        ]
+      },
+      "output": "/** Parse a URL query string literal into an object type at compile time. */\nexport type ParseQuery<S extends string> =\n  // Empty query \u2192 empty object\n  S extends ''\n    ? {}\n    // Split on the first '&' and merge the result of the head pair with the tail\n    : S extends `${infer Pair}&${infer Rest}`\n      ? ParsePair<Pair> & ParseQuery<Rest>\n      // No more '&' \u2192 parse the final pair\n      : ParsePair<S>;\n\n/** Turn a single `key=value` fragment into an object `{ key: value }`. */\ntype ParsePair<P extends string> =\n  P extends `${infer K}=${infer V}`\n    ? { [K in K]: V }\n    : {};",
+      "latency_ms": 28585.5,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 1606,
+      "checks": [
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": false,
+          "detail": "solution.ts(15,15): error TS2313: Type parameter 'K' has a circular constraint.\n"
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:typed-emitter",
+      "category": "hybrid",
+      "difficulty": 2,
+      "prompt": "Write TypeScript. Implement and `export` a class `EventEmitter<TEvents extends Record<string, unknown[]>>`\nwith these methods, fully type-checked against the event map:\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void\n`emit` invokes every handler registered for that event, in registration order, with the given args.\nThe handler's argument types MUST be inferred per event from TEvents, and an unknown event name or\nwrong argument types MUST be a compile error.\nRules: pure TypeScript, no external imports, do NOT use `any` (and no `as any`).\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rules",
+          "rule:no_any",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:required_export",
+          "type_check"
+        ]
+      },
+      "output": "export class EventEmitter<TEvents extends Record<string, unknown[]>> {\n  /**\n   * Internal storage: for each event name we keep an array of handlers.\n   * Handlers are stored in a type\u2011erased form (unknown arguments) because\n   * the concrete tuple type is known only at compile time.\n   */\n  private readonly handlers = new Map<\n    keyof TEvents,\n    Array<(...args: unknown[]) => void>\n  >();\n\n  /**\n   * Register a handler for an event.\n   *\n   * @param name    Event name \u2013 must be a key of `TEvents`.\n   * @param handler Function whose parameters exactly match the tuple type\n   *                associated with `name` in `TEvents`.\n   */\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void {\n    let list = this.handlers.get(name);\n    if (!list) {\n      list = [];\n      this.handlers.set(name, list);\n    }\n    // Store the handler in a type\u2011erased form; we know it matches `TEvents[K]`.\n    list.push(handler as (...args: unknown[]) => void);\n  }\n\n  /**\n   * Emit an event, invoking all registered handlers in the order they were added.\n   *\n   * @param name Event name \u2013 must be a key of `TEvents`.\n   * @param args Arguments that match the tuple type associated with `name`.\n   */\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void {\n    const list = this.handlers.get(name);\n    if (!list) return;\n\n    for (const h of list) {\n      // Cast back to the concrete handler type before invoking.\n      (h as (...args: TEvents[K]) => void)(...args);\n    }\n  }\n}",
+      "latency_ms": 63460.3,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 3997,
+      "checks": [
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "coding-v1:median-stream",
+      "category": "runtime",
+      "difficulty": 1,
+      "prompt": "Write TypeScript. Implement and `export` a class `MedianStream` that tracks a running median\nof a stream of numbers, with this exact API:\n  class MedianStream { add(n: number): void; median(): number }\n`add` inserts a number; `median()` returns the current median (the average of the two middle\nvalues when the count is even). Calling `median()` before any `add` may throw.\nRules: pure TypeScript, no external imports, do NOT use `any`, do NOT call console.log.\nPerformance: `add` will be called hundreds of thousands of times \u2014 it must be sub-linear\n(do NOT re-sort the whole history on every call).\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:required_export",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:no_any",
+          "rules",
+          "type_check"
+        ]
+      },
+      "output": "/**\n * A binary heap implementation for numbers.\n * The `compare` function determines the ordering:\n *   - For a min\u2011heap: (a, b) => a < b\n *   - For a max\u2011heap: (a, b) => a > b\n */\nclass BinaryHeap {\n  private data: number[];\n  private compare: (a: number, b: number) => boolean;\n\n  constructor(compare: (a: number, b: number) => boolean) {\n    this.data = [];\n    this.compare = compare;\n  }\n\n  /** Number of elements in the heap. */\n  size(): number {\n    return this.data.length;\n  }\n\n  /** Returns the top element without removing it. */\n  peek(): number {\n    if (this.size() === 0) throw new Error('Heap is empty');\n    return this.data[0];\n  }\n\n  /** Inserts a value into the heap. */\n  push(value: number): void {\n    this.data.push(value);\n    this.bubbleUp(this.size() - 1);\n  }\n\n  /** Removes and returns the top element. */\n  pop(): number {\n    if (this.size() === 0) throw new Error('Heap is empty');\n    const top = this.data[0];\n    const last = this.data.pop()!;\n    if (this.size() > 0) {\n      this.data[0] = last;\n      this.bubbleDown(0);\n    }\n    return top;\n  }\n\n  private bubbleUp(index: number): void {\n    while (index > 0) {\n      const parent = Math.floor((index - 1) / 2);\n      if (this.compare(this.data[index], this.data[parent])) {\n        [this.data[index], this.data[parent]] = [this.data[parent], this.data[index]];\n        index = parent;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private bubbleDown(index: number): void {\n    const length = this.size();\n    while (true) {\n      let left = index * 2 + 1;\n      let right = index * 2 + 2;\n      let candidate = index;\n\n      if (left < length && this.compare(this.data[left], this.data[candidate])) {\n        candidate = left;\n      }\n      if (right < length && this.compare(this.data[right], this.data[candidate])) {\n        candidate = right;\n      }\n\n      if (candidate !== index) {\n        [this.data[index], this.data[candidate]] = [this.data[candidate], this.data[index]];\n        index = candidate;\n      } else {\n        break;\n      }\n    }\n  }\n}\n\n/**\n * MedianStream maintains a running median of an incoming numeric stream.\n *\n *   const ms = new MedianStream();\n *   ms.add(5);\n *   console.log(ms.median()); // 5\n *\n * The implementation uses two heaps:\n *   - `lower` (max\u2011heap) stores the smaller half of numbers.\n *   - `higher` (min\u2011heap) stores the larger half of numbers.\n *\n * The median is either the top of the larger heap (odd count) or\n * the average of both tops (even count).\n */\nexport class MedianStream {\n  private lower: BinaryHeap; // max\u2011heap for the lower half\n  private higher: BinaryHeap; // min\u2011heap for the upper half\n\n  constructor() {\n    this.lower = new BinaryHeap((a, b) => a > b); // max\u2011heap\n    this.higher = new BinaryHeap((a, b) => a < b); // min\u2011heap\n  }\n\n  /** Inserts a number into the stream. */\n  add(n: number): void {\n    // Decide which heap receives the new value.\n    if (this.lower.size() === 0 || n <= this.lower.peek()) {\n      this.lower.push(n);\n    } else {\n      this.higher.push(n);\n    }\n\n    // Rebalance to keep size difference \u2264 1.\n    if (this.lower.size() > this.higher.size() + 1) {\n      this.higher.push(this.lower.pop());\n    } else if (this.higher.size() > this.lower.size() + 1) {\n      this.lower.push(this.higher.pop());\n    }\n  }\n\n  /** Returns the current median. Throws if no elements have been added. */\n  median(): number {\n    const total = this.lower.size() + this.higher.size();\n    if (total === 0) {\n      throw new Error('MedianStream is empty \u2013 no elements to compute a median.');\n    }\n\n    if (this.lower.size() === this.higher.size()) {\n      // Even number of elements: average the two middle values.\n      return (this.lower.peek() + this.higher.peek()) / 2;\n    } else if (this.lower.size() > this.higher.size()) {\n      // Lower half has the extra element.\n      return this.lower.peek();\n    } else {\n      // Upper half has the extra element.\n      return this.higher.peek();\n    }\n  }\n}",
+      "latency_ms": 40040.5,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 2594,
+      "checks": [
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": false,
+          "detail": "contains banned 'console.log'"
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": false,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    }
+  ]
+}

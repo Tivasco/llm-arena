@@ -1,0 +1,258 @@
+{
+  "model": "qwen/qwen3.6-35b-a3b",
+  "variant": "base",
+  "tier": "coding-v1",
+  "run_name": "qwen3.6:35b@2026-06-20T06:35:31Z",
+  "config": {
+    "reasoning_effort": null,
+    "temperature": 0,
+    "seed": null,
+    "top_p": null,
+    "top_k": null,
+    "call_deadline_s": null,
+    "request_timeout_s": null,
+    "max_tokens_floor": null
+  },
+  "items": [
+    {
+      "id": "coding-v1:persistent-vector",
+      "category": "runtime",
+      "difficulty": 5,
+      "prompt": "Write TypeScript. Implement and `export class PersistentVector<T>` \u2014 an IMMUTABLE\n(persistent) vector with structural sharing, with this API:\n  static empty<T>(): PersistentVector<T>\n  get size(): number\n  get(i: number): T          // throws on out-of-range\n  push(value: T): PersistentVector<T>   // returns a NEW vector; the original is unchanged\n`push` must NOT mutate the receiver, and must be sub-linear (it will be called 100,000+ times \u2014\ndo NOT copy the whole backing array on every push; use a tree with structural sharing).\nRules: generic, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:required_export",
+          "rule:no_any",
+          "rules",
+          "type_check"
+        ]
+      },
+      "output": "export class PersistentVector<T> {\n  private static readonly BRANCH_FACTOR = 32;\n  private static readonly SHIFT = 5; // log2(32)\n  private static readonly MASK = 0x1F; // 32 - 1\n\n  private readonly nodes: Array<Array<T | null>>;\n  private readonly depth: number;\n  private readonly size: number;\n\n  private constructor(nodes: Array<Array<T | null>>, depth: number, size: number) {\n    this.nodes = nodes;\n    this.depth = depth;\n    this.size = size;\n  }\n\n  static empty<T>(): PersistentVector<T> {\n    return new PersistentVector<T>([], 0, 0);\n  }\n\n  get size(): number {\n    return this.size;\n  }\n\n  get(i: number): T {\n    if (i < 0 || i >= this.size) {\n      throw new RangeError(`Index ${i} out of bounds for vector of size ${this.size}`);\n    }\n    return this._get(i, 0);\n  }\n\n  push(value: T): PersistentVector<T> {\n    if (this.size === 0) {\n      // Create a new root with one leaf\n      const leaf: Array<T | null> = new Array(PersistentVector.BRANCH_FACTOR).fill(null);\n      leaf[0] = value;\n      return new PersistentVector<T>([leaf], 0, 1);\n    }\n\n    // Determine if we need to increase depth\n    const newDepth = this._newDepthRequired();\n    let newNodes: Array<Array<T | null>>;\n\n    if (newDepth > this.depth) {\n      // Need to create a new root level\n      const oldRoot = this.nodes[0];\n      const newRoot: Array<Array<T | null> | T | null> = new Array(PersistentVector.BRANCH_FACTOR).fill(null);\n      newRoot[0] = oldRoot;\n      newRoot[1] = this._pushTail(oldRoot, value, 0);\n      newNodes = [newRoot as Array<Array<T | null> | T | null>];\n    } else {\n      // Same depth, just update the path\n      newNodes = this._updatePath(value, 0);\n    }\n\n    return new PersistentVector<T>(newNodes, newDepth, this.size + 1);\n  }\n\n  private _newDepthRequired(): number {\n    // Calculate the number of bits needed to represent the new size\n    const newSize = this.size + 1;\n    if (newSize <= PersistentVector.BRANCH_FACTOR) {\n      return 0;\n    }\n    const bits = Math.ceil(Math.log2(newSize) / PersistentVector.SHIFT);\n    return bits;\n  }\n\n  private _get(i: number, level: number): T {\n    if (level === this.depth) {\n      // Leaf level\n      const leaf = this.nodes[level];\n      const idx = i & PersistentVector.MASK;\n      const val = leaf[idx];\n      if (val === null) {\n        throw new Error(\"Internal error: null value in leaf\");\n      }\n      return val as T;\n    }\n\n    const node = this.nodes[level];\n    const idx = (i >> (level * PersistentVector.SHIFT)) & PersistentVector.MASK;\n    const child = node[idx];\n\n    if (child === null) {\n      throw new Error(\"Internal error: null child\");\n    }\n\n    // If child is a leaf array, we're at the next level\n    if (Array.isArray(child)) {\n      return this._get(i, level + 1);\n    } else {\n      // This shouldn't happen in a well-formed tree except at the very bottom\n      // Actually, in our representation, all nodes at levels < depth are arrays of children\n      // and at depth they are arrays of values.\n      // Let's restructure: nodes[level] is always an array.\n      // At level < depth, children are arrays (sub-nodes).\n      // At level == depth, children are values.\n      throw new Error(\"Internal error: unexpected child type\");\n    }\n  }\n\n  private _pushTail(node: Array<T | null>, value: T, level: number): Array<T | null> {\n    if (level === this.depth) {\n      // Leaf level: create a new leaf with the value\n      const newLeaf = node.slice();\n      const idx = this.size & PersistentVector.MASK;\n      newLeaf[idx] = value;\n      return newLeaf;\n    }\n\n    const idx = (this.size >> (level * PersistentVector.SHIFT)) & PersistentVector.MASK;\n    const child = node[idx];\n\n    if (child === null) {\n      // Create a new leaf at the next level\n      const newLeaf: Array<T | null> = new Array(PersistentVector.BRANCH_FACTOR).fill(null);\n      const newChild = this._pushTail(newLeaf, value, level + 1);\n      const newNode = node.slice();\n      newNode[idx] = newChild;\n      return newNode;\n",
+      "latency_ms": 18069.2,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": false,
+          "detail": "solution.ts(8,20): error TS2300: Duplicate identifier 'size'.\nsolution.ts(20,7): error TS2300: Duplicate identifier 'size'.\nsolution.ts(49,19): error TS2322: Type '(T | (T | null)[] | null)[]' is not assignable to type '(T | null)[]'.\n  Type 'T | (T | null)[] | null' is not assignable to type 'T | null'.\n    Type '(T | null)[]' is not assignable to type 'T'.\n      'T' could be instantiated with an arbitrary type which could be unrelated to '(T | null)[]'.\nsolution.ts(52,7): error TS2322: Type '("
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:json-parse",
+      "category": "runtime",
+      "difficulty": 4,
+      "prompt": "Write TypeScript. Implement and `export function parse(s: string): Json` \u2014 a recursive-descent\nparser for a JSON subset (objects, arrays, strings with \\\" \\\\ \\/ \\n \\t \\r \\b \\f and \\uXXXX escapes,\nnumbers incl. negatives/decimals/exponents, true, false, null, and insignificant whitespace).\nAlso `export type Json`. On malformed input (trailing commas, unquoted keys, single quotes,\ntruncated input, trailing garbage) it MUST throw.\nRules: do NOT use JSON.parse, do NOT use eval, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:banned_substring",
+          "rule:no_any",
+          "rules",
+          "rule:required_export",
+          "type_check",
+          "rule:banned_substring"
+        ]
+      },
+      "output": "export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };\n\nexport function parse(s: string): Json {\n  let pos = 0;\n  const len = s.length;\n\n  function skipWhitespace(): void {\n    while (pos < len) {\n      const c = s.charCodeAt(pos);\n      if (c !== 0x20 && c !== 0x09 && c !== 0x0A && c !== 0x0D) {\n        break;\n      }\n      pos++;\n    }\n  }\n\n  function peek(): string {\n    skipWhitespace();\n    if (pos >= len) {\n      throw new SyntaxError(\"Unexpected end of input\");\n    }\n    return s[pos];\n  }\n\n  function consume(expected: string): void {\n    skipWhitespace();\n    if (pos >= len || s[pos] !== expected) {\n      throw new SyntaxError(`Expected '${expected}' but found '${pos < len ? s[pos] : \"end of input\"}'`);\n    }\n    pos++;\n  }\n\n  function parseString(): string {\n    consume('\"');\n    let result = \"\";\n    while (pos < len) {\n      const c = s[pos];\n      if (c === '\"') {\n        pos++;\n        return result;\n      }\n      if (c === '\\\\') {\n        pos++;\n        if (pos >= len) {\n          throw new SyntaxError(\"Unexpected end of input in string escape\");\n        }\n        const esc = s[pos];\n        switch (esc) {\n          case '\"': result += '\"'; break;\n          case '\\\\': result += '\\\\'; break;\n          case '/': result += '/'; break;\n          case 'b': result += '\\b'; break;\n          case 'f': result += '\\f'; break;\n          case 'n': result += '\\n'; break;\n          case 'r': result += '\\r'; break;\n          case 't': result += '\\t'; break;\n          case 'u':\n            pos++;\n            let hex = \"\";\n            for (let i = 0; i < 4; i++) {\n              if (pos >= len) {\n                throw new SyntaxError(\"Unexpected end of input in unicode escape\");\n              }\n              const h = s[pos];\n              if (!isHexDigit(h)) {\n                throw new SyntaxError(`Invalid unicode escape character: ${h}`);\n              }\n              hex += h;\n              pos++;\n            }\n            result += String.fromCharCode(parseInt(hex, 16));\n            break;\n          default:\n            throw new SyntaxError(`Invalid escape character: ${esc}`);\n        }\n      } else {\n        // Check for control characters (0x00-0x1F) which are not allowed unescaped\n        const code = c.charCodeAt(0);\n        if (code < 0x20) {\n          throw new SyntaxError(`Unescaped control character in string: ${code}`);\n        }\n        result += c;\n        pos++;\n      }\n    }\n    throw new SyntaxError(\"Unterminated string literal\");\n  }\n\n  function isHexDigit(c: string): boolean {\n    const code = c.charCodeAt(0);\n    return (code >= 0x30 && code <= 0x39) || // 0-9\n           (code >= 0x41 && code <= 0x46) || // A-F\n           (code >= 0x61 && code <= 0x66);   // a-f\n  }\n\n  function parseNumber(): number {\n    skipWhitespace();\n    const start = pos;\n    let isNegative = false;\n    if (pos < len && s[pos] === '-') {\n      isNegative = true;\n      pos++;\n    }\n    if (pos >= len || !isDigit(s[pos])) {\n      throw new SyntaxError(\"Invalid number\");\n    }\n    // Integer part\n    if (s[pos] === '0') {\n      pos++;\n      // If followed by digit, it's invalid (leading zeros not allowed except for 0 itself)\n      if (pos < len && isDigit(s[pos])) {\n        throw new SyntaxError(\"Invalid number: leading zeros not allowed\");\n      }\n    } else {\n      // First digit is 1-9\n      pos++;\n      while (pos < len && isDigit(s[pos])) {\n        pos++;\n      }\n    }\n    // Fractional part\n    if (pos < len && s[pos] === '.') {\n      pos++;\n      if (pos >= len || !isDigit(s[pos])) {\n        throw new SyntaxError(\"Invalid number: expected digit after decimal point\");\n      }\n      while (pos < len && isDigit(s[pos])) {\n        pos++;\n      }\n    }\n    // Exponent part\n    if (pos < len && (s[pos] === 'e' || s[pos] === 'E')) {\n      pos++;\n      if (pos < len && (s[pos] === '+' || s[pos] === '-')) {\n        pos++;\n      }\n      if (pos >= len || !isDigit(s[pos])) {\n        throw new SyntaxError(\"Inval",
+      "latency_ms": 26356,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:parse-query",
+      "category": "type-level",
+      "difficulty": 3,
+      "prompt": "Write TypeScript. Implement and `export` a TYPE (not a function) `ParseQuery<S extends string>`\nthat parses a URL query string literal into an object type at COMPILE TIME:\n  ParseQuery<\"a=1\">          => { a: \"1\" }\n  ParseQuery<\"a=1&b=2\">      => { a: \"1\"; b: \"2\" }\n  ParseQuery<\"x=hi&y=lo&z=1\"> => { x: \"hi\"; y: \"lo\"; z: \"1\" }\n  ParseQuery<\"\">             => {}\nUse template-literal types + recursion. This is type-level only \u2014 no runtime code, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:banned_substring",
+          "rules",
+          "type_check",
+          "rule:no_any",
+          "rule:banned_substring",
+          "rule:required_export"
+        ]
+      },
+      "output": "type ParseQuery<S extends string> = S extends ''\n  ? {}\n  : S extends `${infer Key}=${infer Rest}`\n    ? Rest extends `${infer Value}&${infer Next}`\n      ? { [K in Key]: Value } & ParseQuery<Next>\n      : { [K in Key]: Rest }\n    : S extends `${infer Key}&${infer Rest}`\n      ? ParseQuery<Rest>\n      : {}",
+      "latency_ms": 1469.8,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": false,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": false,
+          "detail": "no export named ParseQuery"
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:typed-emitter",
+      "category": "hybrid",
+      "difficulty": 2,
+      "prompt": "Write TypeScript. Implement and `export` a class `EventEmitter<TEvents extends Record<string, unknown[]>>`\nwith these methods, fully type-checked against the event map:\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void\n`emit` invokes every handler registered for that event, in registration order, with the given args.\nThe handler's argument types MUST be inferred per event from TEvents, and an unknown event name or\nwrong argument types MUST be a compile error.\nRules: pure TypeScript, no external imports, do NOT use `any` (and no `as any`).\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rules",
+          "type_check",
+          "rule:no_any",
+          "rule:required_export"
+        ]
+      },
+      "output": "export class EventEmitter<TEvents extends Record<string, unknown[]>> {\n  private listeners: Map<keyof TEvents, Array<(...args: any) => void>> = new Map();\n\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void {\n    const existing = this.listeners.get(name);\n    if (existing) {\n      existing.push(handler as (...args: any) => void);\n    } else {\n      this.listeners.set(name, [handler as (...args: any) => void]);\n    }\n  }\n\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void {\n    const handlers = this.listeners.get(name);\n    if (handlers) {\n      for (const handler of handlers) {\n        handler(...args);\n      }\n    }\n  }\n}",
+      "latency_ms": 2581.4,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "rules",
+          "passed": false,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": false,
+          "detail": "uses any: ': any'"
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:median-stream",
+      "category": "runtime",
+      "difficulty": 1,
+      "prompt": "Write TypeScript. Implement and `export` a class `MedianStream` that tracks a running median\nof a stream of numbers, with this exact API:\n  class MedianStream { add(n: number): void; median(): number }\n`add` inserts a number; `median()` returns the current median (the average of the two middle\nvalues when the count is even). Calling `median()` before any `add` may throw.\nRules: pure TypeScript, no external imports, do NOT use `any`, do NOT call console.log.\nPerformance: `add` will be called hundreds of thousands of times \u2014 it must be sub-linear\n(do NOT re-sort the whole history on every call).\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rules",
+          "type_check",
+          "rule:required_export",
+          "rule:no_any",
+          "rule:banned_substring"
+        ]
+      },
+      "output": "class MedianStream {\n  private minHeap: number[];\n  private maxHeap: number[];\n\n  constructor() {\n    // maxHeap stores the smaller half of numbers (using negative values for min-heap behavior)\n    this.maxHeap = [];\n    // minHeap stores the larger half of numbers\n    this.minHeap = [];\n  }\n\n  private swap(arr: number[], i: number, j: number): void {\n    const temp = arr[i];\n    arr[i] = arr[j];\n    arr[j] = temp;\n  }\n\n  private pushMinHeap(val: number): void {\n    this.minHeap.push(val);\n    this.bubbleUpMin(this.minHeap.length - 1);\n  }\n\n  private popMinHeap(): number {\n    const top = this.minHeap[0];\n    const last = this.minHeap.pop()!;\n    if (this.minHeap.length > 0) {\n      this.minHeap[0] = last;\n      this.bubbleDownMin(0);\n    }\n    return top;\n  }\n\n  private bubbleUpMin(index: number): void {\n    while (index > 0) {\n      const parent = Math.floor((index - 1) / 2);\n      if (this.minHeap[index] < this.minHeap[parent]) {\n        this.swap(this.minHeap, index, parent);\n        index = parent;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private bubbleDownMin(index: number): void {\n    const n = this.minHeap.length;\n    while (true) {\n      let smallest = index;\n      const left = 2 * index + 1;\n      const right = 2 * index + 2;\n      if (left < n && this.minHeap[left] < this.minHeap[smallest]) {\n        smallest = left;\n      }\n      if (right < n && this.minHeap[right] < this.minHeap[smallest]) {\n        smallest = right;\n      }\n      if (smallest !== index) {\n        this.swap(this.minHeap, smallest, index);\n        index = smallest;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private pushMaxHeap(val: number): void {\n    // Store negative to simulate max-heap with min-heap structure\n    this.maxHeap.push(-val);\n    this.bubbleUpMax(this.maxHeap.length - 1);\n  }\n\n  private popMaxHeap(): number {\n    const top = -this.maxHeap[0];\n    const last = this.maxHeap.pop()!;\n    if (this.maxHeap.length > 0) {\n      this.maxHeap[0] = -last;\n      this.bubbleDownMax(0);\n    }\n    return top;\n  }\n\n  private bubbleUpMax(index: number): void {\n    while (index > 0) {\n      const parent = Math.floor((index - 1) / 2);\n      // maxHeap stores negatives, so larger original value = smaller negative\n      if (-this.maxHeap[index] > -this.maxHeap[parent]) {\n        this.swap(this.maxHeap, index, parent);\n        index = parent;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private bubbleDownMax(index: number): void {\n    const n = this.maxHeap.length;\n    while (true) {\n      let largest = index;\n      const left = 2 * index + 1;\n      const right = 2 * index + 2;\n      // Compare original values (negate back)\n      if (left < n && -this.maxHeap[left] > -this.maxHeap[largest]) {\n        largest = left;\n      }\n      if (right < n && -this.maxHeap[right] > -this.maxHeap[largest]) {\n        largest = right;\n      }\n      if (largest !== index) {\n        this.swap(this.maxHeap, largest, index);\n        index = largest;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private getMinHeapTop(): number {\n    return this.minHeap[0];\n  }\n\n  private getMaxHeapTop(): number {\n    return -this.maxHeap[0];\n  }\n\n  private getMinHeapSize(): number {\n    return this.minHeap.length;\n  }\n\n  private getMaxHeapSize(): number {\n    return this.maxHeap.length;\n  }\n\n  add(n: number): void {\n    if (this.getMaxHeapSize() === 0 && this.getMinHeapSize() === 0) {\n      this.pushMaxHeap(n);\n      return;\n    }\n\n    // Determine where to insert\n    if (n <= this.getMaxHeapTop()) {\n      this.pushMaxHeap(n);\n    } else {\n      this.pushMinHeap(n);\n    }\n\n    // Balance heaps: maxHeap can have at most 1 more element than minHeap\n    // or they can be equal\n    if (this.getMaxHeapSize() > this.getMinHeapSize() + 1) {\n      const val = this.popMaxHeap();\n      this.pushMinHeap(val);\n    } else if (this.getMinHeapSize() > this.getMaxHeapSize()) {\n      const val = this.popMinHeap();\n      this.pushMaxHeap(val);\n    }\n  }\n\n  median(): number {\n    ",
+      "latency_ms": 16805.8,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 0,
+      "checks": [
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    }
+  ]
+}

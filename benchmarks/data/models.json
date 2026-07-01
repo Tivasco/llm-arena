@@ -1,0 +1,940 @@
+{
+  "generated_at": "2026-07-01T09:08:15Z",
+  "models": [
+    {
+      "id": "gemma-4-31b-it-mlx",
+      "variant": "base",
+      "label": "gemma-4-31b-it-mlx @base",
+      "alias": "gemma-4-31b-it-mlx",
+      "lmstudio_id": "gemma-4-31b-it-mlx",
+      "size": "31B",
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 25,
+          "total": 30,
+          "rate": 0.8333
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6
+        },
+        "overall": {
+          "pass": 66,
+          "total": 75,
+          "rate": 0.88
+        }
+      },
+      "stats": {
+        "median_latency_ms": 2363,
+        "median_completion_tokens": 0,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-21T21:25:11Z",
+      "publisher": "lmstudio-community",
+      "arch": "gemma4",
+      "family": "gemma4",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "vlm",
+      "max_context_length": 262144,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "gemma-4-31b-it-mlx",
+      "variant": "think",
+      "label": "gemma-4-31b-it-mlx @think",
+      "alias": "gemma-4-31b-it-mlx",
+      "lmstudio_id": "gemma-4-31b-it-mlx",
+      "size": "31B",
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4
+        },
+        "overall": {
+          "pass": 68,
+          "total": 75,
+          "rate": 0.9067
+        }
+      },
+      "stats": {
+        "median_latency_ms": 2287,
+        "median_completion_tokens": 0,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-20T06:46:47Z",
+      "publisher": "lmstudio-community",
+      "arch": "gemma4",
+      "family": "gemma4",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "vlm",
+      "max_context_length": 262144,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "gemma-4-e4b-it-mlx",
+      "variant": "base",
+      "label": "gemma-4-e4b-it-mlx @base",
+      "alias": "gemma-4-e4b-it-mlx",
+      "lmstudio_id": "gemma-4-e4b-it-mlx",
+      "size": "E4B",
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 17,
+          "total": 30,
+          "rate": 0.5667
+        },
+        "tooluse-v2": {
+          "pass": 17,
+          "total": 25,
+          "rate": 0.68
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0
+        },
+        "overall": {
+          "pass": 46,
+          "total": 75,
+          "rate": 0.6133
+        }
+      },
+      "stats": {
+        "median_latency_ms": 3349,
+        "median_completion_tokens": 0,
+        "truncation_rate": 0.0133,
+        "error_rate": 0.0133,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-20T06:43:45Z",
+      "publisher": "lmstudio-community",
+      "arch": "gemma4",
+      "family": "gemma4",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "vlm",
+      "max_context_length": 131072,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "google-gemma-4-12b",
+      "variant": "base",
+      "label": "google/gemma-4-12b @base",
+      "alias": "gemma-4-12b",
+      "lmstudio_id": "google/gemma-4-12b",
+      "size": "12B",
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2
+        },
+        "overall": {
+          "pass": 66,
+          "total": 75,
+          "rate": 0.88
+        }
+      },
+      "stats": {
+        "median_latency_ms": 1210,
+        "median_completion_tokens": 36,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-30T18:00:18Z",
+      "publisher": "google",
+      "arch": "gemma4",
+      "family": "gemma4",
+      "quantization": "Q8_0",
+      "format": "gguf",
+      "modality": "vlm",
+      "max_context_length": 262144,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "local-qwen3-coder-next",
+      "variant": "base",
+      "label": "local/qwen3-coder-next @base",
+      "alias": "qwen3-coder-next",
+      "lmstudio_id": "local/qwen3-coder-next",
+      "size": null,
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667
+        },
+        "tooluse-v2": {
+          "pass": 23,
+          "total": 25,
+          "rate": 0.92
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2
+        },
+        "overall": {
+          "pass": 62,
+          "total": 75,
+          "rate": 0.8267
+        }
+      },
+      "stats": {
+        "median_latency_ms": 1078,
+        "median_completion_tokens": 0,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-20T06:39:11Z"
+    },
+    {
+      "id": "minimax-minimax-m2.7",
+      "variant": "base",
+      "label": "minimax/minimax-m2.7 @base",
+      "alias": "minimax-m2.7",
+      "lmstudio_id": "minimax/minimax-m2.7",
+      "size": null,
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6
+        },
+        "overall": {
+          "pass": 67,
+          "total": 75,
+          "rate": 0.8933
+        }
+      },
+      "stats": {
+        "median_latency_ms": 5795,
+        "median_completion_tokens": 218,
+        "truncation_rate": 0.0133,
+        "error_rate": 0.0133,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-30T14:44:01Z",
+      "publisher": "minimax",
+      "arch": "minimax-m2",
+      "family": "minimax-m2",
+      "quantization": "Q4_K_M",
+      "format": "gguf",
+      "modality": "llm",
+      "max_context_length": 196608,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "minimax-minimax-m2.7",
+      "variant": "no-think",
+      "label": "minimax/minimax-m2.7 @no-think",
+      "alias": "minimax-m2.7",
+      "lmstudio_id": "minimax/minimax-m2.7",
+      "size": null,
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 25,
+          "total": 30,
+          "rate": 0.8333
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0
+        },
+        "overall": {
+          "pass": 57,
+          "total": 75,
+          "rate": 0.76
+        }
+      },
+      "stats": {
+        "median_latency_ms": 1563,
+        "median_completion_tokens": 47,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0667,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-30T13:06:14Z",
+      "publisher": "minimax",
+      "arch": "minimax-m2",
+      "family": "minimax-m2",
+      "quantization": "Q4_K_M",
+      "format": "gguf",
+      "modality": "llm",
+      "max_context_length": 196608,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "nvidia-nemotron-3-super",
+      "variant": "base",
+      "label": "nvidia/nemotron-3-super @base",
+      "alias": "nemotron-3-super",
+      "lmstudio_id": "nvidia/nemotron-3-super",
+      "size": null,
+      "config": {
+        "reasoning_effort": "none",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 24,
+          "total": 30,
+          "rate": 0.8
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4
+        },
+        "overall": {
+          "pass": 58,
+          "total": 75,
+          "rate": 0.7733
+        }
+      },
+      "stats": {
+        "median_latency_ms": 2155,
+        "median_completion_tokens": 39,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-24T15:25:22Z",
+      "publisher": "nvidia",
+      "arch": "nemotron_h_moe",
+      "family": "nemotron-h MoE",
+      "quantization": "Q4_K_M",
+      "format": "gguf",
+      "modality": "llm",
+      "max_context_length": 1048576,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "nvidia-nemotron-3-super",
+      "variant": "high",
+      "label": "nvidia/nemotron-3-super @high",
+      "alias": "nemotron-3-super",
+      "lmstudio_id": "nvidia/nemotron-3-super",
+      "size": null,
+      "config": {
+        "reasoning_effort": "high",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 23,
+          "total": 25,
+          "rate": 0.92
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2
+        },
+        "overall": {
+          "pass": 67,
+          "total": 75,
+          "rate": 0.8933
+        }
+      },
+      "stats": {
+        "median_latency_ms": 5814,
+        "median_completion_tokens": 158,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0133,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-24T15:36:16Z",
+      "publisher": "nvidia",
+      "arch": "nemotron_h_moe",
+      "family": "nemotron-h MoE",
+      "quantization": "Q4_K_M",
+      "format": "gguf",
+      "modality": "llm",
+      "max_context_length": 1048576,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "openai-gpt-oss-120b",
+      "variant": "base",
+      "label": "openai/gpt-oss-120b @base",
+      "alias": "gpt-oss-120b",
+      "lmstudio_id": "openai/gpt-oss-120b",
+      "size": "120B",
+      "config": {
+        "reasoning_effort": "none",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6
+        },
+        "overall": {
+          "pass": 67,
+          "total": 75,
+          "rate": 0.8933
+        }
+      },
+      "stats": {
+        "median_latency_ms": 1421,
+        "median_completion_tokens": 64,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-29T22:24:46Z",
+      "publisher": "openai",
+      "arch": "gpt_oss",
+      "family": "gpt-oss",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "llm",
+      "max_context_length": 131072,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "openai-gpt-oss-120b",
+      "variant": "high",
+      "label": "openai/gpt-oss-120b @high",
+      "alias": "gpt-oss-120b",
+      "lmstudio_id": "openai/gpt-oss-120b",
+      "size": "120B",
+      "config": {
+        "reasoning_effort": "high",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 20,
+          "total": 25,
+          "rate": 0.8
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2
+        },
+        "overall": {
+          "pass": 61,
+          "total": 75,
+          "rate": 0.8133
+        }
+      },
+      "stats": {
+        "median_latency_ms": 5640,
+        "median_completion_tokens": 325,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0267,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-29T22:30:28Z",
+      "publisher": "openai",
+      "arch": "gpt_oss",
+      "family": "gpt-oss",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "llm",
+      "max_context_length": 131072,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "openai-gpt-oss-120b",
+      "variant": "low",
+      "label": "openai/gpt-oss-120b @low",
+      "alias": "gpt-oss-120b",
+      "lmstudio_id": "openai/gpt-oss-120b",
+      "size": "120B",
+      "config": {
+        "reasoning_effort": "low",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6
+        },
+        "overall": {
+          "pass": 67,
+          "total": 75,
+          "rate": 0.8933
+        }
+      },
+      "stats": {
+        "median_latency_ms": 1408,
+        "median_completion_tokens": 64,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-29T22:26:21Z",
+      "publisher": "openai",
+      "arch": "gpt_oss",
+      "family": "gpt-oss",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "llm",
+      "max_context_length": 131072,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "openai-gpt-oss-120b",
+      "variant": "medium",
+      "label": "openai/gpt-oss-120b @medium",
+      "alias": "gpt-oss-120b",
+      "lmstudio_id": "openai/gpt-oss-120b",
+      "size": "120B",
+      "config": {
+        "reasoning_effort": "medium",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6
+        },
+        "overall": {
+          "pass": 65,
+          "total": 75,
+          "rate": 0.8667
+        }
+      },
+      "stats": {
+        "median_latency_ms": 2801,
+        "median_completion_tokens": 136,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-29T22:27:57Z",
+      "publisher": "openai",
+      "arch": "gpt_oss",
+      "family": "gpt-oss",
+      "quantization": "8bit",
+      "format": "mlx",
+      "modality": "llm",
+      "max_context_length": 131072,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "qwen-qwen3.6-27b",
+      "variant": "base",
+      "label": "qwen/qwen3.6-27b @base",
+      "alias": "qwen3.6-27b",
+      "lmstudio_id": "qwen/qwen3.6-27b",
+      "size": "27B",
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4
+        },
+        "overall": {
+          "pass": 69,
+          "total": 75,
+          "rate": 0.92
+        }
+      },
+      "stats": {
+        "median_latency_ms": 2832,
+        "median_completion_tokens": 26,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-24T21:13:09Z",
+      "publisher": "qwen",
+      "arch": "qwen35",
+      "family": "qwen3.6",
+      "quantization": "Q6_K",
+      "format": "gguf",
+      "modality": "vlm",
+      "max_context_length": 262144,
+      "capabilities": [
+        "tool_use"
+      ]
+    },
+    {
+      "id": "qwen-qwen3.6-35b-a3b",
+      "variant": "base",
+      "label": "qwen/qwen3.6-35b-a3b @base",
+      "alias": "qwen3.6-35b-a3b",
+      "lmstudio_id": "qwen/qwen3.6-35b-a3b",
+      "size": "35B-A3B",
+      "config": {
+        "reasoning_effort": null,
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0
+        },
+        "overall": {
+          "pass": 66,
+          "total": 75,
+          "rate": 0.88
+        }
+      },
+      "stats": {
+        "median_latency_ms": 713,
+        "median_completion_tokens": 0,
+        "truncation_rate": 0.0,
+        "error_rate": 0.0,
+        "n_calls": 75
+      },
+      "last_run": "2026-06-20T06:35:31Z",
+      "publisher": "qwen",
+      "arch": "qwen35moe",
+      "family": "qwen3.6 MoE",
+      "quantization": "Q6_K",
+      "format": "gguf",
+      "modality": "vlm",
+      "max_context_length": 262144,
+      "capabilities": [
+        "tool_use"
+      ]
+    }
+  ]
+}

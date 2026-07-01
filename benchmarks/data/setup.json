@@ -1,0 +1,533 @@
+{
+  "generated_at": "2026-07-01T09:08:15Z",
+  "environment": {
+    "summary": "Self-hosted open-weight models behind a firewall, called over an OpenAI-compatible endpoint with greedy decoding (temperature 0). No per-call fees; no data leaves the host.",
+    "decoding": "greedy (temperature 0)"
+  },
+  "config_matrix": [
+    {
+      "model": "gemma-4-31b-it-mlx",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "gemma-4-31b-it-mlx",
+      "variant": "think",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "gemma-4-e4b-it-mlx",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "google/gemma-4-12b",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "local/qwen3-coder-next",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "minimax/minimax-m2.7",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "minimax/minimax-m2.7",
+      "variant": "no-think",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "nvidia/nemotron-3-super",
+      "variant": "base",
+      "reasoning_effort": "none",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "nvidia/nemotron-3-super",
+      "variant": "high",
+      "reasoning_effort": "high",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "variant": "base",
+      "reasoning_effort": "none",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "variant": "high",
+      "reasoning_effort": "high",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "variant": "low",
+      "reasoning_effort": "low",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "variant": "medium",
+      "reasoning_effort": "medium",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "qwen/qwen3.6-27b",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "qwen/qwen3.6-35b-a3b",
+      "variant": "base",
+      "reasoning_effort": null,
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    }
+  ],
+  "checks": [
+    {
+      "name": "json_valid",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "json_only",
+      "kind": "checker",
+      "desc": "Structural shape only: text is bare JSON with no surrounding prose.",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_prose_lines",
+      "kind": "checker",
+      "desc": "No narrative lines: every non-empty line is structural (bullet/number/json/table/csv).",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_stray_fences",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "fence_required",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "json_inside_valid",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_trailing_prose",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "exactly_n_bullets",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "numbered_exactly",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "array_len",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "sorted_desc",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "types",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "schema",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "nested_schema",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "key_casing",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "enum_values",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "valid_md_table",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "csv_count",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "csv_2col",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "equals",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "word_cap",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "min_words",
+      "kind": "checker",
+      "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.').",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "contains_token",
+      "kind": "checker",
+      "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "single_sentence",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "sentence_count",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "max_words_per_sentence",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_em_dash",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_emoji",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_exclaim",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_question_opener",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_think_leak",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_filler",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_clickbait_opener",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "regex_full",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "sorted_asc",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "array_each_keys",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "array_each_enum",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "unique_values",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "line_count",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "all_lines_match",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "forbid_chars",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "max_words_per_bullet",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "formatting"
+    },
+    {
+      "name": "no_tool_call",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "called_tool",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "single_call",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "not_called",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "tool_args_match",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "call_count",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "call_args_cover",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "no_extra_args",
+      "kind": "checker",
+      "desc": "",
+      "tier_family": "tooluse"
+    },
+    {
+      "name": "banned_substring",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    },
+    {
+      "name": "required_substring",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    },
+    {
+      "name": "required_export",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    },
+    {
+      "name": "banned_import",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    },
+    {
+      "name": "no_any",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    },
+    {
+      "name": "no_loops",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    },
+    {
+      "name": "max_lines",
+      "kind": "rule",
+      "desc": "",
+      "tier_family": "coding"
+    }
+  ]
+}

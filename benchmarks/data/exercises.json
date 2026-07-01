@@ -1,0 +1,1381 @@
+{
+  "generated_at": "2026-07-01T09:08:15Z",
+  "datasets": [
+    {
+      "id": "formatting-v1",
+      "label": "Formatting",
+      "n_items": 30,
+      "items": [
+        {
+          "id": "t1-json-basic",
+          "difficulty": 1,
+          "level": null,
+          "category": "structural",
+          "prompt": "Respond with ONLY valid JSON with keys name and age, from this text: \"Tiago is 38.\"",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            }
+          ]
+        },
+        {
+          "id": "t1-bullets-3",
+          "difficulty": 1,
+          "level": null,
+          "category": "structural",
+          "prompt": "Give exactly 3 bullet points on why backups matter. No intro or outro.",
+          "checks": [
+            {
+              "name": "exactly_n_bullets",
+              "params": {
+                "n": 3
+              },
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t1-one-word",
+          "difficulty": 1,
+          "level": null,
+          "category": "structural",
+          "prompt": "Reply with the single word: OK",
+          "checks": [
+            {
+              "name": "equals",
+              "params": {
+                "value": "OK"
+              },
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t1-no-emdash",
+          "difficulty": 1,
+          "level": null,
+          "category": "voice",
+          "prompt": "In one sentence, say what DNS does. Do not use em-dashes.",
+          "checks": [
+            {
+              "name": "single_sentence",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "DNS"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 5
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t1-csv-4",
+          "difficulty": 1,
+          "level": null,
+          "category": "structural",
+          "prompt": "List 4 fruits as a single comma-separated line. Nothing else.",
+          "checks": [
+            {
+              "name": "csv_count",
+              "params": {
+                "n": 4
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_prose_lines",
+              "params": {},
+              "desc": "No narrative lines: every non-empty line is structural (bullet/number/json/table/csv)."
+            }
+          ]
+        },
+        {
+          "id": "t2-json-types",
+          "difficulty": 2,
+          "level": null,
+          "category": "structural",
+          "prompt": "From \"Lisbon, Portugal, about 545000 people\": return ONLY JSON with keys\ncity, country, population. population must be an integer. No prose, no code fences.",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "types",
+              "params": {
+                "map": {
+                  "population": "int"
+                }
+              },
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t2-summary-cap",
+          "difficulty": 2,
+          "level": null,
+          "category": "voice",
+          "prompt": "Summarize what a load balancer does in 40 words or fewer. No em-dashes. Do not open with a question.",
+          "checks": [
+            {
+              "name": "word_cap",
+              "params": {
+                "max": 40
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_question_opener",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "load"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 8
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t2-blurb-clean",
+          "difficulty": 2,
+          "level": null,
+          "category": "voice",
+          "prompt": "Write a 2-sentence product blurb for a note-taking app. No emojis, no em-dashes.",
+          "checks": [
+            {
+              "name": "sentence_count",
+              "params": {
+                "n": 2
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_emoji",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "note"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 8
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t2-md-table",
+          "difficulty": 2,
+          "level": null,
+          "category": "structural",
+          "prompt": "Output a markdown table with columns Name | Role and exactly 3 data rows. Nothing else.",
+          "checks": [
+            {
+              "name": "valid_md_table",
+              "params": {
+                "cols": [
+                  "Name",
+                  "Role"
+                ],
+                "rows": 3
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_prose_lines",
+              "params": {},
+              "desc": "No narrative lines: every non-empty line is structural (bullet/number/json/table/csv)."
+            }
+          ]
+        },
+        {
+          "id": "t2-numbered-5",
+          "difficulty": 2,
+          "level": null,
+          "category": "structural",
+          "prompt": "Give exactly 5 numbered steps to make tea. No intro, no closing line.",
+          "checks": [
+            {
+              "name": "numbered_exactly",
+              "params": {
+                "n": 5
+              },
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t3-json-sorted",
+          "difficulty": 3,
+          "level": null,
+          "category": "structural",
+          "prompt": "Return ONLY a JSON array of 3 objects with keys task and priority,\nsorted by priority descending. No prose, no code fences.",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "array_len",
+              "params": {
+                "n": 3
+              },
+              "desc": ""
+            },
+            {
+              "name": "sorted_desc",
+              "params": {
+                "key": "priority"
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_stray_fences",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t3-fence-required",
+          "difficulty": 3,
+          "level": null,
+          "category": "structural",
+          "prompt": "Return ONLY a fenced ```json code block containing an object with keys a, b, c.",
+          "checks": [
+            {
+              "name": "fence_required",
+              "params": {
+                "lang": "json"
+              },
+              "desc": ""
+            },
+            {
+              "name": "json_inside_valid",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t3-linkedin-voice",
+          "difficulty": 3,
+          "level": null,
+          "category": "voice",
+          "prompt": "Write a 3-sentence LinkedIn post about shipping a small internal tool.\nNo emojis, no em-dashes, do not open with a question, no clickbait opener.",
+          "checks": [
+            {
+              "name": "sentence_count",
+              "params": {
+                "n": 3
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_emoji",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_question_opener",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_clickbait_opener",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "tool"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 12
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t3-strip-emdash",
+          "difficulty": 3,
+          "level": null,
+          "category": "voice",
+          "prompt": "Rewrite this exactly, only removing em-dashes: 'We shipped it \u2014 finally \u2014 last night.'",
+          "checks": [
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "shipped"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 4
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t3-steps-then-stop",
+          "difficulty": 3,
+          "level": null,
+          "category": "structural",
+          "prompt": "Give exactly 3 numbered steps to reset a router, then output nothing further.",
+          "checks": [
+            {
+              "name": "numbered_exactly",
+              "params": {
+                "n": 3
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_trailing_prose",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t4-rewrite-clean",
+          "difficulty": 4,
+          "level": null,
+          "category": "voice",
+          "prompt": "Rewrite this cleanly: no em-dashes, no emojis, no exclamation marks. Keep the meaning.\nText: \"We shipped it \u2014 finally! \ud83c\udf89 The team crushed it \u2014 no sleep \u2014 but worth it!!!\"",
+          "checks": [
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_emoji",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_exclaim",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "team"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 8
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t4-extract-schema",
+          "difficulty": 4,
+          "level": null,
+          "category": "structural",
+          "prompt": "From \"Ana, a senior backend engineer with 9 years, knows Python, Go and Rust\":\nreturn ONLY JSON with keys name, role, years, skills. years is an integer,\nskills is an array of strings. No prose, no fences.",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "schema",
+              "params": {
+                "keys": [
+                  "name",
+                  "role",
+                  "years",
+                  "skills"
+                ]
+              },
+              "desc": ""
+            },
+            {
+              "name": "types",
+              "params": {
+                "map": {
+                  "years": "int",
+                  "skills": "list"
+                }
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_stray_fences",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t4-banned-words",
+          "difficulty": 4,
+          "level": null,
+          "category": "voice",
+          "prompt": "Write 5 bullets on why monitoring matters. Do not use the words 'delve',\n'tapestry', or 'crucial'. No emojis.",
+          "checks": [
+            {
+              "name": "exactly_n_bullets",
+              "params": {
+                "n": 5
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_filler",
+              "params": {
+                "extra": [
+                  "delve",
+                  "tapestry",
+                  "crucial"
+                ]
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_emoji",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "monitor"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 10
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t4-instruction-at-top",
+          "difficulty": 4,
+          "level": null,
+          "category": "structural",
+          "prompt": "Respond as a 2-column CSV of term,definition. Only the CSV.\n\nBackground you do not need to repeat: our team has been discussing\nobservability for weeks. People keep confusing metrics, logs, and traces.\nThere were long threads about cardinality and sampling. Ignore all of that\nframing and just produce the CSV for these three terms: metric, log, trace.",
+          "checks": [
+            {
+              "name": "csv_2col",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_prose_lines",
+              "params": {},
+              "desc": "No narrative lines: every non-empty line is structural (bullet/number/json/table/csv)."
+            }
+          ]
+        },
+        {
+          "id": "t4-nested-json",
+          "difficulty": 4,
+          "level": null,
+          "category": "structural",
+          "prompt": "Return ONLY JSON shaped as {\"user\": {\"name\": ..., \"age\": ...}, \"tags\": [...]}\nwith exactly those keys and that casing. No fences, no text after the closing brace.\nUse name \"Tiago\", age 38, tags [\"founder\",\"engineer\"].",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "nested_schema",
+              "params": {
+                "spec": {
+                  "user": [
+                    "name",
+                    "age"
+                  ],
+                  "tags": "list"
+                }
+              },
+              "desc": ""
+            },
+            {
+              "name": "key_casing",
+              "params": {
+                "keys": [
+                  "user",
+                  "tags"
+                ]
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_trailing_prose",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t5-suppress-prose",
+          "difficulty": 5,
+          "level": null,
+          "category": "structural",
+          "prompt": "I know you probably want to explain your reasoning and add helpful context,\nbut do not. Output ONLY a JSON object with keys x, y, z (values 1, 2, 3).\nResist the urge to explain or add commentary.",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "no_prose_lines",
+              "params": {},
+              "desc": "No narrative lines: every non-empty line is structural (bullet/number/json/table/csv)."
+            }
+          ]
+        },
+        {
+          "id": "t5-think-suppress",
+          "difficulty": 5,
+          "level": null,
+          "category": "structural",
+          "prompt": "Give ONLY the final JSON answer with key result for 17 * 23.\nShow no reasoning and no working. Example shape: {\"result\": 0}",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "no_think_leak",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "t5-rewrite-question-trap",
+          "difficulty": 5,
+          "level": null,
+          "category": "voice",
+          "prompt": "Rewrite the following as ONE clean statement sentence. No em-dashes, no emojis,\nand it must NOT be a question.\nText: \"Ever wondered why deploys fail at 5pm \u2014 every single time? \ud83d\ude29\"",
+          "checks": [
+            {
+              "name": "single_sentence",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_emoji",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_question_opener",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "contains_token",
+              "params": {
+                "token": "deploy"
+              },
+              "desc": "Topic-anchor signal: the output must echo a distinctive on-topic word from the"
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 6
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t5-multi-constraint",
+          "difficulty": 5,
+          "level": null,
+          "category": "voice",
+          "prompt": "Reply with exactly 2 sentences. Each sentence must be under 12 words. No em-dashes. Do not begin with a question.",
+          "checks": [
+            {
+              "name": "sentence_count",
+              "params": {
+                "n": 2
+              },
+              "desc": ""
+            },
+            {
+              "name": "max_words_per_sentence",
+              "params": {
+                "max": 12
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_em_dash",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_question_opener",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "min_words",
+              "params": {
+                "min": 4
+              },
+              "desc": "Non-degenerate content floor: kills empty / one-word answers ('' / 'No.')."
+            }
+          ]
+        },
+        {
+          "id": "t5-deep-json",
+          "difficulty": 5,
+          "level": null,
+          "category": "structural",
+          "prompt": "Return ONLY JSON shaped as {\"status\": ..., \"items\": [{\"id\": ..., \"level\": ...}]}.\nstatus must be one of \"ok\", \"warn\", \"fail\". items must have exactly 2 entries\nsorted by level descending. No fences. Nothing after the closing brace.",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "enum_values",
+              "params": {
+                "field": "status",
+                "allowed": [
+                  "ok",
+                  "warn",
+                  "fail"
+                ]
+              },
+              "desc": ""
+            },
+            {
+              "name": "array_len",
+              "params": {
+                "n": 2,
+                "path": "items"
+              },
+              "desc": ""
+            },
+            {
+              "name": "sorted_desc",
+              "params": {
+                "key": "level",
+                "path": "items"
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_stray_fences",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_trailing_prose",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "x6-strict-regex",
+          "difficulty": 6,
+          "level": null,
+          "category": "structural",
+          "prompt": "Output exactly one line and nothing else (no quotes, no prose, no trailing text): three UPPERCASE letters, a hyphen, then a four-digit number. Use the letters RED and the number 0042.",
+          "checks": [
+            {
+              "name": "regex_full",
+              "params": {
+                "pattern": "^[A-Z]{3}-\\d{4}$"
+              },
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "x6-json-matrix",
+          "difficulty": 6,
+          "level": null,
+          "category": "structural",
+          "prompt": "Return ONLY a JSON array of exactly 4 objects. Each object must have EXACTLY the\nkeys id and level. id values are the unique integers 1, 2, 3, 4. level is one of\n\"low\", \"mid\", \"high\". Sort the array by id ascending. No code fences. Nothing\nafter the closing bracket.",
+          "checks": [
+            {
+              "name": "json_valid",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "json_only",
+              "params": {},
+              "desc": "Structural shape only: text is bare JSON with no surrounding prose."
+            },
+            {
+              "name": "array_len",
+              "params": {
+                "n": 4
+              },
+              "desc": ""
+            },
+            {
+              "name": "array_each_keys",
+              "params": {
+                "keys": [
+                  "id",
+                  "level"
+                ]
+              },
+              "desc": ""
+            },
+            {
+              "name": "array_each_enum",
+              "params": {
+                "field": "level",
+                "allowed": [
+                  "low",
+                  "mid",
+                  "high"
+                ]
+              },
+              "desc": ""
+            },
+            {
+              "name": "sorted_asc",
+              "params": {
+                "key": "id"
+              },
+              "desc": ""
+            },
+            {
+              "name": "unique_values",
+              "params": {
+                "key": "id"
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_stray_fences",
+              "params": {},
+              "desc": ""
+            },
+            {
+              "name": "no_trailing_prose",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "x6-buried-format",
+          "difficulty": 6,
+          "level": null,
+          "category": "structural",
+          "prompt": "We have been reviewing the Q3 migration project for the past few weeks and the team\nraised several points worth recording. The staging environment was finally stabilized\nafter the cache layer was rebuilt, though there are still intermittent timeouts under\nload that nobody has fully explained. Reply with exactly three lines, each formatted\nas a lowercase word, then a colon and a space, then a value, with no blank lines, no\nbullets, and no numbering. Marketing also asked about the launch date but that is out\nof scope for this note, and the budget review was pushed to next month. Summarize the\nthree most important status fields you can infer (for example status, risk, owner).\nDo not add any preamble or closing remark.",
+          "checks": [
+            {
+              "name": "line_count",
+              "params": {
+                "n": 3
+              },
+              "desc": ""
+            },
+            {
+              "name": "all_lines_match",
+              "params": {
+                "pattern": "^[a-z][a-z_]*: \\S.*$"
+              },
+              "desc": ""
+            },
+            {
+              "name": "no_stray_fences",
+              "params": {},
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "x6-lipogram",
+          "difficulty": 6,
+          "level": null,
+          "category": "structural",
+          "prompt": "Give exactly 4 bullet points about software tools. Each bullet must be 5 words or fewer. Do not use the letter e (lowercase or uppercase) anywhere in your answer. No intro and no closing line.",
+          "checks": [
+            {
+              "name": "exactly_n_bullets",
+              "params": {
+                "n": 4
+              },
+              "desc": ""
+            },
+            {
+              "name": "max_words_per_bullet",
+              "params": {
+                "max": 5
+              },
+              "desc": ""
+            },
+            {
+              "name": "forbid_chars",
+              "params": {
+                "chars": "e"
+              },
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": "x6-bare-number",
+          "difficulty": 6,
+          "level": null,
+          "category": "structural",
+          "prompt": "A train travels 60 km in 45 minutes. Output only its average speed in km per hour as a plain integer. No units, no words, no punctuation, no explanation, and do not show your working.",
+          "checks": [
+            {
+              "name": "equals",
+              "params": {
+                "value": "80"
+              },
+              "desc": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tooluse-v2",
+      "label": "Tool use",
+      "n_items": 25,
+      "items": [
+        {
+          "id": "t1-weather",
+          "difficulty": 1,
+          "level": null,
+          "category": "selection",
+          "prompt": "What's the weather in Lisbon right now?"
+        },
+        {
+          "id": "t1-time",
+          "difficulty": 1,
+          "level": null,
+          "category": "arguments",
+          "prompt": "What time is it in Tokyo right now?"
+        },
+        {
+          "id": "t1-calc",
+          "difficulty": 1,
+          "level": null,
+          "category": "arguments",
+          "prompt": "What is 4817 multiplied by 3926?"
+        },
+        {
+          "id": "t2-news",
+          "difficulty": 2,
+          "level": null,
+          "category": "selection",
+          "prompt": "What's the latest news on the climate summit?"
+        },
+        {
+          "id": "t2-reminder",
+          "difficulty": 2,
+          "level": null,
+          "category": "selection",
+          "prompt": "Remind me to call mom at 6pm."
+        },
+        {
+          "id": "t2-stock",
+          "difficulty": 2,
+          "level": null,
+          "category": "selection",
+          "prompt": "What's Microsoft's share price?"
+        },
+        {
+          "id": "t3-fact",
+          "difficulty": 3,
+          "level": null,
+          "category": "abstention",
+          "prompt": "What is the capital of France?"
+        },
+        {
+          "id": "t3-chitchat",
+          "difficulty": 3,
+          "level": null,
+          "category": "abstention",
+          "prompt": "Thanks, that's everything for now."
+        },
+        {
+          "id": "t3-opinion",
+          "difficulty": 3,
+          "level": null,
+          "category": "abstention",
+          "prompt": "Do you think remote work is here to stay?"
+        },
+        {
+          "id": "t4-flight",
+          "difficulty": 4,
+          "level": null,
+          "category": "arguments",
+          "prompt": "Book a flight from Lisbon to Berlin on December 10th in business class."
+        },
+        {
+          "id": "t4-temp",
+          "difficulty": 4,
+          "level": null,
+          "category": "arguments",
+          "prompt": "Convert 451.7 degrees Fahrenheit to Kelvin."
+        },
+        {
+          "id": "t4-playlist",
+          "difficulty": 4,
+          "level": null,
+          "category": "arguments",
+          "prompt": "Make a playlist called Roadtrip with Bohemian Rhapsody and Hotel California."
+        },
+        {
+          "id": "t5-forecast-trap",
+          "difficulty": 5,
+          "level": null,
+          "category": "trap",
+          "prompt": "What will the weather in Madrid be over the next 5 days?"
+        },
+        {
+          "id": "t5-crypto-trap",
+          "difficulty": 5,
+          "level": null,
+          "category": "trap",
+          "prompt": "What's the price of Bitcoin right now?"
+        },
+        {
+          "id": "t5-pseudo-tool",
+          "difficulty": 5,
+          "level": null,
+          "category": "trap",
+          "prompt": "Why is the sky blue?"
+        },
+        {
+          "id": "t6-parallel-weather",
+          "difficulty": 6,
+          "level": null,
+          "category": "parallel",
+          "prompt": "What's the weather in Lisbon and in Tokyo right now?"
+        },
+        {
+          "id": "t6-distractors",
+          "difficulty": 6,
+          "level": null,
+          "category": "selection",
+          "prompt": "Lots going on today, but right now I just need to know what 2340 US dollars is worth in euros for the invoice."
+        },
+        {
+          "id": "t6-nested-args",
+          "difficulty": 6,
+          "level": null,
+          "category": "arguments",
+          "prompt": "Schedule a 45-minute meeting titled Q3 Planning with alice@example.com and bob@example.com."
+        },
+        {
+          "id": "t6-no-extra-args",
+          "difficulty": 6,
+          "level": null,
+          "category": "arguments",
+          "prompt": "Email alice@example.com with the subject Lunch?"
+        },
+        {
+          "id": "t6-today-trap",
+          "difficulty": 6,
+          "level": null,
+          "category": "trap",
+          "prompt": "Do I need an umbrella for my meeting in Porto this afternoon?"
+        },
+        {
+          "id": "mt-weather",
+          "difficulty": 7,
+          "level": null,
+          "category": "multiturn",
+          "prompt": "What's the weather in Lisbon?"
+        },
+        {
+          "id": "mt-stock",
+          "difficulty": 7,
+          "level": null,
+          "category": "multiturn",
+          "prompt": "What's Tesla trading at?"
+        },
+        {
+          "id": "mt-notfound",
+          "difficulty": 7,
+          "level": null,
+          "category": "multiturn",
+          "prompt": "What's the share price of Globex Corp?"
+        },
+        {
+          "id": "mt-summary",
+          "difficulty": 7,
+          "level": null,
+          "category": "multiturn",
+          "prompt": "Give me a quick read on the weather in Berlin."
+        },
+        {
+          "id": "mt-conditional-call",
+          "difficulty": 7,
+          "level": null,
+          "category": "multiturn",
+          "prompt": "If it's going to rain in Lisbon today, remind me to bring an umbrella."
+        }
+      ]
+    },
+    {
+      "id": "tooluse-v3",
+      "label": "Agentic",
+      "n_items": 15,
+      "items": [
+        {
+          "id": "chain-launch-weather",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "What's the weather at the next rocket launch site?"
+        },
+        {
+          "id": "chain-hq-weather",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "What's the weather at Hooli's headquarters?"
+        },
+        {
+          "id": "chain-capital-time",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "What time is it in the capital of Australia?"
+        },
+        {
+          "id": "chain-user-orders",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "How many orders does the user Alice have?"
+        },
+        {
+          "id": "chain-capital-population",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "What's the population of the capital of Spain?"
+        },
+        {
+          "id": "chain-order-convert",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "What is order #4471's total, in euros?"
+        },
+        {
+          "id": "chain-3hop-launch-temp",
+          "difficulty": 8,
+          "level": null,
+          "category": "chaining",
+          "prompt": "What's the temperature at the next rocket launch site, in Fahrenheit?"
+        },
+        {
+          "id": "recover-retry",
+          "difficulty": 8,
+          "level": null,
+          "category": "recovery",
+          "prompt": "What's the weather in Lisbon?"
+        },
+        {
+          "id": "recover-fix-ticker",
+          "difficulty": 8,
+          "level": null,
+          "category": "recovery",
+          "prompt": "What's Tesla's stock price?"
+        },
+        {
+          "id": "recover-ratelimit",
+          "difficulty": 8,
+          "level": null,
+          "category": "recovery",
+          "prompt": "What's Apple's stock price?"
+        },
+        {
+          "id": "recover-unrecoverable",
+          "difficulty": 8,
+          "level": null,
+          "category": "recovery",
+          "prompt": "What's the stock price of Globex Corp?"
+        },
+        {
+          "id": "ask-weather-city",
+          "difficulty": 8,
+          "level": null,
+          "category": "ask",
+          "prompt": "What's the weather right now?"
+        },
+        {
+          "id": "ask-flight-origin",
+          "difficulty": 8,
+          "level": null,
+          "category": "ask",
+          "prompt": "Book me a flight to Berlin next Friday."
+        },
+        {
+          "id": "ask-reminder-time",
+          "difficulty": 8,
+          "level": null,
+          "category": "ask",
+          "prompt": "Remind me to call the dentist."
+        },
+        {
+          "id": "ask-convert-amount",
+          "difficulty": 8,
+          "level": null,
+          "category": "ask",
+          "prompt": "Convert my dollars to euros."
+        }
+      ]
+    },
+    {
+      "id": "coding-v1",
+      "label": "Coding",
+      "n_items": 5,
+      "items": [
+        {
+          "id": "median-stream",
+          "difficulty": null,
+          "level": 1,
+          "category": null,
+          "prompt": "Write TypeScript. Implement and `export` a class `MedianStream` that tracks a running median\nof a stream of numbers, with this exact API:\n  class MedianStream { add(n: number): void; median(): number }\n`add` inserts a number; `median()` returns the current median (the average of the two middle\nvalues when the count is even). Calling `median()` before any `add` may throw.\nRules: pure TypeScript, no external imports, do NOT use `any`, do NOT call console.log.\nPerformance: `add` will be called hundreds of thousands of times \u2014 it must be sub-linear\n(do NOT re-sort the whole history on every call).\nReturn ONLY a single ```ts code block.",
+          "rules": [
+            {
+              "rule": "no_any"
+            },
+            {
+              "rule": "banned_substring",
+              "value": "console.log"
+            },
+            {
+              "rule": "required_export",
+              "value": "MedianStream"
+            }
+          ],
+          "tests_assert": null,
+          "gold_passes": null
+        },
+        {
+          "id": "typed-emitter",
+          "difficulty": null,
+          "level": 2,
+          "category": null,
+          "prompt": "Write TypeScript. Implement and `export` a class `EventEmitter<TEvents extends Record<string, unknown[]>>`\nwith these methods, fully type-checked against the event map:\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void\n`emit` invokes every handler registered for that event, in registration order, with the given args.\nThe handler's argument types MUST be inferred per event from TEvents, and an unknown event name or\nwrong argument types MUST be a compile error.\nRules: pure TypeScript, no external imports, do NOT use `any` (and no `as any`).\nReturn ONLY a single ```ts code block.",
+          "rules": [
+            {
+              "rule": "no_any"
+            },
+            {
+              "rule": "required_export",
+              "value": "EventEmitter"
+            }
+          ],
+          "tests_assert": null,
+          "gold_passes": null
+        },
+        {
+          "id": "parse-query",
+          "difficulty": null,
+          "level": 3,
+          "category": null,
+          "prompt": "Write TypeScript. Implement and `export` a TYPE (not a function) `ParseQuery<S extends string>`\nthat parses a URL query string literal into an object type at COMPILE TIME:\n  ParseQuery<\"a=1\">          => { a: \"1\" }\n  ParseQuery<\"a=1&b=2\">      => { a: \"1\"; b: \"2\" }\n  ParseQuery<\"x=hi&y=lo&z=1\"> => { x: \"hi\"; y: \"lo\"; z: \"1\" }\n  ParseQuery<\"\">             => {}\nUse template-literal types + recursion. This is type-level only \u2014 no runtime code, no `any`.\nReturn ONLY a single ```ts code block.",
+          "rules": [
+            {
+              "rule": "no_any"
+            },
+            {
+              "rule": "required_export",
+              "value": "ParseQuery"
+            },
+            {
+              "rule": "banned_substring",
+              "value": "function"
+            },
+            {
+              "rule": "banned_substring",
+              "value": "=>"
+            }
+          ],
+          "tests_assert": null,
+          "gold_passes": null
+        },
+        {
+          "id": "json-parse",
+          "difficulty": null,
+          "level": 4,
+          "category": null,
+          "prompt": "Write TypeScript. Implement and `export function parse(s: string): Json` \u2014 a recursive-descent\nparser for a JSON subset (objects, arrays, strings with \\\" \\\\ \\/ \\n \\t \\r \\b \\f and \\uXXXX escapes,\nnumbers incl. negatives/decimals/exponents, true, false, null, and insignificant whitespace).\nAlso `export type Json`. On malformed input (trailing commas, unquoted keys, single quotes,\ntruncated input, trailing garbage) it MUST throw.\nRules: do NOT use JSON.parse, do NOT use eval, no external imports, no `any`.\nReturn ONLY a single ```ts code block.",
+          "rules": [
+            {
+              "rule": "no_any"
+            },
+            {
+              "rule": "banned_substring",
+              "value": "JSON.parse"
+            },
+            {
+              "rule": "banned_substring",
+              "value": "eval"
+            },
+            {
+              "rule": "required_export",
+              "value": "parse"
+            }
+          ],
+          "tests_assert": null,
+          "gold_passes": null
+        },
+        {
+          "id": "persistent-vector",
+          "difficulty": null,
+          "level": 5,
+          "category": null,
+          "prompt": "Write TypeScript. Implement and `export class PersistentVector<T>` \u2014 an IMMUTABLE\n(persistent) vector with structural sharing, with this API:\n  static empty<T>(): PersistentVector<T>\n  get size(): number\n  get(i: number): T          // throws on out-of-range\n  push(value: T): PersistentVector<T>   // returns a NEW vector; the original is unchanged\n`push` must NOT mutate the receiver, and must be sub-linear (it will be called 100,000+ times \u2014\ndo NOT copy the whole backing array on every push; use a tree with structural sharing).\nRules: generic, no external imports, no `any`.\nReturn ONLY a single ```ts code block.",
+          "rules": [
+            {
+              "rule": "no_any"
+            },
+            {
+              "rule": "required_export",
+              "value": "PersistentVector"
+            }
+          ],
+          "tests_assert": null,
+          "gold_passes": null
+        }
+      ]
+    }
+  ]
+}
