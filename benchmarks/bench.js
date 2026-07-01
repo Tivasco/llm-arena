@@ -84,7 +84,12 @@ function renderTabs() {
     nav.append(el("button", { class: "bench-tab", "data-tab": t.id, onclick: () => selectTab(t.id) }, t.label));
 }
 
-function closePanel() { document.getElementById("panel-root").innerHTML = ""; document.body.classList.remove("panel-open"); }
+let _escHandler = null;
+function closePanel() {
+  if (_escHandler) { document.removeEventListener("keydown", _escHandler); _escHandler = null; }
+  document.getElementById("panel-root").innerHTML = "";
+  document.body.classList.remove("panel-open");
+}
 function openPanel(title, body) {
   const root = document.getElementById("panel-root");
   root.innerHTML = "";
@@ -94,12 +99,13 @@ function openPanel(title, body) {
       el("div", { class: "panel-body" }, body)));
   root.append(overlay);
   document.body.classList.add("panel-open");
-  document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { closePanel(); document.removeEventListener("keydown", esc); } });
+  _escHandler = (e) => { if (e.key === "Escape") closePanel(); };
+  document.addEventListener("keydown", _escHandler);
 }
 function itemRow(it) {
   const failed = it.pass === false;
   const head = el("div", { class: `di-head ${failed ? "di-fail" : "di-pass"}`, onclick: (e) => {
-    const body = e.currentTarget.nextSibling; body.style.display = body.style.display === "none" ? "" : "none";
+    const body = e.currentTarget.nextElementSibling; body.style.display = body.style.display === "none" ? "" : "none";
   } },
     el("span", { class: `chip ${failed ? "v-stop" : "v-go"}` }, failed ? "FAIL" : "pass"),
     el("span", { class: "di-id" }, it.id),
