@@ -187,6 +187,11 @@ def bench_page():
     if 'src="bench.js"' not in txt: problems.append("benchmarks/index.html: missing bench.js")
     if not (ROOT / "benchmarks" / "bench.js").exists(): problems.append("benchmarks/bench.js missing")
     if not (ROOT / "benchmarks" / "data" / "board.json").exists(): problems.append("benchmarks/data/board.json missing")
+    bj = ROOT / "benchmarks" / "bench.js"
+    if bj.exists() and "exercise_results.json" not in read(bj):
+        problems.append("benchmarks/bench.js: missing exercise_results.json reference")
+    if not (ROOT / "benchmarks" / "data" / "exercise_results.json").exists():
+        problems.append("benchmarks/data/exercise_results.json missing")
     return problems
 
 @check

@@ -190,11 +190,20 @@ async function openCard(model, variant) {
       el("span", {}, `errors ${Math.round((st.error_rate || 0) * 100)}%`)),
     el("p", { class: "mc-lastrun", style: "color:var(--text-muted)" }, `last run ${m.last_run}`)));
 }
+let EXRES = null;
 async function mountExercises() {
   const v = document.getElementById("view"); v.innerHTML = "";
   try {
     const ex = await fetchJSON("data/exercises.json");
+    if (EXRES === null) { try { EXRES = await fetchJSON("data/exercise_results.json"); } catch (_) { EXRES = false; } }
+    const models = EXRES && EXRES.models;
+    if (models) {
+      v.append(el("div", { class: "panel ex-colkey" },
+        el("span", { class: "ex-colkey-title" }, "Columns — leaderboard order"),
+        ...models.map((m, i) => el("span", { class: "ex-colkey-item" }, el("b", {}, String(i + 1)), m.label))));
+    }
     for (const ds of ex.datasets) {
+      const results = models && EXRES.datasets[ds.id];
       const items = ds.items.map(it => {
         const crit = (it.checks || []).map(c =>
           el("span", { class: "chip", title: c.desc || "" }, c.name + (c.params && Object.keys(c.params).length ? " " + JSON.stringify(c.params) : "")));
@@ -203,17 +212,24 @@ async function mountExercises() {
                    : it.gold_passes === false ? el("span", { class: "chip v-stop" }, "gold ✗") : null;
         const head = el("div", { class: "ex-head", "aria-expanded": "false",
           ...activatable((e) => {
-            const b = e.currentTarget.nextElementSibling;
+            const item = e.currentTarget.closest(".ex-item");
+            const b = item.querySelector(".ex-body");
             const show = b.style.display === "none";
             b.style.display = show ? "" : "none";
             e.currentTarget.setAttribute("aria-expanded", show ? "true" : "false");
           }) },
           el("span", { class: "ex-id" }, it.id),
           el("span", { class: "ex-meta" }, [it.category, (it.difficulty ?? it.level) != null ? "L" + (it.difficulty ?? it.level) : null].filter(Boolean).join(" · ")));
+        const arr = results && results[it.id];
+        const resultsStrip = arr ? el("div", { class: "ex-results" },
+          el("span", { class: "ex-count" }, `${arr.filter(x => x === true).length}/${arr.filter(x => x != null).length} passed`),
+          el("div", { class: "hm" }, ...arr.map((val, i) => el("span", {
+            class: "hm-cell " + (val === true ? "hm-go" : val === false ? "hm-stop" : "hm-none"),
+            title: `${models[i].label} — ${val === true ? "pass" : val === false ? "fail" : "—"}` })))) : null;
         const body = el("div", { class: "ex-body", style: "display:none" },
           el("div", { class: "ex-prompt" }, it.prompt),
           el("div", { class: "ex-crit" }, ...crit, ...rules, gold));
-        return el("div", { class: "ex-item" }, head, body);
+        return el("div", { class: "ex-item" }, head, resultsStrip, body);
       });
       v.append(el("div", { class: "panel ex-ds" }, el("h3", {}, `${ds.label} — ${ds.n_items} items`), ...items));
     }

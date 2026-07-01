@@ -807,6 +807,18 @@ body.panel-open { overflow: hidden; }
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: calc(var(--space) * 1.5);
 }
 .ex-crit { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Exercises: shared column key + per-exercise per-model results heatmap */
+.ex-colkey { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.ex-colkey-title { width: 100%; margin-bottom: 4px; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); }
+.ex-colkey-item { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.01em; color: var(--text-muted); }
+.ex-colkey-item b { color: var(--accent); font-weight: 600; margin-right: 4px; }
+.ex-results { display: flex; align-items: center; gap: calc(var(--space) * 1.5); padding: 0 clamp(20px, 2.6vw, 28px) calc(var(--space) * 1.5); }
+.ex-count { min-width: 8ch; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.66rem; letter-spacing: 0.02em; color: var(--text-muted); white-space: nowrap; }
+.hm { display: flex; flex-wrap: wrap; gap: 3px; }
+.hm-cell { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
+.hm-go   { background: color-mix(in srgb, var(--verdict-go) 52%, var(--card));   border-color: color-mix(in srgb, var(--verdict-go) 60%, var(--border)); }
+.hm-stop { background: color-mix(in srgb, var(--verdict-stop) 42%, var(--card)); border-color: color-mix(in srgb, var(--verdict-stop) 52%, var(--border)); }
+.hm-none { background: var(--surface); }
 
 /* ── Setup: config matrix + checks catalog ──────────────────────────────── */
 /* Scoped to #view so this never bleeds into the shell's shared .panel on
