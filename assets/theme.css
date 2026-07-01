@@ -797,7 +797,9 @@ body.panel-open { overflow: hidden; }
 .ex-crit { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* ── Setup: config matrix + checks catalog ──────────────────────────────── */
-.panel:has(> .table) { overflow-x: auto; }
+/* Scoped to #view so this never bleeds into the shell's shared .panel on
+   other pages (hub/about) that may hold a .table. */
+#view .panel:has(> .table) { overflow-x: auto; }
 .setup-checks {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: calc(var(--space) * 1.25); margin-top: calc(var(--space) * 1.75);
@@ -823,6 +825,6 @@ body.panel-open { overflow: hidden; }
 @media (max-width: 720px) {
   #view { overflow-x: auto; }
   .lb { min-width: 560px; }
-  .panel:has(> .table) > .table { min-width: 620px; }
+  #view .panel:has(> .table) > .table { min-width: 620px; }
   .bench-panel { max-height: 90vh; }
 }
