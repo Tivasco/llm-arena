@@ -1,10 +1,10 @@
 {
-  "model": "nvidia/nemotron-3-super",
-  "variant": "base",
+  "model": "qwen/qwen3.6-27b",
+  "variant": "high+q8",
   "tier": "tooluse-v2",
-  "run_name": "nvidia/nemotron-3-super+effort=none+temp=0+quant=q4_k_m@2026-07-12T20:53:42Z",
+  "run_name": "qwen/qwen3.6-27b+effort=high+temp=0+quant=q8@2026-07-02T21:23:40Z",
   "config": {
-    "reasoning_effort": "none",
+    "reasoning_effort": "high",
     "temperature": 0,
     "seed": null,
     "top_p": null,
@@ -23,17 +23,17 @@
         "checks": [
           "single_call",
           "called_tool:get_weather",
-          "tool_args_match:get_weather",
           "called_tool:set_reminder",
-          "single_call",
-          "tool_args_match:set_reminder"
+          "tool_args_match:get_weather",
+          "tool_args_match:set_reminder",
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'sixcQl2g4OfgLPnlToFa0JKe6NPdTjFi', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
-      "latency_ms": 2686.5,
+      "output": "\n\n",
+      "latency_ms": 65580.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 66,
+      "completion_tokens": 1397,
       "checks": [
         {
           "name": "single_call",
@@ -46,22 +46,22 @@
           "detail": ""
         },
         {
-          "name": "tool_args_match:get_weather",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "called_tool:set_reminder",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "tool_args_match:get_weather",
           "passed": true,
           "detail": ""
         },
         {
           "name": "tool_args_match:set_reminder",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -75,31 +75,21 @@
       "prompt": "Give me a quick read on the weather in Berlin.",
       "expected": {
         "checks": [
-          "no_tool_call",
-          "tool_args_match:get_weather",
-          "single_call",
+          "called_tool:get_weather",
           "answer_contains",
-          "called_tool:get_weather"
+          "single_call",
+          "no_tool_call",
+          "tool_args_match:get_weather"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'ezEDVjOpHB86sVPmj9K3x67zt8sX3gXv', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Berlin\"}'}}]",
-      "latency_ms": 2124.7,
+      "output": "\n\n",
+      "latency_ms": 12059.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 44,
+      "completion_tokens": 231,
       "checks": [
         {
-          "name": "no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "tool_args_match:get_weather",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "single_call",
+          "name": "called_tool:get_weather",
           "passed": true,
           "detail": ""
         },
@@ -109,7 +99,17 @@
           "detail": ""
         },
         {
-          "name": "called_tool:get_weather",
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "tool_args_match:get_weather",
           "passed": true,
           "detail": ""
         }
@@ -123,21 +123,26 @@
       "prompt": "What's the share price of Globex Corp?",
       "expected": {
         "checks": [
-          "no_tool_call",
-          "called_tool:get_stock",
           "single_call",
           "tool_args_match:get_stock",
+          "called_tool:get_stock",
+          "no_tool_call",
           "answer_excludes"
         ]
       },
-      "output": "[{'type': 'function', 'id': '0gpYNznFZXdwZGWFl40ywJFQl4w7cxyj', 'function': {'name': 'get_stock', 'arguments': '{\"symbol\":\"GLOBEX\"}'}}]",
-      "latency_ms": 4478.1,
+      "output": "\n\n",
+      "latency_ms": 40824.4,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 129,
+      "completion_tokens": 861,
       "checks": [
         {
-          "name": "no_tool_call",
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "tool_args_match:get_stock",
           "passed": true,
           "detail": ""
         },
@@ -147,12 +152,7 @@
           "detail": ""
         },
         {
-          "name": "single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "tool_args_match:get_stock",
+          "name": "no_tool_call",
           "passed": true,
           "detail": ""
         },
@@ -171,19 +171,29 @@
       "prompt": "What's Tesla trading at?",
       "expected": {
         "checks": [
+          "called_tool:get_stock",
+          "no_tool_call",
           "answer_contains",
           "single_call",
-          "tool_args_match:get_stock",
-          "no_tool_call",
-          "called_tool:get_stock"
+          "tool_args_match:get_stock"
         ]
       },
-      "output": "[{'type': 'function', 'id': '5R7fSJA4hYEaagknhDKVw8486XLieL8G', 'function': {'name': 'get_stock', 'arguments': '{\"symbol\":\"TSLA\"}'}}]",
-      "latency_ms": 2988.5,
+      "output": "\n\n",
+      "latency_ms": 11430.7,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 49,
+      "completion_tokens": 217,
       "checks": [
+        {
+          "name": "called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "answer_contains",
           "passed": true,
@@ -198,16 +208,6 @@
           "name": "tool_args_match:get_stock",
           "passed": true,
           "detail": ""
-        },
-        {
-          "name": "no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "called_tool:get_stock",
-          "passed": true,
-          "detail": ""
         }
       ],
       "pass": true
@@ -219,21 +219,21 @@
       "prompt": "What's the weather in Lisbon?",
       "expected": {
         "checks": [
-          "single_call",
+          "no_tool_call",
           "tool_args_match:get_weather",
-          "answer_contains",
           "called_tool:get_weather",
-          "no_tool_call"
+          "single_call",
+          "answer_contains"
         ]
       },
-      "output": "[{'type': 'function', 'id': '3lbx3rzWHiyIt7aqWglw0idMhZQZEw7N', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
-      "latency_ms": 2221.7,
+      "output": "\n\n",
+      "latency_ms": 12463.7,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 49,
+      "completion_tokens": 238,
       "checks": [
         {
-          "name": "single_call",
+          "name": "no_tool_call",
           "passed": true,
           "detail": ""
         },
@@ -243,17 +243,17 @@
           "detail": ""
         },
         {
-          "name": "answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "called_tool:get_weather",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "no_tool_call",
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "answer_contains",
           "passed": true,
           "detail": ""
         }
@@ -267,25 +267,25 @@
       "prompt": "Do I need an umbrella for my meeting in Porto this afternoon?",
       "expected": {
         "checks": [
-          "single_call",
           "not_called:get_forecast",
+          "called_tool:get_weather",
           "tool_args_match:get_weather",
-          "called_tool:get_weather"
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': '2YH2sEwkjbKrOUUL74bxqLNfkS6xHPlD', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Porto\"}'}}]",
-      "latency_ms": 1115.6,
+      "output": "\n\n",
+      "latency_ms": 21557.9,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 26,
+      "completion_tokens": 444,
       "checks": [
         {
-          "name": "single_call",
+          "name": "not_called:get_forecast",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "not_called:get_forecast",
+          "name": "called_tool:get_weather",
           "passed": true,
           "detail": ""
         },
@@ -295,7 +295,7 @@
           "detail": ""
         },
         {
-          "name": "called_tool:get_weather",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -309,20 +309,25 @@
       "prompt": "Email alice@example.com with the subject Lunch?",
       "expected": {
         "checks": [
-          "single_call",
-          "tool_args_match:send_email",
           "no_extra_args:send_email",
-          "called_tool:send_email"
+          "called_tool:send_email",
+          "tool_args_match:send_email",
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'XPoOAE4U2waL2H5cXB5Ra7QKUylwJtjD', 'function': {'name': 'send_email', 'arguments': '{\"to\":\"alice@example.com\",\"subject\":\"Lunch?\"}'}}]",
-      "latency_ms": 2511,
+      "output": "\n\n",
+      "latency_ms": 7510.1,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 39,
+      "completion_tokens": 134,
       "checks": [
         {
-          "name": "single_call",
+          "name": "no_extra_args:send_email",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "called_tool:send_email",
           "passed": true,
           "detail": ""
         },
@@ -332,12 +337,7 @@
           "detail": ""
         },
         {
-          "name": "no_extra_args:send_email",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "called_tool:send_email",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -352,15 +352,15 @@
       "expected": {
         "checks": [
           "tool_args_match:schedule_meeting",
-          "single_call",
-          "called_tool:schedule_meeting"
+          "called_tool:schedule_meeting",
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'ljB4toy6cmwWN5dfvDllo6vOMt1voIO6', 'function': {'name': 'schedule_meeting', 'arguments': '{\"title\":\"Q3 Planning\",\"attendees\":[\"alice@example.com\",\"bob@example.com\"],\"duration_minutes\":45}'}}]",
-      "latency_ms": 3432.9,
+      "output": "\n\n",
+      "latency_ms": 13476.4,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 63,
+      "completion_tokens": 261,
       "checks": [
         {
           "name": "tool_args_match:schedule_meeting",
@@ -368,12 +368,12 @@
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "called_tool:schedule_meeting",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "called_tool:schedule_meeting",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -392,11 +392,11 @@
           "called_tool:convert_currency"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'jbyuHUk1bC34vsuowpm84ijsCGP7jeZM', 'function': {'name': 'convert_currency', 'arguments': '{\"amount\":2340,\"from_currency\":\"USD\",\"to_currency\":\"EUR\"}'}}]",
-      "latency_ms": 4100.7,
+      "output": "\n\n",
+      "latency_ms": 10798,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 51,
+      "completion_tokens": 181,
       "checks": [
         {
           "name": "single_call",
@@ -423,28 +423,18 @@
       "prompt": "What's the weather in Lisbon and in Tokyo right now?",
       "expected": {
         "checks": [
-          "call_args_cover:get_weather",
-          "call_count",
           "called_tool:get_weather",
-          "tool_args_match:get_weather"
+          "tool_args_match:get_weather",
+          "call_args_cover:get_weather",
+          "call_count"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'TN64XEa4P4DLopkdt0o4gewPXkJyeZFE', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
-      "latency_ms": 1973.9,
+      "output": "\n\n \n",
+      "latency_ms": 7101.5,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 27,
+      "completion_tokens": 131,
       "checks": [
-        {
-          "name": "call_args_cover:get_weather",
-          "passed": false,
-          "detail": "'Tokyo' not covered by get_weather.city ['lisbon']"
-        },
-        {
-          "name": "call_count",
-          "passed": false,
-          "detail": "1 calls (want 2)"
-        },
         {
           "name": "called_tool:get_weather",
           "passed": true,
@@ -454,9 +444,19 @@
           "name": "tool_args_match:get_weather",
           "passed": true,
           "detail": ""
+        },
+        {
+          "name": "call_args_cover:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "call_count",
+          "passed": true,
+          "detail": ""
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v2:t5-pseudo-tool",
@@ -468,19 +468,19 @@
           "no_tool_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'tZoVx6ckNSgVD5iHezqRmnIahsDESDme', 'function': {'name': 'calculate', 'arguments': '{\"expression\":\"1+1\"}'}}]",
-      "latency_ms": 1996.8,
+      "output": "\n\nThe sky appears blue due to a phenomenon called **Rayleigh scattering**. \n\nSunlight may look white, but it's actually made up of all the colors of the visible spectrum. When sunlight enters Earth's atmosphere, it collides with gas molecules (mostly nitrogen and oxygen) and tiny particles. These molecules scatter shorter wavelengths of light (blue and violet) much more strongly than longer wavelengths (red, orange, and yellow).\n\nEven though violet light is scattered slightly more than blue, we see the sky as blue for two main reasons:\n1. Our eyes are much more sensitive to blue light than violet.\n2. Some of the violet light is absorbed by the upper atmosphere before it reaches our eyes.\n\nThis scattering effect is strongest when the sun is high in the sky, which is why the daytime sky looks blue. At sunrise and sunset, sunlight travels through more atmosphere, scattering away most of the blue light and leaving the longer red and orange wavelengths to dominate the sky.",
+      "latency_ms": 27764.5,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 26,
+      "completion_tokens": 580,
       "checks": [
         {
           "name": "no_tool_call",
-          "passed": false,
-          "detail": "expected no call, got 1"
+          "passed": true,
+          "detail": ""
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v2:t5-crypto-trap",
@@ -489,18 +489,23 @@
       "prompt": "What's the price of Bitcoin right now?",
       "expected": {
         "checks": [
+          "single_call",
           "not_called:get_stock",
           "called_tool:get_crypto",
-          "tool_args_match:get_crypto",
-          "single_call"
+          "tool_args_match:get_crypto"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'vsZiE8jXs2afh3Cj55v9c6RHXFnTqHx1', 'function': {'name': 'get_crypto', 'arguments': '{\"symbol\":\"BTC\"}'}}]",
-      "latency_ms": 2026.9,
+      "output": "\n\n",
+      "latency_ms": 7132.4,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 26,
+      "completion_tokens": 128,
       "checks": [
+        {
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "not_called:get_stock",
           "passed": true,
@@ -515,11 +520,6 @@
           "name": "tool_args_match:get_crypto",
           "passed": true,
           "detail": ""
-        },
-        {
-          "name": "single_call",
-          "passed": true,
-          "detail": ""
         }
       ],
       "pass": true
@@ -531,20 +531,20 @@
       "prompt": "What will the weather in Madrid be over the next 5 days?",
       "expected": {
         "checks": [
-          "single_call",
+          "not_called:get_weather",
           "called_tool:get_forecast",
           "tool_args_match:get_forecast",
-          "not_called:get_weather"
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': '8QDihImNj6OEvUjzwkEdwDvsBABzqjVR', 'function': {'name': 'get_forecast', 'arguments': '{\"city\":\"Madrid\",\"days\":5}'}}]",
-      "latency_ms": 2361.7,
+      "output": "\n\n",
+      "latency_ms": 40247.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 35,
+      "completion_tokens": 852,
       "checks": [
         {
-          "name": "single_call",
+          "name": "not_called:get_weather",
           "passed": true,
           "detail": ""
         },
@@ -559,7 +559,7 @@
           "detail": ""
         },
         {
-          "name": "not_called:get_weather",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -573,17 +573,22 @@
       "prompt": "Make a playlist called Roadtrip with Bohemian Rhapsody and Hotel California.",
       "expected": {
         "checks": [
+          "single_call",
           "tool_args_match:create_playlist",
-          "called_tool:create_playlist",
-          "single_call"
+          "called_tool:create_playlist"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'pL4gYBHRpO5YbJ7fXyQ7Rnefa29VmEVa', 'function': {'name': 'create_playlist', 'arguments': '{\"name\":\"Roadtrip\",\"songs\":[\"Bohemian Rhapsody\",\"Hotel California\"]}'}}]",
-      "latency_ms": 3491,
+      "output": "\n\n",
+      "latency_ms": 8110.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 48,
+      "completion_tokens": 135,
       "checks": [
+        {
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "tool_args_match:create_playlist",
           "passed": true,
@@ -591,11 +596,6 @@
         },
         {
           "name": "called_tool:create_playlist",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -614,11 +614,11 @@
           "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'RG2Fe4Q3FjwZ8dfjInZJB0MP6rTVVj8M', 'function': {'name': 'convert_temperature', 'arguments': '{\"value\":451.7,\"from_unit\":\"fahrenheit\",\"to_unit\":\"kelvin\"}'}}]",
-      "latency_ms": 3705.3,
+      "output": "\n\n",
+      "latency_ms": 9854.1,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 54,
+      "completion_tokens": 171,
       "checks": [
         {
           "name": "called_tool:convert_temperature",
@@ -650,11 +650,11 @@
           "called_tool:book_flight"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'gpbWtiJ9cW3xWMbmojZJC5Ucr73nCiDD', 'function': {'name': 'book_flight', 'arguments': '{\"origin\":\"Lisbon\",\"destination\":\"Berlin\",\"date\":\"December 10th\",\"travel_class\":\"business\"}'}}]",
-      "latency_ms": 4052.7,
+      "output": "\n\n",
+      "latency_ms": 16583.2,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 64,
+      "completion_tokens": 318,
       "checks": [
         {
           "name": "single_call",
@@ -684,19 +684,19 @@
           "no_tool_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': '6h6lvlK8mun2bw9a3G3upkyoSm7tdLLV', 'function': {'name': 'get_news', 'arguments': '{\"topic\":\"remote work\"}'}}]",
-      "latency_ms": 2018.2,
+      "output": "\n\nRemote work is very likely here to stay, though probably not in its purest form. The pandemic accelerated a shift that was already underway, and several structural factors suggest it will remain a permanent fixture in the modern workforce:\n\n**Why it's staying:**\n- **Strong employee demand:** Consistent surveys show that flexibility is now a top priority for workers. Companies offering remote or hybrid options typically see higher retention, broader applicant pools, and improved work-life balance.\n- **Mature technology:** Cloud infrastructure, video conferencing, project management platforms, and async communication tools have reached a level of reliability that makes location largely irrelevant for many roles.\n- **Economic incentives:** Businesses can reduce real estate and overhead costs, while employees save on commuting, childcare, and urban living expenses.\n- **Global talent access:** Remote work breaks down geographic barriers, allowing companies to hire the best people regardless of location and giving workers access to opportunities worldwide.\n\n**Why it's evolving, not dominating:**\n- **Collaboration & culture:** Spontaneous brainstorming, mentorship, onboarding, and team cohesion are often harder to replicate fully remotely. Many organizations find that some in-person time significantly boosts innovation and relationship-building.\n- **Role dependency:** Knowledge work, tech, finance, and creative fields adapt well to remote setups. Healthcare, manufacturing, logistics, education, and retail remain inherently location-bound.\n- **Management & equity challenges:** Tracking outcomes vs. hours, preventing burnout, navigating cross-border tax/labor laws, and ensuring fairness between remote and on-site staff require intentional policies and leadership training.\n\n**The likely outcome:** A **flexible, hybrid-default model** for most knowledge workers, with 2\u20133 days in the office (or periodic in-person gatherings) balanced with remote flexibility. Companies are increasingly shifting from \"where you work\" to \"what you deliver,\" measuring success by outcomes rather than physical presence.\n\nIn short: remote work isn't going away, but it's maturing. The future of work is less about fully remote vs. fully in-office and more about intentional flexibility tailored to roles, teams, and organizational goals.",
+      "latency_ms": 55910.1,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 26,
+      "completion_tokens": 1194,
       "checks": [
         {
           "name": "no_tool_call",
-          "passed": false,
-          "detail": "expected no call, got 1"
+          "passed": true,
+          "detail": ""
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v2:t3-chitchat",
@@ -708,11 +708,11 @@
           "no_tool_call"
         ]
       },
-      "output": "You're welcome! If you need anything else later, just let me know. Have a great day! \ud83d\ude0a",
-      "latency_ms": 2018.5,
+      "output": "\n\nYou're welcome! If you need anything else in the future, just let me know. Have a great day! \ud83d\ude0a",
+      "latency_ms": 9655.5,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 25,
+      "completion_tokens": 183,
       "checks": [
         {
           "name": "no_tool_call",
@@ -732,19 +732,19 @@
           "no_tool_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'YH76xJNuAQWUcd61q71fv1FggddZtNmA', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Paris\"}'}}]",
-      "latency_ms": 1984.3,
+      "output": "\n\nThe capital of France is Paris.",
+      "latency_ms": 4562.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 25,
+      "completion_tokens": 72,
       "checks": [
         {
           "name": "no_tool_call",
-          "passed": false,
-          "detail": "expected no call, got 1"
+          "passed": true,
+          "detail": ""
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v2:t2-stock",
@@ -753,24 +753,24 @@
       "prompt": "What's Microsoft's share price?",
       "expected": {
         "checks": [
-          "tool_args_match:get_stock",
           "single_call",
+          "tool_args_match:get_stock",
           "called_tool:get_stock"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'EZHO158qfhvKJno7RRncTjfmhwgU5GWy', 'function': {'name': 'get_stock', 'arguments': '{\"symbol\":\"MSFT\"}'}}]",
-      "latency_ms": 1063.4,
+      "output": "\n\n",
+      "latency_ms": 8369.5,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 25,
+      "completion_tokens": 151,
       "checks": [
         {
-          "name": "tool_args_match:get_stock",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "tool_args_match:get_stock",
           "passed": true,
           "detail": ""
         },
@@ -789,17 +789,22 @@
       "prompt": "Remind me to call mom at 6pm.",
       "expected": {
         "checks": [
+          "tool_args_match:set_reminder",
           "called_tool:set_reminder",
-          "single_call",
-          "tool_args_match:set_reminder"
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'GtHsRBLc58G4d1gWDGVw5UsaWtku5yrY', 'function': {'name': 'set_reminder', 'arguments': '{\"text\":\"Call mom\",\"time\":\"6pm\"}'}}]",
-      "latency_ms": 2565.8,
+      "output": "\n\n",
+      "latency_ms": 23830.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 39,
+      "completion_tokens": 490,
       "checks": [
+        {
+          "name": "tool_args_match:set_reminder",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "called_tool:set_reminder",
           "passed": true,
@@ -807,11 +812,6 @@
         },
         {
           "name": "single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "tool_args_match:set_reminder",
           "passed": true,
           "detail": ""
         }
@@ -826,15 +826,15 @@
       "expected": {
         "checks": [
           "single_call",
-          "called_tool:get_news",
-          "tool_args_match:get_news"
+          "tool_args_match:get_news",
+          "called_tool:get_news"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'B1AmZ2nzfJE8chQLoq9jk8iaGXEQriQG', 'function': {'name': 'get_news', 'arguments': '{\"topic\":\"climate summit\"}'}}]",
-      "latency_ms": 2182.3,
+      "output": "\n\n",
+      "latency_ms": 9913.7,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 27,
+      "completion_tokens": 185,
       "checks": [
         {
           "name": "single_call",
@@ -842,12 +842,12 @@
           "detail": ""
         },
         {
-          "name": "called_tool:get_news",
+          "name": "tool_args_match:get_news",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "tool_args_match:get_news",
+          "name": "called_tool:get_news",
           "passed": true,
           "detail": ""
         }
@@ -866,11 +866,11 @@
           "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'htW2bbIMhiag0LZ6ekbqEXrSp8PuErZ2', 'function': {'name': 'calculate', 'arguments': '{\"expression\":\"4817 * 3926\"}'}}]",
-      "latency_ms": 2135.4,
+      "output": "\n\n",
+      "latency_ms": 5453.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 33,
+      "completion_tokens": 95,
       "checks": [
         {
           "name": "called_tool:calculate",
@@ -897,19 +897,19 @@
       "prompt": "What time is it in Tokyo right now?",
       "expected": {
         "checks": [
-          "called_tool:get_time",
+          "single_call",
           "tool_args_match:get_time",
-          "single_call"
+          "called_tool:get_time"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'dMotB6pF281KMmG9cYYKpdwHzs7Nwz3p', 'function': {'name': 'get_time', 'arguments': '{\"timezone\":\"Tokyo\"}'}}]",
-      "latency_ms": 1898.1,
+      "output": "\n\n",
+      "latency_ms": 8402.9,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 25,
+      "completion_tokens": 160,
       "checks": [
         {
-          "name": "called_tool:get_time",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         },
@@ -919,7 +919,7 @@
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "called_tool:get_time",
           "passed": true,
           "detail": ""
         }
@@ -933,17 +933,22 @@
       "prompt": "What's the weather in Lisbon right now?",
       "expected": {
         "checks": [
+          "tool_args_match:get_weather",
           "called_tool:get_weather",
-          "single_call",
-          "tool_args_match:get_weather"
+          "single_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': 'GvBL4ZiQBS40dVZ0U7Qpt0r8dhEzBdAX', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
-      "latency_ms": 2044.4,
+      "output": "\n\n",
+      "latency_ms": 8490.9,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 27,
+      "completion_tokens": 162,
       "checks": [
+        {
+          "name": "tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "called_tool:get_weather",
           "passed": true,
@@ -951,11 +956,6 @@
         },
         {
           "name": "single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "tool_args_match:get_weather",
           "passed": true,
           "detail": ""
         }

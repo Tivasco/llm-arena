@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T09:08:15Z",
+  "generated_at": "2026-07-13T12:00:00Z",
   "verdict_buckets": {
     "automate": 0.85,
     "supervise": 0.6
@@ -32,9 +32,9 @@
   ],
   "rows": [
     {
-      "model": "gemma-4-31b-it-mlx",
+      "model": "gemma-4-31b-it",
       "variant": "base",
-      "label": "gemma-4-31b-it-mlx @base",
+      "label": "gemma-4-31b-it @base",
       "family": "gemma4",
       "size": "31B",
       "config": {
@@ -49,13 +49,13 @@
       },
       "scores": {
         "formatting-v1": {
-          "pass": 25,
+          "pass": 26,
           "total": 30,
-          "rate": 0.8333,
-          "verdict": "supervise",
+          "rate": 0.8667,
+          "verdict": "automate",
           "borderline": true,
-          "run_at": "2026-06-21T21:25:11Z",
-          "detail": "detail/gemma-4-31b-it-mlx@base/formatting-v1.json"
+          "run_at": "2026-07-02T01:32:00Z",
+          "detail": "detail/gemma-4-31b-it@base/formatting-v1.json"
         },
         "tooluse-v2": {
           "pass": 25,
@@ -63,8 +63,8 @@
           "rate": 1.0,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-18T20:30:35Z",
-          "detail": "detail/gemma-4-31b-it-mlx@base/tooluse-v2.json"
+          "run_at": "2026-07-02T01:33:04Z",
+          "detail": "detail/gemma-4-31b-it@base/tooluse-v2.json"
         },
         "tooluse-v3": {
           "pass": 13,
@@ -72,8 +72,8 @@
           "rate": 0.8667,
           "verdict": "automate",
           "borderline": true,
-          "run_at": "2026-06-19T20:52:59Z",
-          "detail": "detail/gemma-4-31b-it-mlx@base/tooluse-v3.json"
+          "run_at": "2026-07-02T01:34:49Z",
+          "detail": "detail/gemma-4-31b-it@base/tooluse-v3.json"
         },
         "coding-v1": {
           "pass": 3,
@@ -81,20 +81,20 @@
           "rate": 0.6,
           "verdict": "supervise",
           "borderline": true,
-          "run_at": "2026-06-20T06:40:24Z",
-          "detail": "detail/gemma-4-31b-it-mlx@base/coding-v1.json"
+          "run_at": "2026-07-02T01:35:47Z",
+          "detail": "detail/gemma-4-31b-it@base/coding-v1.json"
         }
       },
       "overall": {
-        "pass": 66,
+        "pass": 67,
         "total": 75,
-        "rate": 0.88
+        "rate": 0.8933
       }
     },
     {
-      "model": "gemma-4-31b-it-mlx",
+      "model": "gemma-4-31b-it",
       "variant": "think",
-      "label": "gemma-4-31b-it-mlx @think",
+      "label": "gemma-4-31b-it @think",
       "family": "gemma4",
       "size": "31B",
       "config": {
@@ -109,46 +109,46 @@
       },
       "scores": {
         "formatting-v1": {
-          "pass": 28,
+          "pass": 26,
           "total": 30,
-          "rate": 0.9333,
-          "verdict": "automate",
-          "borderline": false,
-          "run_at": "2026-06-18T12:31:34Z",
-          "detail": "detail/gemma-4-31b-it-mlx@think/formatting-v1.json"
-        },
-        "tooluse-v2": {
-          "pass": 25,
-          "total": 25,
-          "rate": 1.0,
-          "verdict": "automate",
-          "borderline": false,
-          "run_at": "2026-06-18T20:33:32Z",
-          "detail": "detail/gemma-4-31b-it-mlx@think/tooluse-v2.json"
-        },
-        "tooluse-v3": {
-          "pass": 13,
-          "total": 15,
           "rate": 0.8667,
           "verdict": "automate",
           "borderline": true,
-          "run_at": "2026-06-19T20:55:17Z",
-          "detail": "detail/gemma-4-31b-it-mlx@think/tooluse-v3.json"
+          "run_at": "2026-07-02T01:51:51Z",
+          "detail": "detail/gemma-4-31b-it@think/formatting-v1.json"
+        },
+        "tooluse-v2": {
+          "pass": 20,
+          "total": 25,
+          "rate": 0.8,
+          "verdict": "supervise",
+          "borderline": false,
+          "run_at": "2026-07-02T02:00:26Z",
+          "detail": "detail/gemma-4-31b-it@think/tooluse-v2.json"
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "verdict": "automate",
+          "borderline": false,
+          "run_at": "2026-07-02T02:05:33Z",
+          "detail": "detail/gemma-4-31b-it@think/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 2,
+          "pass": 3,
           "total": 5,
-          "rate": 0.4,
-          "verdict": "escalate",
+          "rate": 0.6,
+          "verdict": "supervise",
           "borderline": true,
-          "run_at": "2026-06-20T06:46:47Z",
-          "detail": "detail/gemma-4-31b-it-mlx@think/coding-v1.json"
+          "run_at": "2026-07-02T02:09:20Z",
+          "detail": "detail/gemma-4-31b-it@think/coding-v1.json"
         }
       },
       "overall": {
-        "pass": 68,
+        "pass": 64,
         "total": 75,
-        "rate": 0.9067
+        "rate": 0.8533
       }
     },
     {
@@ -354,16 +354,16 @@
           "rate": 0.9333,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-30T12:40:00Z",
+          "run_at": "2026-07-04T13:31:43Z",
           "detail": "detail/minimax-minimax-m2.7@base/formatting-v1.json"
         },
         "tooluse-v2": {
-          "pass": 22,
+          "pass": 23,
           "total": 25,
-          "rate": 0.88,
+          "rate": 0.92,
           "verdict": "automate",
-          "borderline": true,
-          "run_at": "2026-06-30T12:47:02Z",
+          "borderline": false,
+          "run_at": "2026-07-04T13:38:31Z",
           "detail": "detail/minimax-minimax-m2.7@base/tooluse-v2.json"
         },
         "tooluse-v3": {
@@ -372,16 +372,16 @@
           "rate": 0.9333,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-30T12:49:24Z",
+          "run_at": "2026-07-04T13:40:50Z",
           "detail": "detail/minimax-minimax-m2.7@base/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 3,
+          "pass": 2,
           "total": 5,
-          "rate": 0.6,
-          "verdict": "supervise",
+          "rate": 0.4,
+          "verdict": "escalate",
           "borderline": true,
-          "run_at": "2026-06-30T14:44:01Z",
+          "run_at": "2026-07-04T13:42:54Z",
           "detail": "detail/minimax-minimax-m2.7@base/coding-v1.json"
         }
       },
@@ -474,7 +474,7 @@
           "rate": 0.8,
           "verdict": "supervise",
           "borderline": false,
-          "run_at": "2026-06-24T15:22:28Z",
+          "run_at": "2026-07-12T20:52:53Z",
           "detail": "detail/nvidia-nemotron-3-super@base/formatting-v1.json"
         },
         "tooluse-v2": {
@@ -483,7 +483,7 @@
           "rate": 0.84,
           "verdict": "supervise",
           "borderline": true,
-          "run_at": "2026-06-24T15:23:19Z",
+          "run_at": "2026-07-12T20:53:42Z",
           "detail": "detail/nvidia-nemotron-3-super@base/tooluse-v2.json"
         },
         "tooluse-v3": {
@@ -492,23 +492,23 @@
           "rate": 0.7333,
           "verdict": "supervise",
           "borderline": false,
-          "run_at": "2026-06-24T15:24:27Z",
+          "run_at": "2026-07-12T20:54:47Z",
           "detail": "detail/nvidia-nemotron-3-super@base/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 2,
+          "pass": 1,
           "total": 5,
-          "rate": 0.4,
+          "rate": 0.2,
           "verdict": "escalate",
-          "borderline": true,
-          "run_at": "2026-06-24T15:25:22Z",
+          "borderline": false,
+          "run_at": "2026-07-12T20:55:40Z",
           "detail": "detail/nvidia-nemotron-3-super@base/coding-v1.json"
         }
       },
       "overall": {
-        "pass": 58,
+        "pass": 57,
         "total": 75,
-        "rate": 0.7733
+        "rate": 0.76
       }
     },
     {
@@ -534,41 +534,41 @@
           "rate": 0.9333,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-24T15:27:26Z",
+          "run_at": "2026-07-12T21:08:12Z",
           "detail": "detail/nvidia-nemotron-3-super@high/formatting-v1.json"
         },
         "tooluse-v2": {
-          "pass": 23,
+          "pass": 24,
           "total": 25,
-          "rate": 0.92,
+          "rate": 0.96,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-24T15:31:20Z",
+          "run_at": "2026-07-12T21:12:46Z",
           "detail": "detail/nvidia-nemotron-3-super@high/tooluse-v2.json"
         },
         "tooluse-v3": {
-          "pass": 15,
+          "pass": 14,
           "total": 15,
-          "rate": 1.0,
+          "rate": 0.9333,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-24T15:34:05Z",
+          "run_at": "2026-07-12T21:15:27Z",
           "detail": "detail/nvidia-nemotron-3-super@high/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 1,
+          "pass": 2,
           "total": 5,
-          "rate": 0.2,
+          "rate": 0.4,
           "verdict": "escalate",
-          "borderline": false,
-          "run_at": "2026-06-24T15:36:16Z",
+          "borderline": true,
+          "run_at": "2026-07-12T21:17:42Z",
           "detail": "detail/nvidia-nemotron-3-super@high/coding-v1.json"
         }
       },
       "overall": {
-        "pass": 67,
+        "pass": 68,
         "total": 75,
-        "rate": 0.8933
+        "rate": 0.9067
       }
     },
     {
@@ -594,7 +594,7 @@
           "rate": 0.9333,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-29T22:09:22Z",
+          "run_at": "2026-07-12T18:00:03Z",
           "detail": "detail/openai-gpt-oss-120b@base/formatting-v1.json"
         },
         "tooluse-v2": {
@@ -603,32 +603,32 @@
           "rate": 0.88,
           "verdict": "automate",
           "borderline": true,
-          "run_at": "2026-06-29T22:16:03Z",
+          "run_at": "2026-07-12T18:00:52Z",
           "detail": "detail/openai-gpt-oss-120b@base/tooluse-v2.json"
         },
         "tooluse-v3": {
-          "pass": 14,
+          "pass": 13,
           "total": 15,
-          "rate": 0.9333,
+          "rate": 0.8667,
           "verdict": "automate",
-          "borderline": false,
-          "run_at": "2026-06-29T22:20:34Z",
+          "borderline": true,
+          "run_at": "2026-07-12T18:01:58Z",
           "detail": "detail/openai-gpt-oss-120b@base/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 3,
+          "pass": 2,
           "total": 5,
-          "rate": 0.6,
-          "verdict": "supervise",
+          "rate": 0.4,
+          "verdict": "escalate",
           "borderline": true,
-          "run_at": "2026-06-29T22:24:46Z",
+          "run_at": "2026-07-12T18:02:34Z",
           "detail": "detail/openai-gpt-oss-120b@base/coding-v1.json"
         }
       },
       "overall": {
-        "pass": 67,
+        "pass": 65,
         "total": 75,
-        "rate": 0.8933
+        "rate": 0.8667
       }
     },
     {
@@ -649,21 +649,21 @@
       },
       "scores": {
         "formatting-v1": {
-          "pass": 28,
+          "pass": 27,
           "total": 30,
-          "rate": 0.9333,
+          "rate": 0.9,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-29T22:12:44Z",
+          "run_at": "2026-07-12T18:11:54Z",
           "detail": "detail/openai-gpt-oss-120b@high/formatting-v1.json"
         },
         "tooluse-v2": {
-          "pass": 20,
+          "pass": 21,
           "total": 25,
-          "rate": 0.8,
+          "rate": 0.84,
           "verdict": "supervise",
-          "borderline": false,
-          "run_at": "2026-06-29T22:18:45Z",
+          "borderline": true,
+          "run_at": "2026-07-12T18:15:54Z",
           "detail": "detail/openai-gpt-oss-120b@high/tooluse-v2.json"
         },
         "tooluse-v3": {
@@ -672,7 +672,7 @@
           "rate": 0.8,
           "verdict": "supervise",
           "borderline": true,
-          "run_at": "2026-06-29T22:22:49Z",
+          "run_at": "2026-07-12T18:18:10Z",
           "detail": "detail/openai-gpt-oss-120b@high/tooluse-v3.json"
         },
         "coding-v1": {
@@ -681,7 +681,7 @@
           "rate": 0.2,
           "verdict": "escalate",
           "borderline": false,
-          "run_at": "2026-06-29T22:30:28Z",
+          "run_at": "2026-07-12T18:20:01Z",
           "detail": "detail/openai-gpt-oss-120b@high/coding-v1.json"
         }
       },
@@ -692,13 +692,13 @@
       }
     },
     {
-      "model": "openai/gpt-oss-120b",
-      "variant": "low",
-      "label": "openai/gpt-oss-120b @low",
-      "family": "gpt-oss",
-      "size": "120B",
+      "model": "qwen/qwen3.6-27b",
+      "variant": "high",
+      "label": "qwen/qwen3.6-27b @high",
+      "family": "qwen3.6",
+      "size": "27B",
       "config": {
-        "reasoning_effort": "low",
+        "reasoning_effort": "high",
         "temperature": 0,
         "seed": null,
         "top_p": null,
@@ -709,56 +709,56 @@
       },
       "scores": {
         "formatting-v1": {
-          "pass": 28,
+          "pass": 29,
           "total": 30,
-          "rate": 0.9333,
+          "rate": 0.9667,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-29T22:10:09Z",
-          "detail": "detail/openai-gpt-oss-120b@low/formatting-v1.json"
+          "run_at": "2026-07-01T22:34:10Z",
+          "detail": "detail/qwen-qwen3.6-27b@high/formatting-v1.json"
         },
         "tooluse-v2": {
-          "pass": 22,
+          "pass": 25,
           "total": 25,
-          "rate": 0.88,
-          "verdict": "automate",
-          "borderline": true,
-          "run_at": "2026-06-29T22:16:55Z",
-          "detail": "detail/openai-gpt-oss-120b@low/tooluse-v2.json"
-        },
-        "tooluse-v3": {
-          "pass": 14,
-          "total": 15,
-          "rate": 0.9333,
+          "rate": 1.0,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-29T22:21:15Z",
-          "detail": "detail/openai-gpt-oss-120b@low/tooluse-v3.json"
+          "run_at": "2026-07-01T22:55:51Z",
+          "detail": "detail/qwen-qwen3.6-27b@high/tooluse-v2.json"
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "verdict": "automate",
+          "borderline": false,
+          "run_at": "2026-07-01T23:02:49Z",
+          "detail": "detail/qwen-qwen3.6-27b@high/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 3,
+          "pass": 1,
           "total": 5,
-          "rate": 0.6,
-          "verdict": "supervise",
-          "borderline": true,
-          "run_at": "2026-06-29T22:26:21Z",
-          "detail": "detail/openai-gpt-oss-120b@low/coding-v1.json"
+          "rate": 0.2,
+          "verdict": "escalate",
+          "borderline": false,
+          "run_at": "2026-07-01T23:08:28Z",
+          "detail": "detail/qwen-qwen3.6-27b@high/coding-v1.json"
         }
       },
       "overall": {
-        "pass": 67,
+        "pass": 70,
         "total": 75,
-        "rate": 0.8933
+        "rate": 0.9333
       }
     },
     {
-      "model": "openai/gpt-oss-120b",
-      "variant": "medium",
-      "label": "openai/gpt-oss-120b @medium",
-      "family": "gpt-oss",
-      "size": "120B",
+      "model": "qwen/qwen3.6-27b",
+      "variant": "high+q8",
+      "label": "qwen/qwen3.6-27b @high+q8",
+      "family": "qwen3.6",
+      "size": "27B",
       "config": {
-        "reasoning_effort": "medium",
+        "reasoning_effort": "high",
         "temperature": 0,
         "seed": null,
         "top_p": null,
@@ -774,17 +774,17 @@
           "rate": 0.9333,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-29T22:10:55Z",
-          "detail": "detail/openai-gpt-oss-120b@medium/formatting-v1.json"
+          "run_at": "2026-07-02T21:04:28Z",
+          "detail": "detail/qwen-qwen3.6-27b@high+q8/formatting-v1.json"
         },
         "tooluse-v2": {
-          "pass": 22,
+          "pass": 25,
           "total": 25,
-          "rate": 0.88,
+          "rate": 1.0,
           "verdict": "automate",
-          "borderline": true,
-          "run_at": "2026-06-29T22:17:47Z",
-          "detail": "detail/openai-gpt-oss-120b@medium/tooluse-v2.json"
+          "borderline": false,
+          "run_at": "2026-07-02T21:23:40Z",
+          "detail": "detail/qwen-qwen3.6-27b@high+q8/tooluse-v2.json"
         },
         "tooluse-v3": {
           "pass": 12,
@@ -792,17 +792,17 @@
           "rate": 0.8,
           "verdict": "supervise",
           "borderline": true,
-          "run_at": "2026-06-29T22:21:56Z",
-          "detail": "detail/openai-gpt-oss-120b@medium/tooluse-v3.json"
+          "run_at": "2026-07-02T21:31:10Z",
+          "detail": "detail/qwen-qwen3.6-27b@high+q8/tooluse-v3.json"
         },
         "coding-v1": {
-          "pass": 3,
+          "pass": 0,
           "total": 5,
-          "rate": 0.6,
-          "verdict": "supervise",
-          "borderline": true,
-          "run_at": "2026-06-29T22:27:57Z",
-          "detail": "detail/openai-gpt-oss-120b@medium/coding-v1.json"
+          "rate": 0.0,
+          "verdict": "escalate",
+          "borderline": false,
+          "run_at": "2026-07-02T21:50:26Z",
+          "detail": "detail/qwen-qwen3.6-27b@high+q8/coding-v1.json"
         }
       },
       "overall": {
@@ -813,12 +813,12 @@
     },
     {
       "model": "qwen/qwen3.6-27b",
-      "variant": "base",
-      "label": "qwen/qwen3.6-27b @base",
+      "variant": "low",
+      "label": "qwen/qwen3.6-27b @low",
       "family": "qwen3.6",
       "size": "27B",
       "config": {
-        "reasoning_effort": null,
+        "reasoning_effort": "low",
         "temperature": 0,
         "seed": null,
         "top_p": null,
@@ -834,8 +834,8 @@
           "rate": 0.9,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-24T21:11:44Z",
-          "detail": "detail/qwen-qwen3.6-27b@base/formatting-v1.json"
+          "run_at": "2026-07-01T22:16:42Z",
+          "detail": "detail/qwen-qwen3.6-27b@low/formatting-v1.json"
         },
         "tooluse-v2": {
           "pass": 25,
@@ -843,8 +843,8 @@
           "rate": 1.0,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-24T21:13:09Z",
-          "detail": "detail/qwen-qwen3.6-27b@base/tooluse-v2.json"
+          "run_at": "2026-07-01T22:17:37Z",
+          "detail": "detail/qwen-qwen3.6-27b@low/tooluse-v2.json"
         },
         "tooluse-v3": {
           "pass": 15,
@@ -852,8 +852,8 @@
           "rate": 1.0,
           "verdict": "automate",
           "borderline": false,
-          "run_at": "2026-06-19T20:51:32Z",
-          "detail": "detail/qwen-qwen3.6-27b@base/tooluse-v3.json"
+          "run_at": "2026-07-01T22:19:15Z",
+          "detail": "detail/qwen-qwen3.6-27b@low/tooluse-v3.json"
         },
         "coding-v1": {
           "pass": 2,
@@ -861,14 +861,74 @@
           "rate": 0.4,
           "verdict": "escalate",
           "borderline": true,
-          "run_at": "2026-06-20T06:36:40Z",
-          "detail": "detail/qwen-qwen3.6-27b@base/coding-v1.json"
+          "run_at": "2026-07-01T22:20:13Z",
+          "detail": "detail/qwen-qwen3.6-27b@low/coding-v1.json"
         }
       },
       "overall": {
         "pass": 69,
         "total": 75,
         "rate": 0.92
+      }
+    },
+    {
+      "model": "qwen/qwen3.6-27b",
+      "variant": "low+q8",
+      "label": "qwen/qwen3.6-27b @low+q8",
+      "family": "qwen3.6",
+      "size": "27B",
+      "config": {
+        "reasoning_effort": "low",
+        "temperature": 0,
+        "seed": null,
+        "top_p": null,
+        "top_k": null,
+        "call_deadline_s": null,
+        "request_timeout_s": null,
+        "max_tokens_floor": null
+      },
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667,
+          "verdict": "automate",
+          "borderline": true,
+          "run_at": "2026-07-02T20:37:44Z",
+          "detail": "detail/qwen-qwen3.6-27b@low+q8/formatting-v1.json"
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "verdict": "automate",
+          "borderline": false,
+          "run_at": "2026-07-02T20:39:48Z",
+          "detail": "detail/qwen-qwen3.6-27b@low+q8/tooluse-v2.json"
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "verdict": "automate",
+          "borderline": false,
+          "run_at": "2026-07-02T20:43:22Z",
+          "detail": "detail/qwen-qwen3.6-27b@low+q8/tooluse-v3.json"
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "verdict": "escalate",
+          "borderline": false,
+          "run_at": "2026-07-02T20:44:36Z",
+          "detail": "detail/qwen-qwen3.6-27b@low+q8/coding-v1.json"
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
       }
     },
     {

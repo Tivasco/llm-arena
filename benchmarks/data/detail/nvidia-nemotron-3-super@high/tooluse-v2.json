@@ -2,7 +2,7 @@
   "model": "nvidia/nemotron-3-super",
   "variant": "high",
   "tier": "tooluse-v2",
-  "run_name": "nemotron3:super+effort=high@2026-06-24T15:31:20Z",
+  "run_name": "nvidia/nemotron-3-super+effort=high+temp=0+quant=q4_k_m@2026-07-12T21:12:46Z",
   "config": {
     "reasoning_effort": "high",
     "temperature": 0,
@@ -21,27 +21,22 @@
       "prompt": "If it's going to rain in Lisbon today, remind me to bring an umbrella.",
       "expected": {
         "checks": [
-          "tool_args_match:set_reminder",
-          "single_call",
+          "called_tool:set_reminder",
           "tool_args_match:get_weather",
           "called_tool:get_weather",
           "single_call",
-          "called_tool:set_reminder"
+          "tool_args_match:set_reminder",
+          "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 20488.600000000002,
+      "output": "[{'type': 'function', 'id': 'itHknOoXo7FxNPVQCpHYTbdISdWB2Zhm', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
+      "latency_ms": 19451.9,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 637,
+      "completion_tokens": 634,
       "checks": [
         {
-          "name": "tool_args_match:set_reminder",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "single_call",
+          "name": "called_tool:set_reminder",
           "passed": true,
           "detail": ""
         },
@@ -61,7 +56,12 @@
           "detail": ""
         },
         {
-          "name": "called_tool:set_reminder",
+          "name": "tool_args_match:set_reminder",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -76,14 +76,14 @@
       "expected": {
         "checks": [
           "called_tool:get_weather",
-          "answer_contains",
+          "single_call",
           "tool_args_match:get_weather",
-          "no_tool_call",
-          "single_call"
+          "answer_contains",
+          "no_tool_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 6681.6,
+      "output": "[{'type': 'function', 'id': 'F1BdWKVyOM5VAwkIqkaVw4HCUkx8OIBk', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Berlin\"}'}}]",
+      "latency_ms": 6126.200000000001,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 173,
@@ -94,7 +94,7 @@
           "detail": ""
         },
         {
-          "name": "answer_contains",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         },
@@ -104,12 +104,12 @@
           "detail": ""
         },
         {
-          "name": "no_tool_call",
+          "name": "answer_contains",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "no_tool_call",
           "passed": true,
           "detail": ""
         }
@@ -123,26 +123,31 @@
       "prompt": "What's the share price of Globex Corp?",
       "expected": {
         "checks": [
-          "answer_excludes",
           "called_tool:get_stock",
+          "answer_excludes",
+          "no_tool_call",
           "tool_args_match:get_stock",
-          "single_call",
-          "no_tool_call"
+          "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 15505.8,
+      "output": "[{'type': 'function', 'id': 'wrRsux0HNQ4z1el4l08eN21xxW16YylK', 'function': {'name': 'get_stock', 'arguments': '{\"symbol\":\"GLOBEX\"}'}}]",
+      "latency_ms": 11746,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 471,
+      "completion_tokens": 374,
       "checks": [
+        {
+          "name": "called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "answer_excludes",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "called_tool:get_stock",
+          "name": "no_tool_call",
           "passed": true,
           "detail": ""
         },
@@ -153,11 +158,6 @@
         },
         {
           "name": "single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_tool_call",
           "passed": true,
           "detail": ""
         }
@@ -171,31 +171,21 @@
       "prompt": "What's Tesla trading at?",
       "expected": {
         "checks": [
-          "no_tool_call",
           "answer_contains",
-          "single_call",
           "tool_args_match:get_stock",
-          "called_tool:get_stock"
+          "single_call",
+          "called_tool:get_stock",
+          "no_tool_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 6022.1,
+      "output": "[{'type': 'function', 'id': 'KLJDFOs0aj7QKcAte5xZD8v6xPNJySys', 'function': {'name': 'get_stock', 'arguments': '{\"symbol\":\"TSLA\"}'}}]",
+      "latency_ms": 6284.8,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 153,
       "checks": [
         {
-          "name": "no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "single_call",
           "passed": true,
           "detail": ""
         },
@@ -205,7 +195,17 @@
           "detail": ""
         },
         {
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_tool_call",
           "passed": true,
           "detail": ""
         }
@@ -219,19 +219,29 @@
       "prompt": "What's the weather in Lisbon?",
       "expected": {
         "checks": [
+          "answer_contains",
+          "tool_args_match:get_weather",
           "single_call",
           "called_tool:get_weather",
-          "no_tool_call",
-          "answer_contains",
-          "tool_args_match:get_weather"
+          "no_tool_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 8121.7,
+      "output": "[{'type': 'function', 'id': 'UNzeRSz4ShgPbMWFQvu1TZaCJinM8hkv', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
+      "latency_ms": 7489.4,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 222,
       "checks": [
+        {
+          "name": "answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "single_call",
           "passed": true,
@@ -246,16 +256,6 @@
           "name": "no_tool_call",
           "passed": true,
           "detail": ""
-        },
-        {
-          "name": "answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "tool_args_match:get_weather",
-          "passed": true,
-          "detail": ""
         }
       ],
       "pass": true
@@ -267,35 +267,35 @@
       "prompt": "Do I need an umbrella for my meeting in Porto this afternoon?",
       "expected": {
         "checks": [
-          "single_call",
-          "called_tool:get_weather",
           "not_called:get_forecast",
-          "tool_args_match:get_weather"
+          "single_call",
+          "tool_args_match:get_weather",
+          "called_tool:get_weather"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 3729.9,
+      "output": "[{'type': 'function', 'id': 'zZvtZImzHD09Xc0hMTpONJzmYbk4OI1u', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Porto\"}'}}]",
+      "latency_ms": 2847.3,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 87,
       "checks": [
-        {
-          "name": "single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "called_tool:get_weather",
-          "passed": true,
-          "detail": ""
-        },
         {
           "name": "not_called:get_forecast",
           "passed": true,
           "detail": ""
         },
         {
+          "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "called_tool:get_weather",
           "passed": true,
           "detail": ""
         }
@@ -309,20 +309,30 @@
       "prompt": "Email alice@example.com with the subject Lunch?",
       "expected": {
         "checks": [
-          "single_call",
-          "tool_args_match:send_email",
           "called_tool:send_email",
-          "no_extra_args:send_email"
+          "single_call",
+          "no_extra_args:send_email",
+          "tool_args_match:send_email"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 7786.4,
+      "output": "[{'type': 'function', 'id': 'YRPmjdfzgxtBRC0gzeLxo6zvWoyfIBKY', 'function': {'name': 'send_email', 'arguments': '{\"to\":\"alice@example.com\",\"subject\":\"Lunch?\"}'}}]",
+      "latency_ms": 9194.2,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 220,
+      "completion_tokens": 273,
       "checks": [
         {
+          "name": "called_tool:send_email",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_extra_args:send_email",
           "passed": true,
           "detail": ""
         },
@@ -330,19 +340,9 @@
           "name": "tool_args_match:send_email",
           "passed": true,
           "detail": ""
-        },
-        {
-          "name": "called_tool:send_email",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_extra_args:send_email",
-          "passed": false,
-          "detail": "extra args: ['body']"
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v2:t6-nested-args",
@@ -352,12 +352,12 @@
       "expected": {
         "checks": [
           "tool_args_match:schedule_meeting",
-          "single_call",
-          "called_tool:schedule_meeting"
+          "called_tool:schedule_meeting",
+          "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 4597.8,
+      "output": "[{'type': 'function', 'id': 'enPY2b1IT3E5A978Ga5jbGWTmpURyx8n', 'function': {'name': 'schedule_meeting', 'arguments': '{\"title\":\"Q3 Planning\",\"attendees\":[\"alice@example.com\",\"bob@example.com\"],\"duration_minutes\":45}'}}]",
+      "latency_ms": 4747.3,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 110,
@@ -368,12 +368,12 @@
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "called_tool:schedule_meeting",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "called_tool:schedule_meeting",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -387,24 +387,24 @@
       "prompt": "Lots going on today, but right now I just need to know what 2340 US dollars is worth in euros for the invoice.",
       "expected": {
         "checks": [
-          "called_tool:convert_currency",
           "single_call",
+          "called_tool:convert_currency",
           "tool_args_match:convert_currency"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 5259.1,
+      "output": "[{'type': 'function', 'id': '1pTOwMLD9T6jIxLicipCgn2RaxneddfD', 'function': {'name': 'convert_currency', 'arguments': '{\"amount\":2340,\"from_currency\":\"USD\",\"to_currency\":\"EUR\"}'}}]",
+      "latency_ms": 5434.9,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 99,
       "checks": [
         {
-          "name": "called_tool:convert_currency",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "called_tool:convert_currency",
           "passed": true,
           "detail": ""
         },
@@ -429,8 +429,8 @@
           "call_args_cover:get_weather"
         ]
       },
-      "output": "\n\n\n",
-      "latency_ms": 3978.3,
+      "output": "[{'type': 'function', 'id': 'FMlS2LFfXhr6YEbRFvx49FMIqwqd96on', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}, {'type': 'function', 'id': 'X4zXys5gJFwDnckx4509kWgY4TrP30DL', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Tokyo\"}'}}]",
+      "latency_ms": 3178.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 98,
@@ -468,11 +468,11 @@
           "no_tool_call"
         ]
       },
-      "output": "\n\nThe sky appears blue due to a phenomenon called **Rayleigh scattering**. Here's how it works:\n\n1. **Sunlight contains all colors**: White light from the sun is made up of all visible wavelengths (colors), each with different energies.\n2. **Atmospheric molecules scatter light**: When sunlight enters Earth's atmosphere, it collides with gas molecules (mainly nitrogen and oxygen).\n3. **Shorter wavelengths scatter more**: Shorter wavelengths (blue and violet light) are scattered much more efficiently by these tiny molecules than longer wavelengths (red, orange, yellow). This scattering efficiency is inversely proportional to the fourth power of the wavelength (Rayleigh's law).\n4. **Our eyes perceive blue**: Although violet light is scattered even more than blue, our eyes are less sensitive to violet, and some of it is absorbed by the upper atmosphere. The combination of what we see makes the sky appear blue.\n\nDuring sunrise and sunset, the sky often appears red or orange because the sunlight must pass through much more atmosphere, scattering away the shorter blue wavelengths and leaving the longer red/orange wavelengths to reach our eyes.\n\nThis same principle explains why the sky is black on the Moon (no atmosphere to scatter light) and why Mars has a reddish sky (due to dust particles scattering light differently).",
-      "latency_ms": 14182,
+      "output": "\nThe sky appears blue due to a phenomenon called **Rayleigh scattering**. Here's how it works:\n\n1. **Sunlight Composition**: Sunlight appears white but is actually made up of all visible wavelengths (colors) of light, each with different energies and wavelengths.\n\n2. **Scattering in the Atmosphere**: When sunlight enters Earth's atmosphere, it collides with gas molecules (primarily nitrogen and oxygen) and tiny particles. These particles are much smaller than the wavelength of visible light.\n\n3. **Wavelength Dependence**: Shorter wavelengths of light (blue and violet, around 400-500 nanometers) are scattered much more efficiently by these tiny particles than longer wavelengths (red, orange, yellow, around 600-700 nanometers). The scattering intensity is inversely proportional to the fourth power of the wavelength (\u221d 1/\u03bb\u2074), meaning blue light is scattered about 10 times more than red light.\n\n4. **Human Perception**: Although violet light is scattered even more than blue, our eyes are less sensitive to violet, and some of the upper atmosphere absorbs violet light. Additionally, the blue wavelengths dominate what we perceive, making the sky appear blue.\n\n**Why sunrises/sunsets are red/orange**: When the sun is near the horizon, sunlight must pass through a much thicker layer of atmosphere. Most of the shorter blue wavelengths get scattered away before reaching our eyes, leaving the longer red, orange, and yellow wavelengths to dominate the direct sunlight we see.\n\nThis same principle explains why the sky appears black on the Moon (no atmosphere to scatter light) and why Mars has a butterscotch sky (different atmospheric composition and particle sizes).",
+      "latency_ms": 20969.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 438,
+      "completion_tokens": 691,
       "checks": [
         {
           "name": "no_tool_call",
@@ -490,13 +490,13 @@
       "expected": {
         "checks": [
           "single_call",
-          "not_called:get_stock",
           "tool_args_match:get_crypto",
+          "not_called:get_stock",
           "called_tool:get_crypto"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 3627.3,
+      "output": "[{'type': 'function', 'id': 'ihexlgGDTdtK9KIRADav4emQY4q2jdPP', 'function': {'name': 'get_crypto', 'arguments': '{\"symbol\":\"BTC\"}'}}]",
+      "latency_ms": 3379.1,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 74,
@@ -507,12 +507,12 @@
           "detail": ""
         },
         {
-          "name": "not_called:get_stock",
+          "name": "tool_args_match:get_crypto",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "tool_args_match:get_crypto",
+          "name": "not_called:get_stock",
           "passed": true,
           "detail": ""
         },
@@ -531,18 +531,23 @@
       "prompt": "What will the weather in Madrid be over the next 5 days?",
       "expected": {
         "checks": [
+          "not_called:get_weather",
           "tool_args_match:get_forecast",
           "called_tool:get_forecast",
-          "not_called:get_weather",
           "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 3481.2,
+      "output": "[{'type': 'function', 'id': 'rtT4v87hJHIvhnSeMSZggXKuV7nVS5qC', 'function': {'name': 'get_forecast', 'arguments': '{\"city\":\"Madrid\",\"days\":5}'}}]",
+      "latency_ms": 3495.7,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 76,
       "checks": [
+        {
+          "name": "not_called:get_weather",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "tool_args_match:get_forecast",
           "passed": true,
@@ -550,11 +555,6 @@
         },
         {
           "name": "called_tool:get_forecast",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "not_called:get_weather",
           "passed": true,
           "detail": ""
         },
@@ -573,19 +573,19 @@
       "prompt": "Make a playlist called Roadtrip with Bohemian Rhapsody and Hotel California.",
       "expected": {
         "checks": [
-          "tool_args_match:create_playlist",
+          "called_tool:create_playlist",
           "single_call",
-          "called_tool:create_playlist"
+          "tool_args_match:create_playlist"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 4626.2,
+      "output": "[{'type': 'function', 'id': '0PeeQ4cCbkHf8BobKgoIE6Aa0eoejXsk', 'function': {'name': 'create_playlist', 'arguments': '{\"name\":\"Roadtrip\",\"songs\":[\"Bohemian Rhapsody\",\"Hotel California\"]}'}}]",
+      "latency_ms": 4668.7,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 91,
       "checks": [
         {
-          "name": "tool_args_match:create_playlist",
+          "name": "called_tool:create_playlist",
           "passed": true,
           "detail": ""
         },
@@ -595,7 +595,7 @@
           "detail": ""
         },
         {
-          "name": "called_tool:create_playlist",
+          "name": "tool_args_match:create_playlist",
           "passed": true,
           "detail": ""
         }
@@ -609,24 +609,24 @@
       "prompt": "Convert 451.7 degrees Fahrenheit to Kelvin.",
       "expected": {
         "checks": [
-          "called_tool:convert_temperature",
           "tool_args_match:convert_temperature",
+          "called_tool:convert_temperature",
           "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 5248.2,
+      "output": "[{'type': 'function', 'id': '9KN2b7rYriGSBclZL4ydTqw3UakaCeRn', 'function': {'name': 'convert_temperature', 'arguments': '{\"value\":451.7,\"from_unit\":\"fahrenheit\",\"to_unit\":\"kelvin\"}'}}]",
+      "latency_ms": 5328.4,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 112,
       "checks": [
         {
-          "name": "called_tool:convert_temperature",
+          "name": "tool_args_match:convert_temperature",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "tool_args_match:convert_temperature",
+          "name": "called_tool:convert_temperature",
           "passed": true,
           "detail": ""
         },
@@ -645,17 +645,22 @@
       "prompt": "Book a flight from Lisbon to Berlin on December 10th in business class.",
       "expected": {
         "checks": [
+          "called_tool:book_flight",
           "single_call",
-          "tool_args_match:book_flight",
-          "called_tool:book_flight"
+          "tool_args_match:book_flight"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 13977.3,
+      "output": "[{'type': 'function', 'id': 'oGNigq6TRpZnY9KuvmQv220vNEFAIZPh', 'function': {'name': 'book_flight', 'arguments': '{\"origin\":\"Lisbon\",\"destination\":\"Berlin\",\"date\":\"2025-12-10\",\"travel_class\":\"business\"}'}}]",
+      "latency_ms": 10679.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 405,
+      "completion_tokens": 298,
       "checks": [
+        {
+          "name": "called_tool:book_flight",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "single_call",
           "passed": true,
@@ -663,11 +668,6 @@
         },
         {
           "name": "tool_args_match:book_flight",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "called_tool:book_flight",
           "passed": true,
           "detail": ""
         }
@@ -684,8 +684,8 @@
           "no_tool_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 6308.3,
+      "output": "[{'type': 'function', 'id': '0IqCRv4zSLKMOFG689S4HfAordlZ73RM', 'function': {'name': 'get_news', 'arguments': '{\"topic\":\"remote work\"}'}}]",
+      "latency_ms": 6323.3,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 176,
@@ -708,8 +708,8 @@
           "no_tool_call"
         ]
       },
-      "output": "\nYou're welcome! Have a great day!",
-      "latency_ms": 3243.5,
+      "output": "You're welcome! Have a great day!",
+      "latency_ms": 3364,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 71,
@@ -732,8 +732,8 @@
           "no_tool_call"
         ]
       },
-      "output": "\n\nThe capital of France is Paris.",
-      "latency_ms": 3144.3,
+      "output": "\nThe capital of France is Paris.",
+      "latency_ms": 3257.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 69,
@@ -754,12 +754,12 @@
       "expected": {
         "checks": [
           "called_tool:get_stock",
-          "single_call",
-          "tool_args_match:get_stock"
+          "tool_args_match:get_stock",
+          "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 3313.5,
+      "output": "[{'type': 'function', 'id': 'ueK6GWEZ64jwYmukDeCn6FNw3AZ2PguS', 'function': {'name': 'get_stock', 'arguments': '{\"symbol\":\"MSFT\"}'}}]",
+      "latency_ms": 2326.2,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 69,
@@ -770,12 +770,12 @@
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "tool_args_match:get_stock",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "tool_args_match:get_stock",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -789,24 +789,24 @@
       "prompt": "Remind me to call mom at 6pm.",
       "expected": {
         "checks": [
-          "single_call",
           "tool_args_match:set_reminder",
+          "single_call",
           "called_tool:set_reminder"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 5277.5,
+      "output": "[{'type': 'function', 'id': 'gzObcRjIPI6u3d9aJYcm27PWn6VayjrO', 'function': {'name': 'set_reminder', 'arguments': '{\"text\":\"call mom\",\"time\":\"6pm\"}'}}]",
+      "latency_ms": 5371.5,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 136,
       "checks": [
         {
-          "name": "single_call",
+          "name": "tool_args_match:set_reminder",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "tool_args_match:set_reminder",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         },
@@ -825,22 +825,17 @@
       "prompt": "What's the latest news on the climate summit?",
       "expected": {
         "checks": [
-          "single_call",
           "called_tool:get_news",
-          "tool_args_match:get_news"
+          "tool_args_match:get_news",
+          "single_call"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 3081.3,
+      "output": "[{'type': 'function', 'id': 'OCDowTHqr40E1zsvJTTaLljhTmDQ2OoW', 'function': {'name': 'get_news', 'arguments': '{\"topic\":\"climate summit\"}'}}]",
+      "latency_ms": 3198.3,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 63,
       "checks": [
-        {
-          "name": "single_call",
-          "passed": true,
-          "detail": ""
-        },
         {
           "name": "called_tool:get_news",
           "passed": true,
@@ -848,6 +843,11 @@
         },
         {
           "name": "tool_args_match:get_news",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "single_call",
           "passed": true,
           "detail": ""
         }
@@ -861,24 +861,24 @@
       "prompt": "What is 4817 multiplied by 3926?",
       "expected": {
         "checks": [
-          "called_tool:calculate",
           "single_call",
+          "called_tool:calculate",
           "tool_args_match:calculate"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 2725.7,
+      "output": "[{'type': 'function', 'id': 'I48mmBJSH7PN1UJnufNhjXQryjtqJP1c', 'function': {'name': 'calculate', 'arguments': '{\"expression\":\"4817 * 3926\"}'}}]",
+      "latency_ms": 2849.5,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 58,
       "checks": [
         {
-          "name": "called_tool:calculate",
+          "name": "single_call",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "single_call",
+          "name": "called_tool:calculate",
           "passed": true,
           "detail": ""
         },
@@ -902,8 +902,8 @@
           "called_tool:get_time"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 4579.3,
+      "output": "[{'type': 'function', 'id': 'kWOdqTwHnGRBmNCN2usxt48tFViP21Nq', 'function': {'name': 'get_time', 'arguments': '{\"timezone\":\"Tokyo\"}'}}]",
+      "latency_ms": 4466.1,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 114,
@@ -938,8 +938,8 @@
           "tool_args_match:get_weather"
         ]
       },
-      "output": "\n\n",
-      "latency_ms": 3298.2,
+      "output": "[{'type': 'function', 'id': 'LFCx8ut2qBpgjRlvA0VUP9g7Rt3FoX0F', 'function': {'name': 'get_weather', 'arguments': '{\"city\":\"Lisbon\"}'}}]",
+      "latency_ms": 3422.9,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 75,

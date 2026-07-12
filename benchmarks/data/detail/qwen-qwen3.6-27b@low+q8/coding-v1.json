@@ -1,0 +1,348 @@
+{
+  "model": "qwen/qwen3.6-27b",
+  "variant": "low+q8",
+  "tier": "coding-v1",
+  "run_name": "qwen/qwen3.6-27b+effort=low+temp=0+quant=q8@2026-07-02T20:44:36Z",
+  "config": {
+    "reasoning_effort": "low",
+    "temperature": 0,
+    "seed": null,
+    "top_p": null,
+    "top_k": null,
+    "call_deadline_s": null,
+    "request_timeout_s": null,
+    "max_tokens_floor": null
+  },
+  "items": [
+    {
+      "id": "coding-v1:persistent-vector",
+      "category": "runtime",
+      "difficulty": 5,
+      "prompt": "Write TypeScript. Implement and `export class PersistentVector<T>` \u2014 an IMMUTABLE\n(persistent) vector with structural sharing, with this API:\n  static empty<T>(): PersistentVector<T>\n  get size(): number\n  get(i: number): T          // throws on out-of-range\n  push(value: T): PersistentVector<T>   // returns a NEW vector; the original is unchanged\n`push` must NOT mutate the receiver, and must be sub-linear (it will be called 100,000+ times \u2014\ndo NOT copy the whole backing array on every push; use a tree with structural sharing).\nRules: generic, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "type_check",
+          "rules",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:required_export",
+          "rule:no_any",
+          "rule:banned_substring"
+        ]
+      },
+      "output": "export class PersistentVector<T> {\n  private static readonly BRANCH_FACTOR = 32;\n  private static readonly SHIFT = 5;\n  private static readonly MASK = 0x1f;\n\n  private constructor(\n    private readonly root: Node<T>,\n    private readonly size: number,\n    private readonly tailOffset: number,\n    private readonly tail: T[]\n  ) {}\n\n  static empty<T>(): PersistentVector<T> {\n    return new PersistentVector<T>(new Node<T>([]), 0, 0, []);\n  }\n\n  get size(): number {\n    return this.size;\n  }\n\n  get(i: number): T {\n    if (i < 0 || i >= this.size) {\n      throw new RangeError(`Index ${i} out of range [0, ${this.size})`);\n    }\n\n    if (i >= this.tailOffset) {\n      return this.tail[i - this.tailOffset];\n    }\n\n    const node = this.root;\n    let level = this.height();\n    let current = node;\n\n    while (level > 0) {\n      const index = (i >>> (level * PersistentVector.SHIFT)) & PersistentVector.MASK;\n      current = current.children[index]!;\n      level--;\n    }\n\n    return current.values[i & PersistentVector.MASK]!;\n  }\n\n  push(value: T): PersistentVector<T> {\n    if (this.tail.length < PersistentVector.BRANCH_FACTOR) {\n      return new PersistentVector<T>(\n        this.root,\n        this.size + 1,\n        this.tailOffset,\n        [...this.tail, value]\n      );\n    }\n\n    const newRoot = this.pushTail(this.root, this.size, this.tail);\n    const newTailOffset = this.size + 1 - PersistentVector.BRANCH_FACTOR;\n    const newTail = [value];\n\n    return new PersistentVector<T>(\n      newRoot,\n      this.size + 1,\n      newTailOffset,\n      newTail\n    );\n  }\n\n  private height(): number {\n    if (this.size <= PersistentVector.BRANCH_FACTOR) {\n      return 0;\n    }\n    let height = 0;\n    let s = this.size;\n    while (s > PersistentVector.BRANCH_FACTOR) {\n      s = (s + PersistentVector.BRANCH_FACTOR - 1) >>> PersistentVector.SHIFT;\n      height++;\n    }\n    return height;\n  }\n\n  private pushTail(node: Node<T>, index: number, tail: T[]): Node<T> {\n    const level = this.height();\n    if (level === 0) {\n      return new Node<T>([...node.values, ...tail]);\n    }\n\n    const childIndex = (index >>> (level * PersistentVector.SHIFT)) & PersistentVector.MASK;\n    const newChildren = [...node.children];\n    const newChild = this.pushTail(\n      node.children[childIndex]!,\n      index,\n      tail\n    );\n    newChildren[childIndex] = newChild;\n\n    return new Node<T>(newChildren);\n  }\n}\n\nclass Node<T> {\n  constructor(\n    readonly children: Node<T>[],\n    readonly values: T[] = []\n  ) {}\n}",
+      "latency_ms": 34727.5,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 740,
+      "checks": [
+        {
+          "name": "type_check",
+          "passed": false,
+          "detail": "solution.ts(8,22): error TS2300: Duplicate identifier 'size'.\nsolution.ts(17,7): error TS2300: Duplicate identifier 'size'.\nsolution.ts(81,26): error TS2345: Argument of type 'T[]' is not assignable to parameter of type 'Node<T>[]'.\n  Type 'T' is not assignable to type 'Node<T>'.\n"
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:json-parse",
+      "category": "runtime",
+      "difficulty": 4,
+      "prompt": "Write TypeScript. Implement and `export function parse(s: string): Json` \u2014 a recursive-descent\nparser for a JSON subset (objects, arrays, strings with \\\" \\\\ \\/ \\n \\t \\r \\b \\f and \\uXXXX escapes,\nnumbers incl. negatives/decimals/exponents, true, false, null, and insignificant whitespace).\nAlso `export type Json`. On malformed input (trailing commas, unquoted keys, single quotes,\ntruncated input, trailing garbage) it MUST throw.\nRules: do NOT use JSON.parse, do NOT use eval, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:required_export",
+          "type_check",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:no_any",
+          "rules"
+        ]
+      },
+      "output": "export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };\n\nexport function parse(s: string): Json {\n  let pos = 0;\n\n  function peek(): string | undefined {\n    return s[pos];\n  }\n\n  function advance(): string {\n    return s[pos++];\n  }\n\n  function skipWhitespace(): void {\n    while (pos < s.length && /\\s/.test(s[pos])) {\n      pos++;\n    }\n  }\n\n  function expect(expected: string): void {\n    if (s.substring(pos, pos + expected.length) !== expected) {\n      throw new Error(`Expected \"${expected}\" at position ${pos}`);\n    }\n    pos += expected.length;\n  }\n\n  function parseString(): string {\n    if (advance() !== '\"') {\n      throw new Error(`Expected '\"' at position ${pos - 1}`);\n    }\n    let result = '';\n    while (pos < s.length) {\n      const ch = advance();\n      if (ch === '\"') {\n        return result;\n      }\n      if (ch === '\\\\') {\n        const next = advance();\n        switch (next) {\n          case '\"':\n            result += '\"';\n            break;\n          case '\\\\':\n            result += '\\\\';\n            break;\n          case '/':\n            result += '/';\n            break;\n          case 'n':\n            result += '\\n';\n            break;\n          case 't':\n            result += '\\t';\n            break;\n          case 'r':\n            result += '\\r';\n            break;\n          case 'b':\n            result += '\\b';\n            break;\n          case 'f':\n            result += '\\f';\n            break;\n          case 'u': {\n            const hex = s.substring(pos, pos + 4);\n            if (hex.length < 4 || !/^[0-9a-fA-F]{4}$/.test(hex)) {\n              throw new Error(`Invalid unicode escape at position ${pos}`);\n            }\n            result += String.fromCharCode(parseInt(hex, 16));\n            pos += 4;\n            break;\n          }\n          default:\n            throw new Error(`Invalid escape sequence \\\\${next} at position ${pos - 1}`);\n        }\n      } else if (ch < ' ') {\n        throw new Error(`Invalid control character in string at position ${pos - 1}`);\n      } else {\n        result += ch;\n      }\n    }\n    throw new Error('Unterminated string');\n  }\n\n  function parseNumber(): number {\n    let numStr = '';\n    if (peek() === '-') {\n      numStr += advance();\n    }\n    if (pos >= s.length) {\n      throw new Error('Unexpected end of input in number');\n    }\n    if (s[pos] === '0') {\n      numStr += advance();\n      if (pos < s.length && /[0-9]/.test(s[pos])) {\n        throw new Error(`Invalid number: leading zero at position ${pos}`);\n      }\n    } else if (/[1-9]/.test(s[pos])) {\n      while (pos < s.length && /[0-9]/.test(s[pos])) {\n        numStr += advance();\n      }\n    } else {\n      throw new Error(`Invalid number at position ${pos}`);\n    }\n    if (pos < s.length && s[pos] === '.') {\n      numStr += advance();\n      if (pos >= s.length || !/[0-9]/.test(s[pos])) {\n        throw new Error(`Invalid number: expected digit after decimal point at position ${pos}`);\n      }\n      while (pos < s.length && /[0-9]/.test(s[pos])) {\n        numStr += advance();\n      }\n    }\n    if (pos < s.length && (s[pos] === 'e' || s[pos] === 'E')) {\n      numStr += advance();\n      if (pos < s.length && (s[pos] === '+' || s[pos] === '-')) {\n        numStr += advance();\n      }\n      if (pos >= s.length || !/[0-9]/.test(s[pos])) {\n        throw new Error(`Invalid number: expected digit in exponent at position ${pos}`);\n      }\n      while (pos < s.length && /[0-9]/.test(s[pos])) {\n        numStr += advance();\n      }\n    }\n    const num = Number(numStr);\n    if (isNaN(num)) {\n      throw new Error(`Invalid number: ${numStr}`);\n    }\n    return num;\n  }\n\n  function parseLiteral(): boolean | null {\n    if (s.substring(pos, pos + 4) === 'true') {\n      pos += 4;\n      return true;\n    }\n    if (s.substring(pos, pos + 5) === 'false') {\n      pos += 5;\n      return false;\n    }\n    if (s.substring(pos, pos + 4) === 'null') {\n      pos += 4;\n      return null;\n    }\n    throw new Error(`U",
+      "latency_ms": 85405.8,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 1828,
+      "checks": [
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": false,
+          "detail": "solution.ts(164,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.\n  Type 'undefined' is not assignable to type 'string'.\n"
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:parse-query",
+      "category": "type-level",
+      "difficulty": 3,
+      "prompt": "Write TypeScript. Implement and `export` a TYPE (not a function) `ParseQuery<S extends string>`\nthat parses a URL query string literal into an object type at COMPILE TIME:\n  ParseQuery<\"a=1\">          => { a: \"1\" }\n  ParseQuery<\"a=1&b=2\">      => { a: \"1\"; b: \"2\" }\n  ParseQuery<\"x=hi&y=lo&z=1\"> => { x: \"hi\"; y: \"lo\"; z: \"1\" }\n  ParseQuery<\"\">             => {}\nUse template-literal types + recursion. This is type-level only \u2014 no runtime code, no `any`.\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:banned_substring",
+          "rules",
+          "type_check",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:no_any",
+          "rule:required_export"
+        ]
+      },
+      "output": "type ParseQuery<S extends string> = S extends \"\"\n  ? {}\n  : S extends `${infer Key}=${infer Value}&${infer Rest}`\n    ? { [K in Key]: Value } & ParseQuery<Rest>\n    : S extends `${infer Key}=${infer Value}`\n      ? { [K in Key]: Value }\n      : {};",
+      "latency_ms": 4607.4,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 83,
+      "checks": [
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": false,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": false,
+          "detail": "no export named ParseQuery"
+        }
+      ],
+      "pass": false
+    },
+    {
+      "id": "coding-v1:typed-emitter",
+      "category": "hybrid",
+      "difficulty": 2,
+      "prompt": "Write TypeScript. Implement and `export` a class `EventEmitter<TEvents extends Record<string, unknown[]>>`\nwith these methods, fully type-checked against the event map:\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void\n`emit` invokes every handler registered for that event, in registration order, with the given args.\nThe handler's argument types MUST be inferred per event from TEvents, and an unknown event name or\nwrong argument types MUST be a compile error.\nRules: pure TypeScript, no external imports, do NOT use `any` (and no `as any`).\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:no_any",
+          "type_check",
+          "rule:banned_substring",
+          "rule:required_export",
+          "rules"
+        ]
+      },
+      "output": "export class EventEmitter<TEvents extends Record<string, unknown[]>> {\n  private handlers: {\n    [K in keyof TEvents]?: Array<(...args: TEvents[K]) => void>;\n  } = {};\n\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void {\n    if (!this.handlers[name]) {\n      this.handlers[name] = [];\n    }\n    this.handlers[name]!.push(handler);\n  }\n\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void {\n    const handlers = this.handlers[name];\n    if (handlers) {\n      for (const handler of handlers) {\n        handler(...args);\n      }\n    }\n  }\n}",
+      "latency_ms": 8952.4,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 177,
+      "checks": [
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "coding-v1:median-stream",
+      "category": "runtime",
+      "difficulty": 1,
+      "prompt": "Write TypeScript. Implement and `export` a class `MedianStream` that tracks a running median\nof a stream of numbers, with this exact API:\n  class MedianStream { add(n: number): void; median(): number }\n`add` inserts a number; `median()` returns the current median (the average of the two middle\nvalues when the count is even). Calling `median()` before any `add` may throw.\nRules: pure TypeScript, no external imports, do NOT use `any`, do NOT call console.log.\nPerformance: `add` will be called hundreds of thousands of times \u2014 it must be sub-linear\n(do NOT re-sort the whole history on every call).\nReturn ONLY a single ```ts code block.\n",
+      "expected": {
+        "checks": [
+          "rule:required_export",
+          "rule:banned_substring",
+          "rule:no_any",
+          "type_check",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rules"
+        ]
+      },
+      "output": "class MedianStream {\n  private leftHeap: number[]; // Max-heap (stored as negative values)\n  private rightHeap: number[]; // Min-heap\n\n  constructor() {\n    this.leftHeap = [];\n    this.rightHeap = [];\n  }\n\n  add(n: number): void {\n    // Push to left heap (max-heap via negation)\n    this.pushMaxHeap(this.leftHeap, -n);\n\n    // Balance: move the largest from left to right if left is larger\n    if (this.leftHeap.length > this.rightHeap.length) {\n      const maxLeft = -this.popMaxHeap(this.leftHeap);\n      this.pushMinHeap(this.rightHeap, maxLeft);\n    }\n\n    // Ensure all elements in left <= all elements in right\n    // If left is not empty and its max > right's min, swap them\n    if (this.leftHeap.length > 0 && this.rightHeap.length > 0) {\n      const maxLeft = -this.leftHeap[0];\n      const minRight = this.rightHeap[0];\n      if (maxLeft > minRight) {\n        // Remove max from left\n        this.popMaxHeap(this.leftHeap);\n        // Remove min from right\n        this.popMinHeap(this.rightHeap);\n        // Insert minRight into left\n        this.pushMaxHeap(this.leftHeap, -minRight);\n        // Insert maxLeft into right\n        this.pushMinHeap(this.rightHeap, maxLeft);\n      }\n    }\n  }\n\n  median(): number {\n    const total = this.leftHeap.length + this.rightHeap.length;\n    if (total === 0) {\n      throw new Error(\"Cannot compute median of an empty stream\");\n    }\n\n    if (total % 2 === 1) {\n      // Odd: the median is the top of the larger heap\n      // By our balancing, rightHeap has one more element if total is odd\n      // Wait, let's check: we push to left, then move to right if left > right.\n      // So rightHeap.length >= leftHeap.length always.\n      // If total is odd, rightHeap.length = leftHeap.length + 1\n      return this.rightHeap[0];\n    } else {\n      // Even: average of the two middle elements\n      const maxLeft = -this.leftHeap[0];\n      const minRight = this.rightHeap[0];\n      return (maxLeft + minRight) / 2;\n    }\n  }\n\n  // Max-heap operations (using negative values)\n  private pushMaxHeap(heap: number[], val: number): void {\n    heap.push(val);\n    this.siftUpMax(heap, heap.length - 1);\n  }\n\n  private popMaxHeap(heap: number[]): number {\n    if (heap.length === 0) {\n      throw new Error(\"Heap is empty\");\n    }\n    const top = heap[0];\n    const last = heap.pop()!;\n    if (heap.length > 0) {\n      heap[0] = last;\n      this.siftDownMax(heap, 0);\n    }\n    return top;\n  }\n\n  private siftUpMax(heap: number[], index: number): void {\n    while (index > 0) {\n      const parent = Math.floor((index - 1) / 2);\n      if (heap[index] > heap[parent]) {\n        [heap[index], heap[parent]] = [heap[parent], heap[index]];\n        index = parent;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private siftDownMax(heap: number[], index: number): void {\n    const len = heap.length;\n    while (true) {\n      let largest = index;\n      const left = 2 * index + 1;\n      const right = 2 * index + 2;\n\n      if (left < len && heap[left] > heap[largest]) {\n        largest = left;\n      }\n      if (right < len && heap[right] > heap[largest]) {\n        largest = right;\n      }\n\n      if (largest !== index) {\n        [heap[index], heap[largest]] = [heap[largest], heap[index]];\n        index = largest;\n      } else {\n        break;\n      }\n    }\n  }\n\n  // Min-heap operations\n  private pushMinHeap(heap: number[], val: number): void {\n    heap.push(val);\n    this.siftUpMin(heap, heap.length - 1);\n  }\n\n  private popMinHeap(heap: number[]): number {\n    if (heap.length === 0) {\n      throw new Error(\"Heap is empty\");\n    }\n    const top = heap[0];\n    const last = heap.pop()!;\n    if (heap.length > 0) {\n      heap[0] = last;\n      this.siftDownMin(heap, 0);\n    }\n    return top;\n  }\n\n  private siftUpMin(heap: number[], index: number): void {\n    while (index > 0) {\n      const parent = Math.floor((index - 1) / 2);\n      if (heap[index] < heap[parent]) {\n        [heap[index], heap[parent]] = [heap[parent], heap[index]];\n        index = ",
+      "latency_ms": 64987.4,
+      "http_status": 200,
+      "truncated": false,
+      "completion_tokens": 1390,
+      "checks": [
+        {
+          "name": "rule:required_export",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": true,
+          "detail": ""
+        }
+      ],
+      "pass": false
+    }
+  ]
+}

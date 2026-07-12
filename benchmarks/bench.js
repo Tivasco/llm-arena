@@ -65,12 +65,12 @@ function renderLeaderboard() {
       const c = row.scores[t.id];
       if (!c) return el("td", { class: "lb-cell v-none" }, "—");
       return el("td", { class: `lb-cell ${verdictClass(c.rate, b.verdict_buckets)}${c.borderline ? " lb-borderline" : ""}`,
-        title: `${Math.round(c.rate*100)}%${c.borderline ? " · borderline" : ""}`,
+        title: `${c.pass}/${c.total} passed${c.borderline ? " · borderline" : ""}`,
         ...activatable(() => openDrill(row, t),
           { "aria-haspopup": "dialog", "aria-label": `${row.label} ${t.label}: ${c.pass} of ${c.total} passed — open details` }) },
         `${c.pass}/${c.total}`);
     }),
-    el("td", { class: "lb-cell lb-overall" }, `${Math.round(row.overall.rate*100)}%`)));
+    el("td", { class: "lb-cell lb-overall" }, `${row.overall.pass}/${row.overall.total}`)));
   return el("table", { class: "table lb" }, el("thead", {}, head), el("tbody", {}, ...body));
 }
 function mountLeaderboard() {
@@ -186,8 +186,8 @@ async function openCard(model, variant) {
     el("div", { class: "mc-stats" },
       el("span", {}, `median ${st.median_latency_ms} ms`),
       el("span", {}, `${st.n_calls} calls`),
-      el("span", {}, `truncation ${Math.round((st.truncation_rate || 0) * 100)}%`),
-      el("span", {}, `errors ${Math.round((st.error_rate || 0) * 100)}%`)),
+      el("span", {}, `truncation ${Math.round((st.truncation_rate || 0) * (st.n_calls || 0))}/${st.n_calls || 0}`),
+      el("span", {}, `errors ${Math.round((st.error_rate || 0) * (st.n_calls || 0))}/${st.n_calls || 0}`)),
     el("p", { class: "mc-lastrun", style: "color:var(--text-muted)" }, `last run ${m.last_run}`)));
 }
 let EXRES = null;

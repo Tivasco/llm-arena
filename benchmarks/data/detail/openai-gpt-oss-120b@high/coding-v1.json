@@ -2,7 +2,7 @@
   "model": "openai/gpt-oss-120b",
   "variant": "high",
   "tier": "coding-v1",
-  "run_name": "openai/gpt-oss-120b+effort=high@2026-06-29T22:30:28Z",
+  "run_name": "openai/gpt-oss-120b+effort=high+temp=0+quant=8bit@2026-07-12T18:20:01Z",
   "config": {
     "reasoning_effort": "high",
     "temperature": 0,
@@ -21,26 +21,55 @@
       "prompt": "Write TypeScript. Implement and `export class PersistentVector<T>` \u2014 an IMMUTABLE\n(persistent) vector with structural sharing, with this API:\n  static empty<T>(): PersistentVector<T>\n  get size(): number\n  get(i: number): T          // throws on out-of-range\n  push(value: T): PersistentVector<T>   // returns a NEW vector; the original is unchanged\n`push` must NOT mutate the receiver, and must be sub-linear (it will be called 100,000+ times \u2014\ndo NOT copy the whole backing array on every push; use a tree with structural sharing).\nRules: generic, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
       "expected": {
         "checks": [
-          "type_check"
+          "type_check",
+          "rule:banned_substring",
+          "rule:required_export",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rules",
+          "rule:no_any"
         ]
       },
-      "output": {
-        "detail": {
-          "error": "queue_timeout",
-          "message": "Client slot ('interactive') unavailable after 60.0s.",
-          "model": "openai/gpt-oss-120b",
-          "client": "interactive"
-        }
-      },
-      "latency_ms": 60016.1,
-      "http_status": 429,
-      "truncated": false,
-      "completion_tokens": 0,
+      "output": null,
+      "latency_ms": 276289.2,
+      "http_status": 200,
+      "truncated": true,
+      "completion_tokens": 16383,
       "checks": [
         {
           "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
           "passed": false,
-          "detail": "{\"detail\":{\"error\":\"queue_timeout\",\"message\":\"Client slot ('interactive') unavailable after 60.0s.\",\"model\":\"openai/gpt-oss-120b\",\"client\":\"interactive\"}}"
+          "detail": "no export named PersistentVector"
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": false,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
         }
       ],
       "pass": false
@@ -52,19 +81,67 @@
       "prompt": "Write TypeScript. Implement and `export function parse(s: string): Json` \u2014 a recursive-descent\nparser for a JSON subset (objects, arrays, strings with \\\" \\\\ \\/ \\n \\t \\r \\b \\f and \\uXXXX escapes,\nnumbers incl. negatives/decimals/exponents, true, false, null, and insignificant whitespace).\nAlso `export type Json`. On malformed input (trailing commas, unquoted keys, single quotes,\ntruncated input, trailing garbage) it MUST throw.\nRules: do NOT use JSON.parse, do NOT use eval, no external imports, no `any`.\nReturn ONLY a single ```ts code block.\n",
       "expected": {
         "checks": [
-          "type_check"
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:no_any",
+          "rule:banned_substring",
+          "type_check",
+          "rule:required_export",
+          "rule:banned_substring",
+          "rules"
         ]
       },
-      "output": "HTTPConnectionPool(host='[redacted]', port=8080): Read timed out. (read timeout=180)",
-      "latency_ms": 180018.5,
-      "http_status": 0,
-      "truncated": false,
-      "completion_tokens": 0,
+      "output": null,
+      "latency_ms": 275225.5,
+      "http_status": 200,
+      "truncated": true,
+      "completion_tokens": 16383,
       "checks": [
         {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:required_export",
           "passed": false,
-          "detail": "HTTPConnectionPool(host='[redacted]', port=8080): Read timed out. (read timeout=180)"
+          "detail": "no export named parse"
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
+          "passed": false,
+          "detail": ""
         }
       ],
       "pass": false
@@ -77,21 +154,21 @@
       "expected": {
         "checks": [
           "rule:banned_substring",
+          "rule:required_export",
+          "type_check",
           "rule:banned_substring",
           "rule:banned_substring",
-          "rule:banned_substring",
-          "rules",
           "rule:no_any",
           "rule:banned_substring",
-          "type_check",
-          "rule:required_export"
+          "rule:banned_substring",
+          "rules"
         ]
       },
-      "output": "/** Parse a URL query string literal into an object type at compile time. */\nexport type ParseQuery<S extends string> =\n  // Empty query \u2192 empty object\n  S extends ''\n    ? {}\n    // Split on the first '&' and merge the result of the head pair with the tail\n    : S extends `${infer Pair}&${infer Rest}`\n      ? ParsePair<Pair> & ParseQuery<Rest>\n      // No more '&' \u2192 parse the final pair\n      : ParsePair<S>;\n\n/** Turn a single `key=value` fragment into an object `{ key: value }`. */\ntype ParsePair<P extends string> =\n  P extends `${infer K}=${infer V}`\n    ? { [K in K]: V }\n    : {};",
-      "latency_ms": 28585.5,
+      "output": null,
+      "latency_ms": 274607.6,
       "http_status": 200,
-      "truncated": false,
-      "completion_tokens": 1606,
+      "truncated": true,
+      "completion_tokens": 16383,
       "checks": [
         {
           "name": "rule:banned_substring",
@@ -99,7 +176,27 @@
           "detail": ""
         },
         {
+          "name": "rule:required_export",
+          "passed": false,
+          "detail": "no export named ParseQuery"
+        },
+        {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
           "passed": true,
           "detail": ""
         },
@@ -115,27 +212,7 @@
         },
         {
           "name": "rules",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:no_any",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:banned_substring",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "type_check",
           "passed": false,
-          "detail": "solution.ts(15,15): error TS2313: Type parameter 'K' has a circular constraint.\n"
-        },
-        {
-          "name": "rule:required_export",
-          "passed": true,
           "detail": ""
         }
       ],
@@ -148,41 +225,21 @@
       "prompt": "Write TypeScript. Implement and `export` a class `EventEmitter<TEvents extends Record<string, unknown[]>>`\nwith these methods, fully type-checked against the event map:\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void\n`emit` invokes every handler registered for that event, in registration order, with the given args.\nThe handler's argument types MUST be inferred per event from TEvents, and an unknown event name or\nwrong argument types MUST be a compile error.\nRules: pure TypeScript, no external imports, do NOT use `any` (and no `as any`).\nReturn ONLY a single ```ts code block.\n",
       "expected": {
         "checks": [
-          "rules",
-          "rule:no_any",
-          "rule:banned_substring",
-          "rule:banned_substring",
           "rule:banned_substring",
           "rule:required_export",
-          "type_check"
+          "rule:banned_substring",
+          "rule:banned_substring",
+          "rule:no_any",
+          "type_check",
+          "rules"
         ]
       },
-      "output": "export class EventEmitter<TEvents extends Record<string, unknown[]>> {\n  /**\n   * Internal storage: for each event name we keep an array of handlers.\n   * Handlers are stored in a type\u2011erased form (unknown arguments) because\n   * the concrete tuple type is known only at compile time.\n   */\n  private readonly handlers = new Map<\n    keyof TEvents,\n    Array<(...args: unknown[]) => void>\n  >();\n\n  /**\n   * Register a handler for an event.\n   *\n   * @param name    Event name \u2013 must be a key of `TEvents`.\n   * @param handler Function whose parameters exactly match the tuple type\n   *                associated with `name` in `TEvents`.\n   */\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void {\n    let list = this.handlers.get(name);\n    if (!list) {\n      list = [];\n      this.handlers.set(name, list);\n    }\n    // Store the handler in a type\u2011erased form; we know it matches `TEvents[K]`.\n    list.push(handler as (...args: unknown[]) => void);\n  }\n\n  /**\n   * Emit an event, invoking all registered handlers in the order they were added.\n   *\n   * @param name Event name \u2013 must be a key of `TEvents`.\n   * @param args Arguments that match the tuple type associated with `name`.\n   */\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void {\n    const list = this.handlers.get(name);\n    if (!list) return;\n\n    for (const h of list) {\n      // Cast back to the concrete handler type before invoking.\n      (h as (...args: TEvents[K]) => void)(...args);\n    }\n  }\n}",
-      "latency_ms": 63460.3,
+      "output": "export class EventEmitter<TEvents extends Record<string, unknown[]>> {\n  // Handlers stored per event name.\n  private readonly handlers: {\n    [K in keyof TEvents]?: Array<(...args: TEvents[K]) => void>;\n  } = {};\n\n  /**\n   * Register a handler for an event.\n   *\n   * @param name    Event name \u2013 must be a key of `TEvents`.\n   * @param handler Function whose parameters exactly match the tuple type\n   *                defined for that event in `TEvents`.\n   */\n  on<K extends keyof TEvents>(name: K, handler: (...args: TEvents[K]) => void): void {\n    const list = this.handlers[name];\n    if (list) {\n      list.push(handler);\n    } else {\n      // Initialise the array for this event name.\n      this.handlers[name] = [handler];\n    }\n  }\n\n  /**\n   * Emit an event, invoking all registered handlers in registration order.\n   *\n   * @param name Event name \u2013 must be a key of `TEvents`.\n   * @param args Arguments that match the tuple type for this event.\n   */\n  emit<K extends keyof TEvents>(name: K, ...args: TEvents[K]): void {\n    const list = this.handlers[name];\n    if (!list) return;\n    for (const handler of list) {\n      // The spread args are guaranteed to match the handler signature.\n      handler(...args);\n    }\n  }\n}",
+      "latency_ms": 66165,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 3997,
+      "completion_tokens": 4169,
       "checks": [
-        {
-          "name": "rules",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:no_any",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:banned_substring",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:banned_substring",
-          "passed": true,
-          "detail": ""
-        },
         {
           "name": "rule:banned_substring",
           "passed": true,
@@ -194,7 +251,27 @@
           "detail": ""
         },
         {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:no_any",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rules",
           "passed": true,
           "detail": ""
         }
@@ -208,39 +285,29 @@
       "prompt": "Write TypeScript. Implement and `export` a class `MedianStream` that tracks a running median\nof a stream of numbers, with this exact API:\n  class MedianStream { add(n: number): void; median(): number }\n`add` inserts a number; `median()` returns the current median (the average of the two middle\nvalues when the count is even). Calling `median()` before any `add` may throw.\nRules: pure TypeScript, no external imports, do NOT use `any`, do NOT call console.log.\nPerformance: `add` will be called hundreds of thousands of times \u2014 it must be sub-linear\n(do NOT re-sort the whole history on every call).\nReturn ONLY a single ```ts code block.\n",
       "expected": {
         "checks": [
+          "rule:banned_substring",
           "rule:required_export",
           "rule:banned_substring",
-          "rule:banned_substring",
-          "rule:banned_substring",
-          "rule:banned_substring",
           "rule:no_any",
+          "type_check",
+          "rule:banned_substring",
           "rules",
-          "type_check"
+          "rule:banned_substring"
         ]
       },
-      "output": "/**\n * A binary heap implementation for numbers.\n * The `compare` function determines the ordering:\n *   - For a min\u2011heap: (a, b) => a < b\n *   - For a max\u2011heap: (a, b) => a > b\n */\nclass BinaryHeap {\n  private data: number[];\n  private compare: (a: number, b: number) => boolean;\n\n  constructor(compare: (a: number, b: number) => boolean) {\n    this.data = [];\n    this.compare = compare;\n  }\n\n  /** Number of elements in the heap. */\n  size(): number {\n    return this.data.length;\n  }\n\n  /** Returns the top element without removing it. */\n  peek(): number {\n    if (this.size() === 0) throw new Error('Heap is empty');\n    return this.data[0];\n  }\n\n  /** Inserts a value into the heap. */\n  push(value: number): void {\n    this.data.push(value);\n    this.bubbleUp(this.size() - 1);\n  }\n\n  /** Removes and returns the top element. */\n  pop(): number {\n    if (this.size() === 0) throw new Error('Heap is empty');\n    const top = this.data[0];\n    const last = this.data.pop()!;\n    if (this.size() > 0) {\n      this.data[0] = last;\n      this.bubbleDown(0);\n    }\n    return top;\n  }\n\n  private bubbleUp(index: number): void {\n    while (index > 0) {\n      const parent = Math.floor((index - 1) / 2);\n      if (this.compare(this.data[index], this.data[parent])) {\n        [this.data[index], this.data[parent]] = [this.data[parent], this.data[index]];\n        index = parent;\n      } else {\n        break;\n      }\n    }\n  }\n\n  private bubbleDown(index: number): void {\n    const length = this.size();\n    while (true) {\n      let left = index * 2 + 1;\n      let right = index * 2 + 2;\n      let candidate = index;\n\n      if (left < length && this.compare(this.data[left], this.data[candidate])) {\n        candidate = left;\n      }\n      if (right < length && this.compare(this.data[right], this.data[candidate])) {\n        candidate = right;\n      }\n\n      if (candidate !== index) {\n        [this.data[index], this.data[candidate]] = [this.data[candidate], this.data[index]];\n        index = candidate;\n      } else {\n        break;\n      }\n    }\n  }\n}\n\n/**\n * MedianStream maintains a running median of an incoming numeric stream.\n *\n *   const ms = new MedianStream();\n *   ms.add(5);\n *   console.log(ms.median()); // 5\n *\n * The implementation uses two heaps:\n *   - `lower` (max\u2011heap) stores the smaller half of numbers.\n *   - `higher` (min\u2011heap) stores the larger half of numbers.\n *\n * The median is either the top of the larger heap (odd count) or\n * the average of both tops (even count).\n */\nexport class MedianStream {\n  private lower: BinaryHeap; // max\u2011heap for the lower half\n  private higher: BinaryHeap; // min\u2011heap for the upper half\n\n  constructor() {\n    this.lower = new BinaryHeap((a, b) => a > b); // max\u2011heap\n    this.higher = new BinaryHeap((a, b) => a < b); // min\u2011heap\n  }\n\n  /** Inserts a number into the stream. */\n  add(n: number): void {\n    // Decide which heap receives the new value.\n    if (this.lower.size() === 0 || n <= this.lower.peek()) {\n      this.lower.push(n);\n    } else {\n      this.higher.push(n);\n    }\n\n    // Rebalance to keep size difference \u2264 1.\n    if (this.lower.size() > this.higher.size() + 1) {\n      this.higher.push(this.lower.pop());\n    } else if (this.higher.size() > this.lower.size() + 1) {\n      this.lower.push(this.higher.pop());\n    }\n  }\n\n  /** Returns the current median. Throws if no elements have been added. */\n  median(): number {\n    const total = this.lower.size() + this.higher.size();\n    if (total === 0) {\n      throw new Error('MedianStream is empty \u2013 no elements to compute a median.');\n    }\n\n    if (this.lower.size() === this.higher.size()) {\n      // Even number of elements: average the two middle values.\n      return (this.lower.peek() + this.higher.peek()) / 2;\n    } else if (this.lower.size() > this.higher.size()) {\n      // Lower half has the extra element.\n      return this.lower.peek();\n    } else {\n      // Upper half has the extra element.\n      return this.higher.peek();\n    }\n  }\n}",
-      "latency_ms": 40040.5,
+      "output": "/**\n * A binary heap implementation for numbers.\n * The comparator defines the priority:\n *   - For a min\u2011heap: (a, b) => a < b\n *   - For a max\u2011heap: (a, b) => a > b\n */\nclass BinaryHeap {\n    private data: number[] = [];\n\n    /**\n     * @param compare Returns true if `a` has higher priority than `b`.\n     */\n    constructor(private readonly compare: (a: number, b: number) => boolean) {}\n\n    size(): number {\n        return this.data.length;\n    }\n\n    peek(): number | undefined {\n        return this.data[0];\n    }\n\n    push(value: number): void {\n        this.data.push(value);\n        this.bubbleUp(this.data.length - 1);\n    }\n\n    pop(): number | undefined {\n        if (this.data.length === 0) return undefined;\n        const top = this.data[0];\n        const last = this.data.pop()!;\n        if (this.data.length > 0) {\n            this.data[0] = last;\n            this.bubbleDown(0);\n        }\n        return top;\n    }\n\n    private bubbleUp(idx: number): void {\n        const arr = this.data;\n        while (idx > 0) {\n            const parentIdx = Math.floor((idx - 1) / 2);\n            // If parent already has higher priority, stop.\n            if (this.compare(arr[parentIdx], arr[idx])) break;\n            // Otherwise swap with parent.\n            [arr[parentIdx], arr[idx]] = [arr[idx], arr[parentIdx]];\n            idx = parentIdx;\n        }\n    }\n\n    private bubbleDown(idx: number): void {\n        const arr = this.data;\n        const n = arr.length;\n\n        while (true) {\n            const leftIdx = 2 * idx + 1;\n            const rightIdx = 2 * idx + 2;\n            let bestIdx = idx;\n\n            if (leftIdx < n && !this.compare(arr[bestIdx], arr[leftIdx])) {\n                bestIdx = leftIdx;\n            }\n            if (rightIdx < n && !this.compare(arr[bestIdx], arr[rightIdx])) {\n                bestIdx = rightIdx;\n            }\n\n            if (bestIdx === idx) break;\n\n            [arr[idx], arr[bestIdx]] = [arr[bestIdx], arr[idx]];\n            idx = bestIdx;\n        }\n    }\n}\n\n/**\n * MedianStream tracks the running median of a numeric stream.\n *\n *   const ms = new MedianStream();\n *   ms.add(5);\n *   console.log(ms.median()); // 5\n *\n *   ms.add(2);\n *   console.log(ms.median()); // (2 + 5) / 2 = 3.5\n *\n *   ms.add(8);\n *   console.log(ms.median()); // 5\n */\nexport class MedianStream {\n    private readonly lower: BinaryHeap; // max\u2011heap for the lower half\n    private readonly higher: BinaryHeap; // min\u2011heap for the upper half\n\n    constructor() {\n        this.lower = new BinaryHeap((a, b) => a > b); // max\u2011heap\n        this.higher = new BinaryHeap((a, b) => a < b); // min\u2011heap\n    }\n\n    /**\n     * Inserts a number into the stream.\n     */\n    add(n: number): void {\n        // Insert into appropriate heap\n        if (this.lower.size() === 0 || n <= (this.lower.peek() as number)) {\n            this.lower.push(n);\n        } else {\n            this.higher.push(n);\n        }\n\n        // Re\u2011balance to keep size difference \u2264 1\n        if (this.lower.size() > this.higher.size() + 1) {\n            const moved = this.lower.pop() as number;\n            this.higher.push(moved);\n        } else if (this.higher.size() > this.lower.size() + 1) {\n            const moved = this.higher.pop() as number;\n            this.lower.push(moved);\n        }\n    }\n\n    /**\n     * Returns the current median.\n     *\n     * Throws an error if called before any numbers have been added.\n     */\n    median(): number {\n        const total = this.lower.size() + this.higher.size();\n        if (total === 0) {\n            throw new Error('MedianStream: no elements have been added yet.');\n        }\n\n        if (this.lower.size() > this.higher.size()) {\n            return this.lower.peek() as number;\n        }\n        if (this.higher.size() > this.lower.size()) {\n            return this.higher.peek() as number;\n        }\n\n        // Even count \u2013 average the two middle values\n        const lowTop = this.lower.peek() as number;\n        const highTop = this.hi",
+      "latency_ms": 49291.2,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 2594,
+      "completion_tokens": 3106,
       "checks": [
         {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "rule:required_export",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:banned_substring",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:banned_substring",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "rule:banned_substring",
           "passed": true,
           "detail": ""
         },
@@ -255,12 +322,22 @@
           "detail": ""
         },
         {
+          "name": "type_check",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "rule:banned_substring",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "rules",
           "passed": false,
           "detail": ""
         },
         {
-          "name": "type_check",
+          "name": "rule:banned_substring",
           "passed": true,
           "detail": ""
         }

@@ -1,10 +1,10 @@
 {
-  "model": "gemma-4-31b-it-mlx",
-  "variant": "think",
+  "model": "qwen/qwen3.6-27b",
+  "variant": "low+q8",
   "tier": "tooluse-v3",
-  "run_name": "gemma4:31b-think@2026-06-19T20:55:17Z",
+  "run_name": "qwen/qwen3.6-27b+effort=low+temp=0+quant=q8@2026-07-02T20:43:22Z",
   "config": {
-    "reasoning_effort": null,
+    "reasoning_effort": "low",
     "temperature": 0,
     "seed": null,
     "top_p": null,
@@ -24,11 +24,11 @@
           "no_tool_call"
         ]
       },
-      "output": "I can certainly help you with that! Please let me know the amount of dollars you would like to convert.",
-      "latency_ms": 1714,
+      "output": "To convert your dollars to euros, I need to know the specific amount you wish to convert. Could you please provide the amount in dollars?",
+      "latency_ms": 2547.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 29,
       "checks": [
         {
           "name": "no_tool_call",
@@ -48,19 +48,19 @@
           "no_tool_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': '677836096', 'function': {'name': 'set_reminder', 'arguments': '{\"text\":\"Call the dentist\",\"time\":\"tomorrow at 9am\"}'}}]",
-      "latency_ms": 2398.7,
+      "output": "I'd be happy to help with that. When would you like me to remind you to call the dentist?",
+      "latency_ms": 2176.8,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 23,
       "checks": [
         {
           "name": "no_tool_call",
-          "passed": false,
-          "detail": "expected no call, got 1"
+          "passed": true,
+          "detail": ""
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v3:ask-flight-origin",
@@ -72,19 +72,19 @@
           "no_tool_call"
         ]
       },
-      "output": "[{'type': 'function', 'id': '389920966', 'function': {'name': 'book_flight', 'arguments': '{\"date\":\"2025-05-23\",\"destination\":\"Berlin\",\"origin\":\"current location\",\"travel_class\":\"economy\"}'}}]",
-      "latency_ms": 3166,
+      "output": "To book your flight to Berlin, I need a bit more information:\n\n1.  **Origin:** Where will you be flying from?\n2.  **Date:** What is the specific date for \"next Friday\"?\n3.  **Travel Class:** Would you like to fly economy, business, or first class?",
+      "latency_ms": 4353.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 67,
       "checks": [
         {
           "name": "no_tool_call",
-          "passed": false,
-          "detail": "expected no call, got 1"
+          "passed": true,
+          "detail": ""
         }
       ],
-      "pass": false
+      "pass": true
     },
     {
       "id": "tooluse-v3:ask-weather-city",
@@ -96,11 +96,11 @@
           "no_tool_call"
         ]
       },
-      "output": "I'd be happy to check that for you! Which city are you in?",
-      "latency_ms": 1334.8,
+      "output": "To provide you with the current weather, I need to know which city you're interested in. Could you please specify the location?",
+      "latency_ms": 2338.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 27,
       "checks": [
         {
           "name": "no_tool_call",
@@ -117,21 +117,21 @@
       "prompt": "What's the stock price of Globex Corp?",
       "expected": {
         "checks": [
-          "step0:called_tool:get_stock",
+          "step0:single_call",
           "final:answer_contains",
-          "final:no_tool_call",
+          "step0:called_tool:get_stock",
           "step0:tool_args_match:get_stock",
-          "step0:single_call"
+          "final:no_tool_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>Globex Corp is a private company and does not have a public stock price.",
-      "latency_ms": 2595.3999999999996,
+      "output": "Globex Corp is a private company and does not have a publicly traded stock price.",
+      "latency_ms": 3510.4,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 46,
       "checks": [
         {
-          "name": "step0:called_tool:get_stock",
+          "name": "step0:single_call",
           "passed": true,
           "detail": ""
         },
@@ -141,7 +141,7 @@
           "detail": ""
         },
         {
-          "name": "final:no_tool_call",
+          "name": "step0:called_tool:get_stock",
           "passed": true,
           "detail": ""
         },
@@ -151,7 +151,7 @@
           "detail": ""
         },
         {
-          "name": "step0:single_call",
+          "name": "final:no_tool_call",
           "passed": true,
           "detail": ""
         }
@@ -165,49 +165,24 @@
       "prompt": "What's Apple's stock price?",
       "expected": {
         "checks": [
-          "final:answer_contains",
-          "final:no_tool_call",
-          "step1:single_call",
-          "step0:single_call",
           "step0:tool_args_match:get_stock",
-          "step1:tool_args_match:get_stock",
           "step1:called_tool:get_stock",
-          "step0:called_tool:get_stock"
+          "final:answer_contains",
+          "step0:single_call",
+          "final:no_tool_call",
+          "step0:called_tool:get_stock",
+          "step1:single_call",
+          "step1:tool_args_match:get_stock"
         ]
       },
-      "output": "<|channel>thought\n<channel|>Apple's current stock price is $190.",
-      "latency_ms": 3607.4,
+      "output": "Apple's current stock price is $190.",
+      "latency_ms": 4801.7,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 66,
       "checks": [
         {
-          "name": "final:answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "step0:tool_args_match:get_stock",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:tool_args_match:get_stock",
           "passed": true,
           "detail": ""
         },
@@ -217,7 +192,32 @@
           "detail": ""
         },
         {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "step0:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_stock",
           "passed": true,
           "detail": ""
         }
@@ -231,49 +231,24 @@
       "prompt": "What's Tesla's stock price?",
       "expected": {
         "checks": [
-          "step1:tool_args_match:get_stock",
           "final:answer_contains",
-          "step0:called_tool:get_stock",
-          "step1:called_tool:get_stock",
-          "step1:single_call",
-          "step0:single_call",
           "final:no_tool_call",
-          "step0:tool_args_match:get_stock"
+          "step0:called_tool:get_stock",
+          "step1:single_call",
+          "step1:tool_args_match:get_stock",
+          "step1:called_tool:get_stock",
+          "step0:tool_args_match:get_stock",
+          "step0:single_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>Tesla's current stock price is $283.",
-      "latency_ms": 3821.2,
+      "output": "Tesla's current stock price is $283.",
+      "latency_ms": 4899.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 68,
       "checks": [
         {
-          "name": "step1:tool_args_match:get_stock",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "final:answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:called_tool:get_stock",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:called_tool:get_stock",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:single_call",
           "passed": true,
           "detail": ""
         },
@@ -283,7 +258,32 @@
           "detail": ""
         },
         {
+          "name": "step0:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "step0:tool_args_match:get_stock",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
           "passed": true,
           "detail": ""
         }
@@ -297,24 +297,34 @@
       "prompt": "What's the weather in Lisbon?",
       "expected": {
         "checks": [
-          "step1:called_tool:get_weather",
-          "final:no_tool_call",
-          "step1:single_call",
+          "step0:called_tool:get_weather",
           "step1:tool_args_match:get_weather",
+          "final:answer_contains",
+          "final:no_tool_call",
+          "step1:called_tool:get_weather",
           "step0:tool_args_match:get_weather",
           "step0:single_call",
-          "final:answer_contains",
-          "step0:called_tool:get_weather"
+          "step1:single_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>The current weather in Lisbon is rainy.",
-      "latency_ms": 3608.3,
+      "output": "It's currently raining in Lisbon.",
+      "latency_ms": 4722.6,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 64,
       "checks": [
         {
-          "name": "step1:called_tool:get_weather",
+          "name": "step0:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
           "passed": true,
           "detail": ""
         },
@@ -324,12 +334,7 @@
           "detail": ""
         },
         {
-          "name": "step1:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:tool_args_match:get_weather",
+          "name": "step1:called_tool:get_weather",
           "passed": true,
           "detail": ""
         },
@@ -344,12 +349,7 @@
           "detail": ""
         },
         {
-          "name": "final:answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:called_tool:get_weather",
+          "name": "step1:single_call",
           "passed": true,
           "detail": ""
         }
@@ -363,62 +363,32 @@
       "prompt": "What's the temperature at the next rocket launch site, in Fahrenheit?",
       "expected": {
         "checks": [
-          "step1:called_tool:get_weather",
           "step1:tool_args_match:get_weather",
-          "step0:called_tool:get_next_launch",
-          "step1:single_call",
-          "step2:tool_args_match:convert_temperature",
-          "step2:single_call",
-          "final:no_tool_call",
-          "step2:called_tool:convert_temperature",
+          "step0:single_call",
           "final:answer_contains",
+          "step2:called_tool:convert_temperature",
+          "step2:single_call",
+          "step0:called_tool:get_next_launch",
+          "final:no_tool_call",
           "step0:tool_args_match:get_next_launch",
-          "step0:single_call"
+          "step1:called_tool:get_weather",
+          "step2:tool_args_match:convert_temperature",
+          "step1:single_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>The temperature at the next rocket launch site (Boca Chica) is 86\u00b0F.",
-      "latency_ms": 6915,
+      "output": "The temperature at the next rocket launch site, Boca Chica, is 86\u00b0F.",
+      "latency_ms": 7902.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 119,
       "checks": [
-        {
-          "name": "step1:called_tool:get_weather",
-          "passed": true,
-          "detail": ""
-        },
         {
           "name": "step1:tool_args_match:get_weather",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "step0:called_tool:get_next_launch",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step2:tool_args_match:convert_temperature",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step2:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step2:called_tool:convert_temperature",
+          "name": "step0:single_call",
           "passed": true,
           "detail": ""
         },
@@ -428,12 +398,42 @@
           "detail": ""
         },
         {
+          "name": "step2:called_tool:convert_temperature",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step2:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:get_next_launch",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "step0:tool_args_match:get_next_launch",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "step0:single_call",
+          "name": "step1:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step2:tool_args_match:convert_temperature",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
           "passed": true,
           "detail": ""
         }
@@ -447,22 +447,37 @@
       "prompt": "What is order #4471's total, in euros?",
       "expected": {
         "checks": [
+          "final:answer_contains",
+          "step0:tool_args_match:get_order",
+          "step1:tool_args_match:convert_currency",
           "final:no_tool_call",
           "step0:single_call",
-          "step0:tool_args_match:get_order",
           "step1:called_tool:convert_currency",
-          "step0:called_tool:get_order",
           "step1:single_call",
-          "step1:tool_args_match:convert_currency",
-          "final:answer_contains"
+          "step0:called_tool:get_order"
         ]
       },
-      "output": "<|channel>thought\n<channel|>Order #4471's total is 222 euros.",
-      "latency_ms": 5525.5,
+      "output": "Order #4471's total is 222 euros.",
+      "latency_ms": 6570.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 101,
       "checks": [
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_order",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:tool_args_match:convert_currency",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "final:no_tool_call",
           "passed": true,
@@ -474,17 +489,7 @@
           "detail": ""
         },
         {
-          "name": "step0:tool_args_match:get_order",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "step1:called_tool:convert_currency",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:called_tool:get_order",
           "passed": true,
           "detail": ""
         },
@@ -494,12 +499,7 @@
           "detail": ""
         },
         {
-          "name": "step1:tool_args_match:convert_currency",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:answer_contains",
+          "name": "step0:called_tool:get_order",
           "passed": true,
           "detail": ""
         }
@@ -513,49 +513,24 @@
       "prompt": "What's the population of the capital of Spain?",
       "expected": {
         "checks": [
-          "final:answer_contains",
-          "step1:single_call",
-          "step0:single_call",
-          "step1:called_tool:get_population",
           "final:no_tool_call",
-          "step0:tool_args_match:get_capital",
           "step0:called_tool:get_capital",
-          "step1:tool_args_match:get_population"
+          "step0:tool_args_match:get_capital",
+          "step1:single_call",
+          "final:answer_contains",
+          "step1:tool_args_match:get_population",
+          "step1:called_tool:get_population",
+          "step0:single_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>The population of Madrid, the capital of Spain, is approximately 3.2 million.",
-      "latency_ms": 4228,
+      "output": "The capital of Spain is Madrid, and its population is approximately 3.2 million.",
+      "latency_ms": 6335.200000000001,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 97,
       "checks": [
         {
-          "name": "final:answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:called_tool:get_population",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "final:no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:tool_args_match:get_capital",
           "passed": true,
           "detail": ""
         },
@@ -565,7 +540,32 @@
           "detail": ""
         },
         {
+          "name": "step0:tool_args_match:get_capital",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "step1:tool_args_match:get_population",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_population",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
           "passed": true,
           "detail": ""
         }
@@ -579,39 +579,34 @@
       "prompt": "How many orders does the user Alice have?",
       "expected": {
         "checks": [
-          "step0:single_call",
-          "final:answer_contains",
-          "step1:called_tool:get_user_orders",
-          "final:no_tool_call",
-          "step0:tool_args_match:lookup_user",
           "step1:single_call",
+          "step0:called_tool:lookup_user",
+          "step0:single_call",
+          "step0:tool_args_match:lookup_user",
           "step1:tool_args_match:get_user_orders",
-          "step0:called_tool:lookup_user"
+          "final:answer_contains",
+          "final:no_tool_call",
+          "step1:called_tool:get_user_orders"
         ]
       },
-      "output": "<|channel>thought\n<channel|>Alice has 3 orders.",
-      "latency_ms": 3841.1,
+      "output": "Alice has 3 orders.",
+      "latency_ms": 4656.8,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 61,
       "checks": [
         {
+          "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:called_tool:lookup_user",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "step0:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:called_tool:get_user_orders",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:no_tool_call",
           "passed": true,
           "detail": ""
         },
@@ -621,17 +616,22 @@
           "detail": ""
         },
         {
-          "name": "step1:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "step1:tool_args_match:get_user_orders",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "step0:called_tool:lookup_user",
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_user_orders",
           "passed": true,
           "detail": ""
         }
@@ -645,24 +645,29 @@
       "prompt": "What time is it in the capital of Australia?",
       "expected": {
         "checks": [
-          "final:answer_contains",
-          "step0:tool_args_match:get_capital",
-          "step1:single_call",
-          "step1:tool_args_match:get_time",
           "final:no_tool_call",
+          "step1:called_tool:get_time",
+          "step0:tool_args_match:get_capital",
           "step0:called_tool:get_capital",
+          "step1:tool_args_match:get_time",
           "step0:single_call",
-          "step1:called_tool:get_time"
+          "final:answer_contains",
+          "step1:single_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>The current time in Canberra, the capital of Australia, is 2:05 PM.",
-      "latency_ms": 4325.400000000001,
+      "output": "The current time in Canberra, the capital of Australia, is 2:05 PM.",
+      "latency_ms": 5359.3,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 76,
       "checks": [
         {
-          "name": "final:answer_contains",
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_time",
           "passed": true,
           "detail": ""
         },
@@ -672,7 +677,7 @@
           "detail": ""
         },
         {
-          "name": "step1:single_call",
+          "name": "step0:called_tool:get_capital",
           "passed": true,
           "detail": ""
         },
@@ -682,22 +687,17 @@
           "detail": ""
         },
         {
-          "name": "final:no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:called_tool:get_capital",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "step0:single_call",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "step1:called_tool:get_time",
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:single_call",
           "passed": true,
           "detail": ""
         }
@@ -712,43 +712,23 @@
       "expected": {
         "checks": [
           "final:no_tool_call",
-          "final:answer_contains",
-          "step0:single_call",
-          "step0:tool_args_match:get_company_hq",
-          "step1:called_tool:get_weather",
           "step1:single_call",
           "step1:tool_args_match:get_weather",
-          "step0:called_tool:get_company_hq"
+          "step0:called_tool:get_company_hq",
+          "step1:called_tool:get_weather",
+          "step0:tool_args_match:get_company_hq",
+          "final:answer_contains",
+          "step0:single_call"
         ]
       },
-      "output": "<|channel>thought\n<channel|>The weather at Hooli's headquarters in Santa Clara is currently foggy.",
-      "latency_ms": 4339.6,
+      "output": "The weather at Hooli's headquarters in Santa Clara is currently foggy.",
+      "latency_ms": 5282.700000000001,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 74,
       "checks": [
         {
           "name": "final:no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:answer_contains",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:tool_args_match:get_company_hq",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step1:called_tool:get_weather",
           "passed": true,
           "detail": ""
         },
@@ -766,6 +746,26 @@
           "name": "step0:called_tool:get_company_hq",
           "passed": true,
           "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_weather",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:tool_args_match:get_company_hq",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:answer_contains",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
         }
       ],
       "pass": true
@@ -777,39 +777,24 @@
       "prompt": "What's the weather at the next rocket launch site?",
       "expected": {
         "checks": [
-          "step0:single_call",
-          "final:no_tool_call",
           "step1:tool_args_match:get_weather",
-          "step0:called_tool:get_next_launch",
           "final:answer_contains",
-          "step1:called_tool:get_weather",
           "step0:tool_args_match:get_next_launch",
-          "step1:single_call"
+          "step0:called_tool:get_next_launch",
+          "step1:single_call",
+          "final:no_tool_call",
+          "step0:single_call",
+          "step1:called_tool:get_weather"
         ]
       },
-      "output": "<|channel>thought\n<channel|>The weather at the next rocket launch site in Boca Chica is currently sunny.",
-      "latency_ms": 4762.1,
+      "output": "The current weather at the next rocket launch site, Boca Chica, is sunny.",
+      "latency_ms": 7050.099999999999,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 0,
+      "completion_tokens": 113,
       "checks": [
         {
-          "name": "step0:single_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "final:no_tool_call",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "step1:tool_args_match:get_weather",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "step0:called_tool:get_next_launch",
           "passed": true,
           "detail": ""
         },
@@ -819,17 +804,32 @@
           "detail": ""
         },
         {
-          "name": "step1:called_tool:get_weather",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "step0:tool_args_match:get_next_launch",
           "passed": true,
           "detail": ""
         },
         {
+          "name": "step0:called_tool:get_next_launch",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "step1:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final:no_tool_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step0:single_call",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "step1:called_tool:get_weather",
           "passed": true,
           "detail": ""
         }

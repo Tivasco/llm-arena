@@ -2,7 +2,7 @@
   "model": "nvidia/nemotron-3-super",
   "variant": "base",
   "tier": "formatting-v1",
-  "run_name": "nemotron3:super+effort=none@2026-06-24T15:22:28Z",
+  "run_name": "nvidia/nemotron-3-super+effort=none+temp=0+quant=q4_k_m@2026-07-12T20:52:53Z",
   "config": {
     "reasoning_effort": "none",
     "temperature": 0,
@@ -25,7 +25,7 @@
         ]
       },
       "output": 80,
-      "latency_ms": 669.6,
+      "latency_ms": 695.7,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 3,
@@ -45,26 +45,26 @@
       "prompt": "Give exactly 4 bullet points about software tools. Each bullet must be 5 words or fewer. Do not use the letter e (lowercase or uppercase) anywhere in your answer. No intro and no closing line.",
       "expected": {
         "checks": [
-          "forbid_chars",
           "exactly_n_bullets",
+          "forbid_chars",
           "max_words_per_bullet"
         ]
       },
       "output": "- Fast, clean, no bloat  \n- Syncs data across  \n- Runs on old  \n- Free, open source",
-      "latency_ms": 1401.4,
+      "latency_ms": 1451.7,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 29,
       "checks": [
         {
-          "name": "forbid_chars",
-          "passed": false,
-          "detail": "contains forbidden char 'e'"
-        },
-        {
           "name": "exactly_n_bullets",
           "passed": true,
           "detail": ""
+        },
+        {
+          "name": "forbid_chars",
+          "passed": false,
+          "detail": "contains forbidden char 'e'"
         },
         {
           "name": "max_words_per_bullet",
@@ -81,19 +81,19 @@
       "prompt": "We have been reviewing the Q3 migration project for the past few weeks and the team\nraised several points worth recording. The staging environment was finally stabilized\nafter the cache layer was rebuilt, though there are still intermittent timeouts under\nload that nobody has fully explained. Reply with exactly three lines, each formatted\nas a lowercase word, then a colon and a space, then a value, with no blank lines, no\nbullets, and no numbering. Marketing also asked about the launch date but that is out\nof scope for this note, and the budget review was pushed to next month. Summarize the\nthree most important status fields you can infer (for example status, risk, owner).\nDo not add any preamble or closing remark.\n",
       "expected": {
         "checks": [
-          "all_lines_match",
+          "line_count",
           "no_stray_fences",
-          "line_count"
+          "all_lines_match"
         ]
       },
       "output": "status: stabilized  \nrisk: intermittent timeouts under load  \nowner: migration team",
-      "latency_ms": 1512.2,
+      "latency_ms": 1440.3,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 19,
       "checks": [
         {
-          "name": "all_lines_match",
+          "name": "line_count",
           "passed": true,
           "detail": ""
         },
@@ -103,7 +103,7 @@
           "detail": ""
         },
         {
-          "name": "line_count",
+          "name": "all_lines_match",
           "passed": true,
           "detail": ""
         }
@@ -117,15 +117,15 @@
       "prompt": "Return ONLY a JSON array of exactly 4 objects. Each object must have EXACTLY the\nkeys id and level. id values are the unique integers 1, 2, 3, 4. level is one of\n\"low\", \"mid\", \"high\". Sort the array by id ascending. No code fences. Nothing\nafter the closing bracket.\n",
       "expected": {
         "checks": [
-          "unique_values",
-          "array_each_keys",
+          "no_stray_fences",
           "json_only",
+          "sorted_asc",
+          "array_each_keys",
+          "json_valid",
           "array_len",
           "no_trailing_prose",
-          "sorted_asc",
-          "json_valid",
-          "array_each_enum",
-          "no_stray_fences"
+          "unique_values",
+          "array_each_enum"
         ]
       },
       "output": [
@@ -146,13 +146,23 @@
           "level": "low"
         }
       ],
-      "latency_ms": 2043.1,
+      "latency_ms": 1821.4,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 39,
       "checks": [
         {
-          "name": "unique_values",
+          "name": "no_stray_fences",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "json_only",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "sorted_asc",
           "passed": true,
           "detail": ""
         },
@@ -162,7 +172,7 @@
           "detail": ""
         },
         {
-          "name": "json_only",
+          "name": "json_valid",
           "passed": true,
           "detail": ""
         },
@@ -177,22 +187,12 @@
           "detail": ""
         },
         {
-          "name": "sorted_asc",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "json_valid",
+          "name": "unique_values",
           "passed": true,
           "detail": ""
         },
         {
           "name": "array_each_enum",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_stray_fences",
           "passed": true,
           "detail": ""
         }
@@ -210,7 +210,7 @@
         ]
       },
       "output": "RED-0042",
-      "latency_ms": 955.9,
+      "latency_ms": 800.5,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 7,
@@ -230,13 +230,13 @@
       "prompt": "Return ONLY JSON shaped as {\"status\": ..., \"items\": [{\"id\": ..., \"level\": ...}]}.\nstatus must be one of \"ok\", \"warn\", \"fail\". items must have exactly 2 entries\nsorted by level descending. No fences. Nothing after the closing brace.\n",
       "expected": {
         "checks": [
+          "json_only",
           "no_trailing_prose",
           "array_len",
-          "sorted_desc",
           "enum_values",
           "no_stray_fences",
-          "json_only",
-          "json_valid"
+          "json_valid",
+          "sorted_desc"
         ]
       },
       "output": {
@@ -252,11 +252,16 @@
           }
         ]
       },
-      "latency_ms": 1723.3,
+      "latency_ms": 1759.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 38,
       "checks": [
+        {
+          "name": "json_only",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "no_trailing_prose",
           "passed": true,
@@ -264,11 +269,6 @@
         },
         {
           "name": "array_len",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "sorted_desc",
           "passed": true,
           "detail": ""
         },
@@ -283,12 +283,12 @@
           "detail": ""
         },
         {
-          "name": "json_only",
+          "name": "json_valid",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "json_valid",
+          "name": "sorted_desc",
           "passed": true,
           "detail": ""
         }
@@ -302,26 +302,26 @@
       "prompt": "Reply with exactly 2 sentences. Each sentence must be under 12 words. No em-dashes. Do not begin with a question.",
       "expected": {
         "checks": [
-          "no_em_dash",
           "no_question_opener",
-          "sentence_count",
           "max_words_per_sentence",
+          "sentence_count",
+          "no_em_dash",
           "min_words"
         ]
       },
       "output": "The sun rose slowly over the quiet hills. Birds began to sing as morning light spread gently.",
-      "latency_ms": 1173.3,
+      "latency_ms": 1115.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 20,
       "checks": [
         {
-          "name": "no_em_dash",
+          "name": "no_question_opener",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "no_question_opener",
+          "name": "max_words_per_sentence",
           "passed": true,
           "detail": ""
         },
@@ -331,7 +331,7 @@
           "detail": ""
         },
         {
-          "name": "max_words_per_sentence",
+          "name": "no_em_dash",
           "passed": true,
           "detail": ""
         },
@@ -350,22 +350,22 @@
       "prompt": "Rewrite the following as ONE clean statement sentence. No em-dashes, no emojis,\nand it must NOT be a question.\nText: \"Ever wondered why deploys fail at 5pm \u2014 every single time? \ud83d\ude29\"\n",
       "expected": {
         "checks": [
-          "contains_token",
+          "no_emoji",
           "no_em_dash",
           "min_words",
+          "no_question_opener",
           "single_sentence",
-          "no_emoji",
-          "no_question_opener"
+          "contains_token"
         ]
       },
       "output": "Deploys fail at 5pm every single time.",
-      "latency_ms": 945.3,
+      "latency_ms": 1028.4,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 13,
       "checks": [
         {
-          "name": "contains_token",
+          "name": "no_emoji",
           "passed": true,
           "detail": ""
         },
@@ -380,17 +380,17 @@
           "detail": ""
         },
         {
+          "name": "no_question_opener",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "single_sentence",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "no_emoji",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_question_opener",
+          "name": "contains_token",
           "passed": true,
           "detail": ""
         }
@@ -412,7 +412,7 @@
       "output": {
         "result": 391
       },
-      "latency_ms": 848.5,
+      "latency_ms": 854.2,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 9,
@@ -443,8 +443,8 @@
       "expected": {
         "checks": [
           "json_only",
-          "json_valid",
-          "no_prose_lines"
+          "no_prose_lines",
+          "json_valid"
         ]
       },
       "output": {
@@ -452,7 +452,7 @@
         "y": 2,
         "z": 3
       },
-      "latency_ms": 1274.8,
+      "latency_ms": 1336.9,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 24,
@@ -463,12 +463,12 @@
           "detail": ""
         },
         {
-          "name": "json_valid",
+          "name": "no_prose_lines",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "no_prose_lines",
+          "name": "json_valid",
           "passed": true,
           "detail": ""
         }
@@ -483,9 +483,9 @@
       "expected": {
         "checks": [
           "json_valid",
-          "json_only",
           "no_trailing_prose",
           "key_casing",
+          "json_only",
           "nested_schema"
         ]
       },
@@ -499,7 +499,7 @@
           "engineer"
         ]
       },
-      "latency_ms": 1496.7,
+      "latency_ms": 1540.4,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 30,
@@ -510,17 +510,17 @@
           "detail": ""
         },
         {
-          "name": "json_only",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "no_trailing_prose",
           "passed": true,
           "detail": ""
         },
         {
           "name": "key_casing",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "json_only",
           "passed": true,
           "detail": ""
         },
@@ -544,7 +544,7 @@
         ]
       },
       "output": "metric,Definition: A numerical measurement of a system's behavior over time, typically aggregated and used for monitoring performance and trends.\nlog,Definition: A timestamped, structured or unstructured record of discrete events that occurred within a system, often used for debugging and auditing.\ntrace,Definition: A record of the end-to-end journey of a request as it propagates through distributed services, showing latency and dependencies across components.",
-      "latency_ms": 3232.1,
+      "latency_ms": 3217.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 86,
@@ -569,19 +569,29 @@
       "prompt": "Write 5 bullets on why monitoring matters. Do not use the words 'delve',\n'tapestry', or 'crucial'. No emojis.\n",
       "expected": {
         "checks": [
+          "contains_token",
+          "no_emoji",
           "no_filler",
           "exactly_n_bullets",
-          "no_emoji",
-          "min_words",
-          "contains_token"
+          "min_words"
         ]
       },
       "output": "- Monitoring helps detect issues early, preventing small problems from becoming major failures.  \n- It provides data-driven insights that support better decision-making and resource allocation.  \n- Consistent tracking ensures compliance with standards, regulations, and internal policies.  \n- Real-time visibility enables faster response times during incidents or performance drops.  \n- Long-term monitoring reveals trends that inform strategic planning and continuous improvement.",
-      "latency_ms": 2909.6,
+      "latency_ms": 2891.4,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 81,
       "checks": [
+        {
+          "name": "contains_token",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_emoji",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "no_filler",
           "passed": true,
@@ -593,17 +603,7 @@
           "detail": ""
         },
         {
-          "name": "no_emoji",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "min_words",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "contains_token",
           "passed": true,
           "detail": ""
         }
@@ -617,11 +617,11 @@
       "prompt": "From \"Ana, a senior backend engineer with 9 years, knows Python, Go and Rust\":\nreturn ONLY JSON with keys name, role, years, skills. years is an integer,\nskills is an array of strings. No prose, no fences.\n",
       "expected": {
         "checks": [
+          "json_only",
+          "no_stray_fences",
           "schema",
           "json_valid",
-          "no_stray_fences",
-          "types",
-          "json_only"
+          "types"
         ]
       },
       "output": {
@@ -634,11 +634,21 @@
           "Rust"
         ]
       },
-      "latency_ms": 1778.5,
+      "latency_ms": 1805.3,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 41,
       "checks": [
+        {
+          "name": "json_only",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_stray_fences",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "schema",
           "passed": true,
@@ -650,17 +660,7 @@
           "detail": ""
         },
         {
-          "name": "no_stray_fences",
-          "passed": true,
-          "detail": ""
-        },
-        {
           "name": "types",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "json_only",
           "passed": true,
           "detail": ""
         }
@@ -674,29 +674,19 @@
       "prompt": "Rewrite this cleanly: no em-dashes, no emojis, no exclamation marks. Keep the meaning.\nText: \"We shipped it \u2014 finally! \ud83c\udf89 The team crushed it \u2014 no sleep \u2014 but worth it!!!\"\n",
       "expected": {
         "checks": [
-          "no_emoji",
-          "no_exclaim",
           "min_words",
           "no_em_dash",
-          "contains_token"
+          "no_emoji",
+          "contains_token",
+          "no_exclaim"
         ]
       },
       "output": "We shipped it finally. The team crushed it with no sleep but it was worth it.",
-      "latency_ms": 1098.5,
+      "latency_ms": 1135.5,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 19,
       "checks": [
-        {
-          "name": "no_emoji",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_exclaim",
-          "passed": true,
-          "detail": ""
-        },
         {
           "name": "min_words",
           "passed": true,
@@ -708,7 +698,17 @@
           "detail": ""
         },
         {
+          "name": "no_emoji",
+          "passed": true,
+          "detail": ""
+        },
+        {
           "name": "contains_token",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_exclaim",
           "passed": true,
           "detail": ""
         }
@@ -727,7 +727,7 @@
         ]
       },
       "output": "1. Unplug the router from the power source.  \n2. Wait 30 seconds to allow residual power to drain.  \n3. Plug the router back in and wait for it to fully reboot.",
-      "latency_ms": 1836.2,
+      "latency_ms": 1787.9,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 46,
@@ -752,19 +752,19 @@
       "prompt": "Rewrite this exactly, only removing em-dashes: 'We shipped it \u2014 finally \u2014 last night.'",
       "expected": {
         "checks": [
-          "min_words",
+          "contains_token",
           "no_em_dash",
-          "contains_token"
+          "min_words"
         ]
       },
       "output": "We shipped it \u2014 finally \u2014 last night.",
-      "latency_ms": 954.3,
+      "latency_ms": 757.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 10,
       "checks": [
         {
-          "name": "min_words",
+          "name": "contains_token",
           "passed": true,
           "detail": ""
         },
@@ -774,7 +774,7 @@
           "detail": "contains em/en dash"
         },
         {
-          "name": "contains_token",
+          "name": "min_words",
           "passed": true,
           "detail": ""
         }
@@ -789,16 +789,16 @@
       "expected": {
         "checks": [
           "no_question_opener",
-          "contains_token",
-          "sentence_count",
-          "min_words",
-          "no_clickbait_opener",
           "no_em_dash",
-          "no_emoji"
+          "no_clickbait_opener",
+          "sentence_count",
+          "contains_token",
+          "no_emoji",
+          "min_words"
         ]
       },
       "output": "We shipped a small internal tool that streamlines our team\u2019s weekly reporting process, cutting manual effort by over 70%. Built in under two weeks with feedback from daily users, it integrates cleanly with our existing data pipelines. The impact has been immediate\u2014more time for analysis, less time for formatting.",
-      "latency_ms": 2941.2,
+      "latency_ms": 2380,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 63,
@@ -809,7 +809,12 @@
           "detail": ""
         },
         {
-          "name": "contains_token",
+          "name": "no_em_dash",
+          "passed": false,
+          "detail": "contains em/en dash"
+        },
+        {
+          "name": "no_clickbait_opener",
           "passed": true,
           "detail": ""
         },
@@ -819,22 +824,17 @@
           "detail": ""
         },
         {
-          "name": "min_words",
+          "name": "contains_token",
           "passed": true,
           "detail": ""
-        },
-        {
-          "name": "no_clickbait_opener",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_em_dash",
-          "passed": false,
-          "detail": "contains em/en dash"
         },
         {
           "name": "no_emoji",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "min_words",
           "passed": true,
           "detail": ""
         }
@@ -848,23 +848,23 @@
       "prompt": "Return ONLY a fenced ```json code block containing an object with keys a, b, c.",
       "expected": {
         "checks": [
-          "fence_required",
-          "json_inside_valid"
+          "json_inside_valid",
+          "fence_required"
         ]
       },
       "output": "```json\n{\n  \"a\": null,\n  \"b\": null,\n  \"c\": null\n}\n```",
-      "latency_ms": 1195.5,
+      "latency_ms": 1154.9,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 25,
       "checks": [
         {
-          "name": "fence_required",
+          "name": "json_inside_valid",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "json_inside_valid",
+          "name": "fence_required",
           "passed": true,
           "detail": ""
         }
@@ -878,11 +878,11 @@
       "prompt": "Return ONLY a JSON array of 3 objects with keys task and priority,\nsorted by priority descending. No prose, no code fences.\n",
       "expected": {
         "checks": [
+          "json_valid",
+          "no_stray_fences",
           "array_len",
           "sorted_desc",
-          "json_only",
-          "no_stray_fences",
-          "json_valid"
+          "json_only"
         ]
       },
       "output": [
@@ -899,11 +899,21 @@
           "priority": 5
         }
       ],
-      "latency_ms": 1774.6,
+      "latency_ms": 1795.7,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 43,
       "checks": [
+        {
+          "name": "json_valid",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_stray_fences",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "array_len",
           "passed": true,
@@ -916,16 +926,6 @@
         },
         {
           "name": "json_only",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_stray_fences",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "json_valid",
           "passed": true,
           "detail": ""
         }
@@ -942,11 +942,11 @@
           "numbered_exactly"
         ]
       },
-      "output": "1. Boil fresh water in a kettle or pot.  \n2. Place a tea bag or loose-leaf tea in a cup or teapot.  \n3. Pour the hot water over the tea and let it steep for 3\u20135 minutes.  \n4. Remove the tea bag or strain the leaves.  \n5. Add milk, sugar, or lemon if desired, then stir and enjoy.",
-      "latency_ms": 3002.9,
+      "output": "1. Boil fresh water in a kettle or pot.  \n2. Place a tea bag or loose-leaf tea in a cup or teapot.  \n3. Pour the hot water over the tea and let it steep for 2\u20135 minutes, depending on desired strength.  \n4. Remove the tea bag or strain out the leaves.  \n5. Add milk, sugar, lemon, or other preferred additions, then stir and enjoy.",
+      "latency_ms": 3174.7,
       "http_status": 200,
       "truncated": false,
-      "completion_tokens": 88,
+      "completion_tokens": 96,
       "checks": [
         {
           "name": "numbered_exactly",
@@ -963,23 +963,23 @@
       "prompt": "Output a markdown table with columns Name | Role and exactly 3 data rows. Nothing else.",
       "expected": {
         "checks": [
-          "valid_md_table",
-          "no_prose_lines"
+          "no_prose_lines",
+          "valid_md_table"
         ]
       },
       "output": "| Name | Role |\n|------|------|\n| Alice | Developer |\n| Bob   | Designer |\n| Carol | Manager |",
-      "latency_ms": 1251.7,
+      "latency_ms": 1249.2,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 29,
       "checks": [
         {
-          "name": "valid_md_table",
+          "name": "no_prose_lines",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "no_prose_lines",
+          "name": "valid_md_table",
           "passed": true,
           "detail": ""
         }
@@ -993,34 +993,19 @@
       "prompt": "Write a 2-sentence product blurb for a note-taking app. No emojis, no em-dashes.",
       "expected": {
         "checks": [
-          "no_em_dash",
-          "contains_token",
-          "no_emoji",
           "min_words",
-          "sentence_count"
+          "sentence_count",
+          "contains_token",
+          "no_em_dash",
+          "no_emoji"
         ]
       },
       "output": "Capture your thoughts with intuitive, distraction-free note-taking that syncs seamlessly across all your devices. Organize ideas effortlessly with smart tagging and powerful search \u2014 so nothing gets lost, and everything stays within reach.",
-      "latency_ms": 1852.1,
+      "latency_ms": 1886.2,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 46,
       "checks": [
-        {
-          "name": "no_em_dash",
-          "passed": false,
-          "detail": "contains em/en dash"
-        },
-        {
-          "name": "contains_token",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "no_emoji",
-          "passed": true,
-          "detail": ""
-        },
         {
           "name": "min_words",
           "passed": true,
@@ -1028,6 +1013,21 @@
         },
         {
           "name": "sentence_count",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "contains_token",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_em_dash",
+          "passed": false,
+          "detail": "contains em/en dash"
+        },
+        {
+          "name": "no_emoji",
           "passed": true,
           "detail": ""
         }
@@ -1042,14 +1042,14 @@
       "expected": {
         "checks": [
           "min_words",
-          "word_cap",
           "contains_token",
           "no_em_dash",
-          "no_question_opener"
+          "no_question_opener",
+          "word_cap"
         ]
       },
       "output": "A load balancer distributes incoming network traffic across multiple servers to ensure no single server becomes overwhelmed, improving responsiveness, availability, and reliability of applications or websites. It enhances performance and fault tolerance by routing requests efficiently based on server health and capacity.",
-      "latency_ms": 1980.3,
+      "latency_ms": 2017.8,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 50,
@@ -1058,11 +1058,6 @@
           "name": "min_words",
           "passed": true,
           "detail": ""
-        },
-        {
-          "name": "word_cap",
-          "passed": false,
-          "detail": "42 words > 40"
         },
         {
           "name": "contains_token",
@@ -1078,6 +1073,11 @@
           "name": "no_question_opener",
           "passed": true,
           "detail": ""
+        },
+        {
+          "name": "word_cap",
+          "passed": false,
+          "detail": "42 words > 40"
         }
       ],
       "pass": false
@@ -1089,9 +1089,9 @@
       "prompt": "From \"Lisbon, Portugal, about 545000 people\": return ONLY JSON with keys\ncity, country, population. population must be an integer. No prose, no code fences.\n",
       "expected": {
         "checks": [
+          "json_valid",
           "json_only",
-          "types",
-          "json_valid"
+          "types"
         ]
       },
       "output": {
@@ -1099,11 +1099,16 @@
         "country": "Portugal",
         "population": 545000
       },
-      "latency_ms": 1451.9,
+      "latency_ms": 1520.2,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 31,
       "checks": [
+        {
+          "name": "json_valid",
+          "passed": true,
+          "detail": ""
+        },
         {
           "name": "json_only",
           "passed": true,
@@ -1111,11 +1116,6 @@
         },
         {
           "name": "types",
-          "passed": true,
-          "detail": ""
-        },
-        {
-          "name": "json_valid",
           "passed": true,
           "detail": ""
         }
@@ -1129,23 +1129,23 @@
       "prompt": "List 4 fruits as a single comma-separated line. Nothing else.",
       "expected": {
         "checks": [
-          "csv_count",
-          "no_prose_lines"
+          "no_prose_lines",
+          "csv_count"
         ]
       },
       "output": "Apple, banana, orange, grape",
-      "latency_ms": 629.3,
+      "latency_ms": 659.6,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 8,
       "checks": [
         {
-          "name": "csv_count",
+          "name": "no_prose_lines",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "no_prose_lines",
+          "name": "csv_count",
           "passed": true,
           "detail": ""
         }
@@ -1159,25 +1159,25 @@
       "prompt": "In one sentence, say what DNS does. Do not use em-dashes.",
       "expected": {
         "checks": [
-          "contains_token",
           "single_sentence",
+          "contains_token",
           "min_words",
           "no_em_dash"
         ]
       },
       "output": "DNS translates human-readable domain names into IP addresses so computers can locate and communicate with each other on the internet.",
-      "latency_ms": 1092.2,
+      "latency_ms": 1104,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 23,
       "checks": [
         {
-          "name": "contains_token",
+          "name": "single_sentence",
           "passed": true,
           "detail": ""
         },
         {
-          "name": "single_sentence",
+          "name": "contains_token",
           "passed": true,
           "detail": ""
         },
@@ -1205,7 +1205,7 @@
         ]
       },
       "output": "OK",
-      "latency_ms": 461.6,
+      "latency_ms": 438.8,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 2,
@@ -1229,7 +1229,7 @@
         ]
       },
       "output": "- Backups protect against data loss from hardware failure, accidental deletion, or cyberattacks like ransomware.  \n- They ensure business continuity by enabling quick recovery and minimizing downtime during disruptions.  \n- Regular backups provide version history, allowing restoration to a clean state before corruption or malware infection occurred.",
-      "latency_ms": 2384.7,
+      "latency_ms": 2417.2,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 67,
@@ -1257,7 +1257,7 @@
         "name": "Tiago",
         "age": 38
       },
-      "latency_ms": 1994.2,
+      "latency_ms": 1025.1,
       "http_status": 200,
       "truncated": false,
       "completion_tokens": 19,

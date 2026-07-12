@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-01T09:08:15Z",
+  "generated_at": "2026-07-13T12:00:00Z",
   "environment": {
     "summary": "Self-hosted open-weight models behind a firewall, called over an OpenAI-compatible endpoint with greedy decoding (temperature 0). No per-call fees; no data leaves the host.",
     "decoding": "greedy (temperature 0)"
   },
   "config_matrix": [
     {
-      "model": "gemma-4-31b-it-mlx",
+      "model": "gemma-4-31b-it",
       "variant": "base",
       "reasoning_effort": null,
       "temperature": 0,
@@ -18,7 +18,7 @@
       "max_tokens_floor": null
     },
     {
-      "model": "gemma-4-31b-it-mlx",
+      "model": "gemma-4-31b-it",
       "variant": "think",
       "reasoning_effort": null,
       "temperature": 0,
@@ -138,7 +138,31 @@
       "max_tokens_floor": null
     },
     {
-      "model": "openai/gpt-oss-120b",
+      "model": "qwen/qwen3.6-27b",
+      "variant": "high",
+      "reasoning_effort": "high",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "qwen/qwen3.6-27b",
+      "variant": "high+q8",
+      "reasoning_effort": "high",
+      "temperature": 0,
+      "seed": null,
+      "top_p": null,
+      "top_k": null,
+      "call_deadline_s": null,
+      "request_timeout_s": null,
+      "max_tokens_floor": null
+    },
+    {
+      "model": "qwen/qwen3.6-27b",
       "variant": "low",
       "reasoning_effort": "low",
       "temperature": 0,
@@ -150,21 +174,9 @@
       "max_tokens_floor": null
     },
     {
-      "model": "openai/gpt-oss-120b",
-      "variant": "medium",
-      "reasoning_effort": "medium",
-      "temperature": 0,
-      "seed": null,
-      "top_p": null,
-      "top_k": null,
-      "call_deadline_s": null,
-      "request_timeout_s": null,
-      "max_tokens_floor": null
-    },
-    {
       "model": "qwen/qwen3.6-27b",
-      "variant": "base",
-      "reasoning_effort": null,
+      "variant": "low+q8",
+      "reasoning_effort": "low",
       "temperature": 0,
       "seed": null,
       "top_p": null,
