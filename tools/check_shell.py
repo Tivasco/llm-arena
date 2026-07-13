@@ -184,7 +184,7 @@ def bench_page():
     problems = []
     if not idx.exists(): return ["benchmarks/index.html missing"]
     txt = read(idx)
-    if 'src="bench.js"' not in txt: problems.append("benchmarks/index.html: missing bench.js")
+    if 'src="bench.js' not in txt: problems.append("benchmarks/index.html: missing bench.js")
     if not (ROOT / "benchmarks" / "bench.js").exists(): problems.append("benchmarks/bench.js missing")
     if not (ROOT / "benchmarks" / "data" / "leaderboard.json").exists(): problems.append("benchmarks/data/leaderboard.json missing")
     if not (ROOT / "benchmarks" / "data" / "models").is_dir(): problems.append("benchmarks/data/models/ missing")
