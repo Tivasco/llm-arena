@@ -210,6 +210,25 @@ def js_no_external_or_root_fetch():
                 problems.append(f"{p.relative_to(ROOT)}: root-absolute fetch {m.group(0)!r}")
     return problems
 
+# Offline-first, with ONE sanctioned exception: the Cloudflare Web Analytics beacon
+# (privacy-first, cookieless), injected by chrome.js. Any other external resource load
+# in our JS is a contract break. (Plain <a href> navigation to external sites is fine.)
+ALLOWED_EXTERNAL_HOSTS = {"static.cloudflareinsights.com"}
+
+@check
+def js_external_resource_allowlist():
+    """A script may load an external RESOURCE only from an allowlisted host (the analytics beacon)."""
+    import re
+    rx = re.compile(r'\.src\s*=\s*["\'](?:https?:)?//([^/"\'\s]+)', re.I)
+    problems = []
+    for p in ROOT.rglob("*.js"):
+        for m in rx.finditer(read(p)):
+            host = m.group(1)
+            if host not in ALLOWED_EXTERNAL_HOSTS:
+                problems.append(f"{p.relative_to(ROOT)}: external resource host {host!r} not in allowlist "
+                                f"{sorted(ALLOWED_EXTERNAL_HOSTS)}")
+    return problems
+
 def main():
     failed = 0
     for fn in CHECKS:

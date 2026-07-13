@@ -8,6 +8,21 @@
   var SCRIPT = document.currentScript;
   function siteUrl(rel) { return new URL(rel, SCRIPT.src).href; } // siteUrl('../') === "<origin><base>/"
 
+  // ── Cloudflare Web Analytics ────────────────────────────────────────────────
+  // The site's ONE sanctioned external request: a privacy-first, cookieless page-view
+  // beacon. Everything else stays same-origin/offline (enforced by tools/check_shell.py,
+  // which whitelists exactly this host). Paste your beacon token below — Cloudflare
+  // dashboard → Analytics & Logs → Web Analytics → (add site) tivasco.github.io → token.
+  // Until a real 32-hex token is set, this stays a no-op (nothing loads).
+  var CF_WA_TOKEN = "REPLACE_WITH_BEACON_TOKEN";
+  if (/^[a-f0-9]{32,}$/i.test(CF_WA_TOKEN)) {
+    var beacon = document.createElement("script");
+    beacon.defer = true;
+    beacon.src = "https://static.cloudflareinsights.com/beacon.min.js";
+    beacon.setAttribute("data-cf-beacon", JSON.stringify({ token: CF_WA_TOKEN }));
+    (document.head || document.documentElement).appendChild(beacon);
+  }
+
   function mountChrome() {
     if (document.querySelector(".site-header")) return; // already mounted
     const header = document.createElement("header");
