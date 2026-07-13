@@ -73,8 +73,8 @@ def no_cdn():
 @check
 def chrome_contract():
     """Every page links theme.css and includes chrome.js (base-relative, optional ../)."""
-    theme_rx  = re.compile(r'href\s*=\s*["\'](?:\.\./)*assets/theme\.css["\']')
-    chrome_rx = re.compile(r'src\s*=\s*["\'](?:\.\./)*assets/chrome\.js["\']')
+    theme_rx  = re.compile(r'href\s*=\s*["\'](?:\.\./)*assets/theme\.css(?:\?[^"\']*)?["\']')
+    chrome_rx = re.compile(r'src\s*=\s*["\'](?:\.\./)*assets/chrome\.js(?:\?[^"\']*)?["\']')
     problems = []
     for p in html_files():
         txt = read(p)
