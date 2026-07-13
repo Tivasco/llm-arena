@@ -1,0 +1,70 @@
+{
+  "model_key": "gemma-e4b",
+  "model": "Gemma E4B",
+  "family": "gemma4",
+  "size": "E4B",
+  "configs": [
+    {
+      "model_id": "gemma-4-e4b-it-mlx",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 17,
+          "total": 30,
+          "rate": 0.5667,
+          "median_latency_ms": 1693,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 17,
+          "total": 25,
+          "rate": 0.68,
+          "median_latency_ms": 3941,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 5100,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0,
+          "median_latency_ms": 33510,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 1
+        }
+      },
+      "overall": {
+        "pass": 46,
+        "total": 75,
+        "rate": 0.6133
+      },
+      "cost": {
+        "tok_s": 0.0,
+        "median_latency_ms": 4520,
+        "total_completion_tokens": 0,
+        "truncation": 1,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-20T06:43:45Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

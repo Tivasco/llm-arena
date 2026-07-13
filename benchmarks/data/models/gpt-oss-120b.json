@@ -1,0 +1,497 @@
+{
+  "model_key": "gpt-oss-120b",
+  "model": "gpt-oss 120B",
+  "family": "gpt-oss",
+  "size": "120B",
+  "configs": [
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0.5",
+        "quant": "8bit"
+      },
+      "label": "off\u00b7t0.5\u00b78bit",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 1332,
+          "median_ct": 56,
+          "tok_s": 44.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 1467,
+          "median_ct": 53,
+          "tok_s": 38.1,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 2518,
+          "median_ct": 92,
+          "tok_s": 37.5,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 5,
+          "total": 5,
+          "rate": 1.0,
+          "median_latency_ms": 17622,
+          "median_ct": 1084,
+          "tok_s": 61.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 68,
+        "total": 75,
+        "rate": 0.9067
+      },
+      "cost": {
+        "tok_s": 44.6,
+        "median_latency_ms": 1992,
+        "total_completion_tokens": 10886,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T18:06:19Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 1168,
+          "median_ct": 58,
+          "tok_s": 49.1,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 1309,
+          "median_ct": 53,
+          "tok_s": 39.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 2869,
+          "median_ct": 103,
+          "tok_s": 35.8,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 18342,
+          "median_ct": 1156,
+          "tok_s": 63.7,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 49.1,
+        "median_latency_ms": 2089,
+        "total_completion_tokens": 11810,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-29T22:26:21Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "off",
+        "temp": "1.0",
+        "quant": "8bit"
+      },
+      "label": "off\u00b7t1.0\u00b78bit",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 1394,
+          "median_ct": 63,
+          "tok_s": 46.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 1485,
+          "median_ct": 53,
+          "tok_s": 38.6,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 2308,
+          "median_ct": 90,
+          "tok_s": 37.5,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 20142,
+          "median_ct": 1256,
+          "tok_s": 62.0,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 66,
+        "total": 75,
+        "rate": 0.88
+      },
+      "cost": {
+        "tok_s": 46.8,
+        "median_latency_ms": 1896,
+        "total_completion_tokens": 12470,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T18:10:09Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": "8bit"
+      },
+      "label": "off\u00b7t0\u00b78bit",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 1245,
+          "median_ct": 58,
+          "tok_s": 46.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 1502,
+          "median_ct": 54,
+          "tok_s": 37.3,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 2545,
+          "median_ct": 92,
+          "tok_s": 39.3,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 11865,
+          "median_ct": 681,
+          "tok_s": 57.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 46.6,
+        "median_latency_ms": 2024,
+        "total_completion_tokens": 10143,
+        "truncation": 0,
+        "errors": 2,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T18:02:34Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": "8bit"
+      },
+      "label": "on\u00b7t1.0\u00b78bit",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 6128,
+          "median_ct": 374,
+          "tok_s": 61.3,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 3900,
+          "median_ct": 216,
+          "tok_s": 52.6,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 6498,
+          "median_ct": 359,
+          "tok_s": 55.5,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 54618,
+          "median_ct": 3408,
+          "tok_s": 61.9,
+          "trunc": 1
+        }
+      },
+      "overall": {
+        "pass": 64,
+        "total": 75,
+        "rate": 0.8533
+      },
+      "cost": {
+        "tok_s": 61.3,
+        "median_latency_ms": 6313,
+        "total_completion_tokens": 61793,
+        "truncation": 1,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T19:03:28Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0.5",
+        "quant": "8bit"
+      },
+      "label": "on\u00b7t0.5\u00b78bit",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 5936,
+          "median_ct": 365,
+          "tok_s": 61.2,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 20,
+          "total": 25,
+          "rate": 0.8,
+          "median_latency_ms": 2954,
+          "median_ct": 154,
+          "tok_s": 53.6,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 6418,
+          "median_ct": 351,
+          "tok_s": 55.4,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 89326,
+          "median_ct": 5545,
+          "tok_s": 62.1,
+          "trunc": 1
+        }
+      },
+      "overall": {
+        "pass": 62,
+        "total": 75,
+        "rate": 0.8267
+      },
+      "cost": {
+        "tok_s": 61.2,
+        "median_latency_ms": 6177,
+        "total_completion_tokens": 69798,
+        "truncation": 1,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T18:43:19Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": "8bit"
+      },
+      "label": "on\u00b7t0\u00b78bit",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 6650,
+          "median_ct": 409,
+          "tok_s": 61.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 3143,
+          "median_ct": 171,
+          "tok_s": 54.2,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 6248,
+          "median_ct": 377,
+          "tok_s": 57.6,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 274608,
+          "median_ct": 16383,
+          "tok_s": 59.7,
+          "trunc": 3
+        }
+      },
+      "overall": {
+        "pass": 61,
+        "total": 75,
+        "rate": 0.8133
+      },
+      "cost": {
+        "tok_s": 61.6,
+        "median_latency_ms": 6449,
+        "total_completion_tokens": 85229,
+        "truncation": 3,
+        "errors": 3,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T18:20:01Z"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "on\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 6088,
+          "median_ct": 376,
+          "tok_s": 62.1,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 20,
+          "total": 25,
+          "rate": 0.8,
+          "median_latency_ms": 3661,
+          "median_ct": 214,
+          "tok_s": 52.9,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 7388,
+          "median_ct": 395,
+          "tok_s": 55.6,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 60016,
+          "median_ct": 1606,
+          "tok_s": 56.2,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 61,
+        "total": 75,
+        "rate": 0.8133
+      },
+      "cost": {
+        "tok_s": 62.1,
+        "median_latency_ms": 6738,
+        "total_completion_tokens": 32938,
+        "truncation": 0,
+        "errors": 2,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-29T22:30:28Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

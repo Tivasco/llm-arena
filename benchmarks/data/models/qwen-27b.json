@@ -1,0 +1,741 @@
+{
+  "model_key": "qwen-27b",
+  "model": "Qwen 27B",
+  "family": "qwen3.6",
+  "size": "27B",
+  "configs": [
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "on\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 29,
+          "total": 30,
+          "rate": 0.9667,
+          "median_latency_ms": 31266,
+          "median_ct": 866,
+          "tok_s": 27.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 10201,
+          "median_ct": 261,
+          "tok_s": 26.5,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 15531,
+          "median_ct": 395,
+          "tok_s": 26.7,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 258184,
+          "median_ct": 7106,
+          "tok_s": 27.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 70,
+        "total": 75,
+        "rate": 0.9333
+      },
+      "cost": {
+        "tok_s": 27.8,
+        "median_latency_ms": 23398,
+        "total_completion_tokens": 96806,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-01T23:08:28Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0.5",
+        "quant": "q8"
+      },
+      "label": "off\u00b7t0.5\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 1679,
+          "median_ct": 26,
+          "tok_s": 16.0,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 3623,
+          "median_ct": 47,
+          "tok_s": 12.3,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 4797,
+          "median_ct": 68,
+          "tok_s": 13.9,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 35855,
+          "median_ct": 765,
+          "tok_s": 21.3,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 69,
+        "total": 75,
+        "rate": 0.92
+      },
+      "cost": {
+        "tok_s": 16.0,
+        "median_latency_ms": 4210,
+        "total_completion_tokens": 8309,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T20:52:09Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 1336,
+          "median_ct": 24,
+          "tok_s": 19.1,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 2803,
+          "median_ct": 44,
+          "tok_s": 15.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 3682,
+          "median_ct": 67,
+          "tok_s": 18.2,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 32098,
+          "median_ct": 880,
+          "tok_s": 27.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 69,
+        "total": 75,
+        "rate": 0.92
+      },
+      "cost": {
+        "tok_s": 19.1,
+        "median_latency_ms": 3242,
+        "total_completion_tokens": 7870,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-01T22:20:13Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0.5",
+        "quant": "q8"
+      },
+      "label": "on\u00b7t0.5\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 45568,
+          "median_ct": 792,
+          "tok_s": 16.4,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 12398,
+          "median_ct": 214,
+          "tok_s": 18.7,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 28350,
+          "median_ct": 464,
+          "tok_s": 14.3,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 405310,
+          "median_ct": 3076,
+          "tok_s": 19.9,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 68,
+        "total": 75,
+        "rate": 0.9067
+      },
+      "cost": {
+        "tok_s": 16.4,
+        "median_latency_ms": 36959,
+        "total_completion_tokens": 63623,
+        "truncation": 0,
+        "errors": 2,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T23:28:18Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0.5",
+        "quant": null
+      },
+      "label": "off\u00b7t0.5",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 1266,
+          "median_ct": 24,
+          "tok_s": 19.2,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 2134,
+          "median_ct": 44,
+          "tok_s": 20.6,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 3169,
+          "median_ct": 68,
+          "tok_s": 20.8,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 27070,
+          "median_ct": 735,
+          "tok_s": 27.2,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 68,
+        "total": 75,
+        "rate": 0.9067
+      },
+      "cost": {
+        "tok_s": 19.2,
+        "median_latency_ms": 2652,
+        "total_completion_tokens": 8086,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-01T22:25:41Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": "q8"
+      },
+      "label": "on\u00b7t1.0\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 45372,
+          "median_ct": 894,
+          "tok_s": 21.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 12075,
+          "median_ct": 229,
+          "tok_s": 19.7,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 25136,
+          "median_ct": 500,
+          "tok_s": 20.5,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 332943,
+          "median_ct": 4329,
+          "tok_s": 21.1,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 21.6,
+        "median_latency_ms": 35254,
+        "total_completion_tokens": 72184,
+        "truncation": 0,
+        "errors": 2,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-03T00:48:07Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": "q8"
+      },
+      "label": "off\u00b7t0\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667,
+          "median_latency_ms": 2076,
+          "median_ct": 24,
+          "tok_s": 12.2,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 3886,
+          "median_ct": 44,
+          "tok_s": 10.3,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 4802,
+          "median_ct": 67,
+          "tok_s": 13.9,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 34728,
+          "median_ct": 740,
+          "tok_s": 21.3,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 12.2,
+        "median_latency_ms": 4344,
+        "total_completion_tokens": 8201,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T20:44:36Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "1.0",
+        "quant": null
+      },
+      "label": "off\u00b7t1.0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 24,
+          "total": 30,
+          "rate": 0.8,
+          "median_latency_ms": 1293,
+          "median_ct": 24,
+          "tok_s": 18.7,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 2136,
+          "median_ct": 47,
+          "tok_s": 20.6,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 3174,
+          "median_ct": 66,
+          "tok_s": 21.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 40368,
+          "median_ct": 1106,
+          "tok_s": 27.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 18.7,
+        "median_latency_ms": 2655,
+        "total_completion_tokens": 8255,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-01T22:31:16Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": "q8"
+      },
+      "label": "on\u00b7t0\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 35495,
+          "median_ct": 768,
+          "tok_s": 21.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 10798,
+          "median_ct": 185,
+          "tok_s": 19.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 33487,
+          "median_ct": 347,
+          "tok_s": 18.6,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0,
+          "median_latency_ms": 600000,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 21.6,
+        "median_latency_ms": 34491,
+        "total_completion_tokens": 52530,
+        "truncation": 0,
+        "errors": 3,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T21:50:26Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": null
+      },
+      "label": "on\u00b7t1.0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 27873,
+          "median_ct": 768,
+          "tok_s": 27.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 10330,
+          "median_ct": 268,
+          "tok_s": 25.8,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 15909,
+          "median_ct": 369,
+          "tok_s": 25.2,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 251435,
+          "median_ct": 6519,
+          "tok_s": 27.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 27.6,
+        "median_latency_ms": 21891,
+        "total_completion_tokens": 75809,
+        "truncation": 0,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T01:04:19Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0.5",
+        "quant": null
+      },
+      "label": "on\u00b7t0.5",
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667,
+          "median_latency_ms": 28538,
+          "median_ct": 742,
+          "tok_s": 27.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 9802,
+          "median_ct": 223,
+          "tok_s": 23.8,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 18044,
+          "median_ct": 413,
+          "tok_s": 25.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 281718,
+          "median_ct": 7698,
+          "tok_s": 27.3,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 27.6,
+        "median_latency_ms": 23291,
+        "total_completion_tokens": 81945,
+        "truncation": 0,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T00:10:23Z"
+    },
+    {
+      "model_id": "qwen/qwen3.6-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "1.0",
+        "quant": "q8"
+      },
+      "label": "off\u00b7t1.0\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 1625,
+          "median_ct": 26,
+          "tok_s": 16.2,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 3627,
+          "median_ct": 47,
+          "tok_s": 12.4,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333,
+          "median_latency_ms": 4743,
+          "median_ct": 66,
+          "tok_s": 13.9,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 41335,
+          "median_ct": 887,
+          "tok_s": 21.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 64,
+        "total": 75,
+        "rate": 0.8533
+      },
+      "cost": {
+        "tok_s": 16.2,
+        "median_latency_ms": 4185,
+        "total_completion_tokens": 9149,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-02T21:00:06Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

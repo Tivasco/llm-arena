@@ -1,0 +1,497 @@
+{
+  "model_key": "nemotron-120b",
+  "model": "Nemotron 120B A12B",
+  "family": "nemotron-h MoE",
+  "size": "120B",
+  "configs": [
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": "q4_k_m"
+      },
+      "label": "on\u00b7t0\u00b7q4_k_m",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 4605,
+          "median_ct": 139,
+          "tok_s": 30.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 4747,
+          "median_ct": 110,
+          "tok_s": 25.3,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 8510,
+          "median_ct": 205,
+          "tok_s": 25.4,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 51710,
+          "median_ct": 1758,
+          "tok_s": 34.0,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 68,
+        "total": 75,
+        "rate": 0.9067
+      },
+      "cost": {
+        "tok_s": 30.8,
+        "median_latency_ms": 6628,
+        "total_completion_tokens": 37927,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T21:17:42Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": "q4_k_m"
+      },
+      "label": "on\u00b7t1.0\u00b7q4_k_m",
+      "scores": {
+        "formatting-v1": {
+          "pass": 29,
+          "total": 30,
+          "rate": 0.9667,
+          "median_latency_ms": 5766,
+          "median_ct": 183,
+          "tok_s": 31.1,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 5363,
+          "median_ct": 118,
+          "tok_s": 25.8,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 9515,
+          "median_ct": 238,
+          "tok_s": 26.6,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 64470,
+          "median_ct": 2194,
+          "tok_s": 33.6,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 31.1,
+        "median_latency_ms": 7640,
+        "total_completion_tokens": 50955,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T22:05:48Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "on",
+        "temp": "0.5",
+        "quant": "q4_k_m"
+      },
+      "label": "on\u00b7t0.5\u00b7q4_k_m",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 4975,
+          "median_ct": 156,
+          "tok_s": 30.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 4683,
+          "median_ct": 110,
+          "tok_s": 24.2,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 10039,
+          "median_ct": 255,
+          "tok_s": 25.7,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 56783,
+          "median_ct": 1937,
+          "tok_s": 33.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 30.8,
+        "median_latency_ms": 7507,
+        "total_completion_tokens": 53040,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T21:37:04Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "on\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 4692,
+          "median_ct": 139,
+          "tok_s": 29.9,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 23,
+          "total": 25,
+          "rate": 0.92,
+          "median_latency_ms": 4626,
+          "median_ct": 110,
+          "tok_s": 23.9,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 8587,
+          "median_ct": 215,
+          "tok_s": 25.3,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 53019,
+          "median_ct": 999,
+          "tok_s": 32.0,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 29.9,
+        "median_latency_ms": 6640,
+        "total_completion_tokens": 21482,
+        "truncation": 0,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-24T15:36:16Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "off",
+        "temp": "0.5",
+        "quant": "q4_k_m"
+      },
+      "label": "off\u00b7t0.5\u00b7q4_k_m",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 1389,
+          "median_ct": 24,
+          "tok_s": 20.1,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 2180,
+          "median_ct": 35,
+          "tok_s": 14.9,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333,
+          "median_latency_ms": 3695,
+          "median_ct": 64,
+          "tok_s": 19.2,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 23045,
+          "median_ct": 767,
+          "tok_s": 33.3,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 62,
+        "total": 75,
+        "rate": 0.8267
+      },
+      "cost": {
+        "tok_s": 20.1,
+        "median_latency_ms": 2938,
+        "total_completion_tokens": 7522,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T21:01:00Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "off",
+        "temp": "1.0",
+        "quant": "q4_k_m"
+      },
+      "label": "off\u00b7t1.0\u00b7q4_k_m",
+      "scores": {
+        "formatting-v1": {
+          "pass": 25,
+          "total": 30,
+          "rate": 0.8333,
+          "median_latency_ms": 1425,
+          "median_ct": 28,
+          "tok_s": 20.3,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 20,
+          "total": 25,
+          "rate": 0.8,
+          "median_latency_ms": 2361,
+          "median_ct": 35,
+          "tok_s": 15.2,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 10,
+          "total": 15,
+          "rate": 0.6667,
+          "median_latency_ms": 3246,
+          "median_ct": 63,
+          "tok_s": 19.5,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 26884,
+          "median_ct": 902,
+          "tok_s": 33.6,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 58,
+        "total": 75,
+        "rate": 0.7733
+      },
+      "cost": {
+        "tok_s": 20.3,
+        "median_latency_ms": 2804,
+        "total_completion_tokens": 7147,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T21:06:09Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 24,
+          "total": 30,
+          "rate": 0.8,
+          "median_latency_ms": 1474,
+          "median_ct": 29,
+          "tok_s": 20.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 2253,
+          "median_ct": 35,
+          "tok_s": 15.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333,
+          "median_latency_ms": 3734,
+          "median_ct": 63,
+          "tok_s": 17.7,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 24538,
+          "median_ct": 796,
+          "tok_s": 32.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 58,
+        "total": 75,
+        "rate": 0.7733
+      },
+      "cost": {
+        "tok_s": 20.8,
+        "median_latency_ms": 2994,
+        "total_completion_tokens": 6901,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-24T15:25:22Z"
+    },
+    {
+      "model_id": "nvidia/nemotron-3-super",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": "q4_k_m"
+      },
+      "label": "off\u00b7t0\u00b7q4_k_m",
+      "scores": {
+        "formatting-v1": {
+          "pass": 24,
+          "total": 30,
+          "rate": 0.8,
+          "median_latency_ms": 1446,
+          "median_ct": 29,
+          "tok_s": 20.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 2182,
+          "median_ct": 35,
+          "tok_s": 14.8,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333,
+          "median_latency_ms": 3194,
+          "median_ct": 63,
+          "tok_s": 19.4,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 21970,
+          "median_ct": 729,
+          "tok_s": 33.2,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 57,
+        "total": 75,
+        "rate": 0.76
+      },
+      "cost": {
+        "tok_s": 20.6,
+        "median_latency_ms": 2688,
+        "total_completion_tokens": 7548,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-12T20:55:40Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

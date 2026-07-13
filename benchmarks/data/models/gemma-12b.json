@@ -1,0 +1,70 @@
+{
+  "model_key": "gemma-12b",
+  "model": "Gemma 12B",
+  "family": "gemma4",
+  "size": "12B",
+  "configs": [
+    {
+      "model_id": "google/gemma-4-12b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667,
+          "median_latency_ms": 972,
+          "median_ct": 32,
+          "tok_s": 33.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 25,
+          "total": 25,
+          "rate": 1.0,
+          "median_latency_ms": 960,
+          "median_ct": 30,
+          "tok_s": 27.4,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 1916,
+          "median_ct": 54,
+          "tok_s": 29.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 26627,
+          "median_ct": 1129,
+          "tok_s": 42.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 66,
+        "total": 75,
+        "rate": 0.88
+      },
+      "cost": {
+        "tok_s": 33.6,
+        "median_latency_ms": 1444,
+        "total_completion_tokens": 9275,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-30T18:00:18Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

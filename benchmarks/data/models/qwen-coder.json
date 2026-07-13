@@ -1,0 +1,70 @@
+{
+  "model_key": "qwen-coder",
+  "model": "Qwen3 Coder Next",
+  "family": "qwen3.6",
+  "size": null,
+  "configs": [
+    {
+      "model_id": "qwen3-coder-next",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667,
+          "median_latency_ms": 736,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 23,
+          "total": 25,
+          "rate": 0.92,
+          "median_latency_ms": 1162,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 1700,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 16586,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 62,
+        "total": 75,
+        "rate": 0.8267
+      },
+      "cost": {
+        "tok_s": 0.0,
+        "median_latency_ms": 1431,
+        "total_completion_tokens": 0,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-20T06:39:11Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

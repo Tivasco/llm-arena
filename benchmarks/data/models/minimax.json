@@ -1,0 +1,131 @@
+{
+  "model_key": "minimax",
+  "model": "MiniMax M2.7",
+  "family": "minimax-m2",
+  "size": null,
+  "configs": [
+    {
+      "model_id": "minimax/minimax-m2.7",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": "q6"
+      },
+      "label": "off\u00b7t0\u00b7q6",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 10981,
+          "median_ct": 309,
+          "tok_s": 27.9,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 23,
+          "total": 25,
+          "rate": 0.92,
+          "median_latency_ms": 4756,
+          "median_ct": 91,
+          "tok_s": 22.3,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 8582,
+          "median_ct": 201,
+          "tok_s": 22.6,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 778872,
+          "median_ct": 14148,
+          "tok_s": 18.2,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 27.9,
+        "median_latency_ms": 9782,
+        "total_completion_tokens": 86739,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-07-04T13:42:54Z"
+    },
+    {
+      "model_id": "minimax/minimax-m2.7",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 25,
+          "total": 30,
+          "rate": 0.8333,
+          "median_latency_ms": 1074,
+          "median_ct": 26,
+          "tok_s": 29.7,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 1418,
+          "median_ct": 47,
+          "tok_s": 35.7,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 11,
+          "total": 15,
+          "rate": 0.7333,
+          "median_latency_ms": 2633,
+          "median_ct": 93,
+          "tok_s": 30.6,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 105376,
+          "median_ct": 4342,
+          "tok_s": 41.2,
+          "trunc": 1
+        }
+      },
+      "overall": {
+        "pass": 60,
+        "total": 75,
+        "rate": 0.8
+      },
+      "cost": {
+        "tok_s": 29.7,
+        "median_latency_ms": 2026,
+        "total_completion_tokens": 110752,
+        "truncation": 1,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-30T14:44:01Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

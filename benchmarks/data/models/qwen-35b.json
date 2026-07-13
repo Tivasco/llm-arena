@@ -1,0 +1,70 @@
+{
+  "model_key": "qwen-35b",
+  "model": "Qwen 35B-A3B",
+  "family": "qwen3.6 MoE",
+  "size": "35B-A3B",
+  "configs": [
+    {
+      "model_id": "qwen/qwen3.6-35b-a3b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 513,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 718,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 1379,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0,
+          "median_latency_ms": 16806,
+          "median_ct": 0,
+          "tok_s": 0.0,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 66,
+        "total": 75,
+        "rate": 0.88
+      },
+      "cost": {
+        "tok_s": 0.0,
+        "median_latency_ms": 1048,
+        "total_completion_tokens": 0,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-06-20T06:35:31Z"
+    }
+  ],
+  "generated_at": "2026-07-13T12:00:00Z"
+}

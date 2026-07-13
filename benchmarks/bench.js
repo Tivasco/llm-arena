@@ -19,10 +19,7 @@ function el(tag, attrs = {}, ...kids) {
   for (const kid of kids) if (kid != null) n.append(kid.nodeType ? kid : document.createTextNode(kid));
   return n;
 }
-// Makes a non-button element keyboard-operable as a button: adds role/tabindex,
-// the click handler, and Enter/Space activation. `extra` merges extra attrs
-// (e.g. aria-haspopup, aria-label). Used for the table cells / accordion heads
-// that must stay <td>/<div> for layout but need to be real controls (WCAG 2.1.1 / 4.1.2).
+// Makes a non-button element keyboard-operable as a button (WCAG 2.1.1 / 4.1.2).
 function activatable(handler, extra = {}) {
   return {
     role: "button", tabindex: "0",
@@ -36,41 +33,48 @@ function verdictClass(rate, buckets) {
   if (rate >= buckets.supervise) return "v-warn";
   return "v-stop";
 }
+// cost formatters
+function fmtMs(ms) { if (ms == null) return "—"; return ms >= 1000 ? (ms / 1000).toFixed(ms >= 10000 ? 0 : 1) + "s" : Math.round(ms) + "ms"; }
+function fmtToks(t) { if (t == null) return "—"; return t >= 1000 ? (t / 1000).toFixed(1) + "k" : String(t); }
+function fmtTps(x) { return (x == null || x === 0) ? "—" : x.toFixed(0); }
 
-let BOARD = null, sortTier = "overall";
+let LB = null, sortTier = "overall";
 
 function leaderboardRows() {
-  const rows = [...BOARD.rows];
+  const rows = [...LB.rows];
   rows.sort((a, b) => {
-    const ra = sortTier === "overall" ? a.overall.rate : (a.scores[sortTier]?.rate ?? -1);
-    const rb = sortTier === "overall" ? b.overall.rate : (b.scores[sortTier]?.rate ?? -1);
+    const ra = sortTier === "overall" ? a.best.overall.rate : (a.best.scores[sortTier]?.rate ?? -1);
+    const rb = sortTier === "overall" ? b.best.overall.rate : (b.best.scores[sortTier]?.rate ?? -1);
     return rb - ra;
   });
   return rows;
 }
 function renderLeaderboard() {
-  const b = BOARD;
+  const b = LB;
   const sortBy = (id) => activatable(() => { sortTier = id; mountLeaderboard(); }, { "aria-label": `Sort by ${id}` });
   const head = el("tr", {},
     el("th", { class: "lb-model", ...sortBy("overall") }, "Model"),
     ...b.tiers.map(t => el("th", { class: "lb-tier", title: t.job, ...sortBy(t.id) },
       el("div", { class: "lb-tier-label" }, t.label), el("div", { class: "lb-tier-job" }, t.job))),
-    el("th", { ...sortBy("overall") }, "Overall"));
-  const body = leaderboardRows().map(row => el("tr", {},
-    el("td", { class: "lb-model", ...activatable(() => openCard(row.model, row.variant),
-        { "aria-haspopup": "dialog", "aria-label": `Model card: ${row.label}` }) },
-      el("div", {}, row.label),
-      el("div", { class: "lb-sub" }, [row.family, row.size].filter(Boolean).join(" · "))),
-    ...b.tiers.map(t => {
-      const c = row.scores[t.id];
-      if (!c) return el("td", { class: "lb-cell v-none" }, "—");
-      return el("td", { class: `lb-cell ${verdictClass(c.rate, b.verdict_buckets)}${c.borderline ? " lb-borderline" : ""}`,
-        title: `${c.pass}/${c.total} passed${c.borderline ? " · borderline" : ""}`,
-        ...activatable(() => openDrill(row, t),
-          { "aria-haspopup": "dialog", "aria-label": `${row.label} ${t.label}: ${c.pass} of ${c.total} passed — open details` }) },
-        `${c.pass}/${c.total}`);
-    }),
-    el("td", { class: "lb-cell lb-overall" }, `${row.overall.pass}/${row.overall.total}`)));
+    el("th", { ...sortBy("overall") }, "Overall"),
+    el("th", { class: "lb-cfg-h" }, "Best config"),
+    el("th", { class: "lb-tps-h", title: "tokens ÷ end-to-end latency (throughput, not decode speed)" }, "tok/s"));
+  const body = leaderboardRows().map(row => {
+    const bc = row.best;
+    return el("tr", { class: "lb-row", ...activatable(() => openModel(row),
+        { "aria-haspopup": "dialog", "aria-label": `${row.model}: ${row.n_configs} configs — open detail` }) },
+      el("td", { class: "lb-model" },
+        el("div", {}, row.model),
+        el("div", { class: "lb-sub" }, [row.family, row.size].filter(Boolean).join(" · ") + ` · ${row.n_configs} config${row.n_configs === 1 ? "" : "s"}`)),
+      ...b.tiers.map(t => {
+        const c = bc.scores[t.id];
+        if (!c) return el("td", { class: "lb-cell v-none" }, "—");
+        return el("td", { class: `lb-cell ${verdictClass(c.rate, b.verdict_buckets)}`, title: `${c.pass}/${c.total} passed` }, `${c.pass}/${c.total}`);
+      }),
+      el("td", { class: "lb-cell lb-overall" }, `${bc.overall.pass}/${bc.overall.total}`),
+      el("td", { class: "lb-cfg" }, el("span", { class: `cfg-chip cfg-${bc.config.reasoning}` }, bc.label)),
+      el("td", { class: "lb-cell lb-tps" }, fmtTps(bc.cost.tok_s)));
+  });
   return el("table", { class: "table lb" }, el("thead", {}, head), el("tbody", {}, ...body));
 }
 function mountLeaderboard() {
@@ -80,8 +84,9 @@ function mountLeaderboard() {
     el("div", { class: "lb-legend" },
       el("span", { class: "chip v-go" }, "automate ≥85%"),
       el("span", { class: "chip v-warn" }, "supervise 60–84%"),
-      el("span", { class: "chip v-stop" }, "escalate <60%")),
-    renderLeaderboard());
+      el("span", { class: "chip v-stop" }, "escalate <60%"),
+      el("span", { class: "lb-note" }, "each model at its best single config · click a row for every config")),
+    el("div", { class: "lb-scroll" }, renderLeaderboard()));
 }
 
 const TABS = [
@@ -133,63 +138,47 @@ function openPanel(title, body) {
   document.addEventListener("keydown", _panelKeydown);
   closeBtn.focus();
 }
-function itemRow(it) {
-  const failed = it.pass === false;
-  const head = el("div", { class: `di-head ${failed ? "di-fail" : "di-pass"}`, "aria-expanded": failed ? "true" : "false",
-    ...activatable((e) => {
-      const body = e.currentTarget.nextElementSibling;
-      const show = body.style.display === "none";
-      body.style.display = show ? "" : "none";
-      e.currentTarget.setAttribute("aria-expanded", show ? "true" : "false");
-    }) },
-    el("span", { class: `chip ${failed ? "v-stop" : "v-go"}` }, failed ? "FAIL" : "pass"),
-    el("span", { class: "di-id" }, it.id),
-    el("span", { class: "di-meta" }, [it.category, it.difficulty != null ? "L" + it.difficulty : null].filter(Boolean).join(" · ")));
-  const failedChecks = (it.checks || []).filter(c => c.passed === false);
-  const body = el("div", { class: "di-body", style: failed ? "" : "display:none" },
-    el("div", { class: "di-prompt" }, el("b", {}, "prompt "), it.prompt),
-    el("div", { class: "di-output" }, el("b", {}, "output "), it.output),
-    failedChecks.length ? el("div", { class: "di-checks" }, el("b", {}, "failed "),
-      ...failedChecks.map(c => el("span", { class: "chip v-stop", title: c.detail || "" }, c.name))) : null);
-  return el("div", { class: "di-item" }, head, body);
+
+// Model detail: every config (reasoning × temp × quant) with per-tier scores + cost.
+async function openModel(row) {
+  let m;
+  try { m = await fetchJSON("data/" + row.detail); }
+  catch (e) { openPanel(row.model, el("p", {}, "Could not load detail: " + e.message)); return; }
+  const tiers = LB.tiers;
+  const head = el("tr", {},
+    el("th", { class: "cm-cfg" }, "Config"),
+    ...tiers.map(t => el("th", { title: t.job }, t.label)),
+    el("th", {}, "Overall"),
+    el("th", { title: "tokens ÷ end-to-end latency" }, "tok/s"),
+    el("th", { title: "median item latency" }, "time"),
+    el("th", { title: "total completion tokens over 75 items" }, "tokens"),
+    el("th", { title: "truncated items" }, "trunc"));
+  const rows = m.configs.map((c, i) => {
+    const best = i === 0;
+    return el("tr", { class: best ? "cm-best" : "" },
+      el("td", { class: "cm-cfg" },
+        el("span", { class: `cfg-chip cfg-${c.config.reasoning}` }, c.label),
+        best ? el("span", { class: "cm-bestflag" }, "BEST") : null),
+      ...tiers.map(t => {
+        const s = c.scores[t.id];
+        return s ? el("td", { class: `lb-cell ${verdictClass(s.rate, LB.verdict_buckets)}` }, `${s.pass}/${s.total}`)
+                 : el("td", { class: "lb-cell v-none" }, "—");
+      }),
+      el("td", { class: "lb-cell lb-overall" }, `${c.overall.pass}/${c.overall.total}`),
+      el("td", { class: "cm-cost" }, fmtTps(c.cost.tok_s)),
+      el("td", { class: "cm-cost" }, fmtMs(c.cost.median_latency_ms)),
+      el("td", { class: "cm-cost" }, fmtToks(c.cost.total_completion_tokens)),
+      el("td", { class: "cm-cost" }, String(c.cost.truncation || 0)));
+  });
+  const table = el("div", { class: "cm-scroll" },
+    el("table", { class: "table cm" }, el("thead", {}, head), el("tbody", {}, ...rows)));
+  openPanel(m.model, el("div", { class: "mc" },
+    el("p", { class: "mc-fam" }, [m.family, m.size].filter(Boolean).join(" · ") + ` · ${m.configs.length} configs tested`),
+    table,
+    el("p", { class: "cm-caveat" },
+      "tok/s is end-to-end throughput (tokens ÷ total call latency), not decode speed — short reasoning-off answers read low because a fixed prefill+network cost dominates. time = median item latency; tokens = total completion (reasoning + answer) over 75 items.")));
 }
-async function openDrill(row, tier) {
-  const title = `${row.label} · ${tier.job}`;
-  try {
-    const d = await fetchJSON("data/" + row.scores[tier.id].detail);
-    const nFail = d.items.filter(i => i.pass === false).length;
-    openPanel(title, el("div", {},
-      el("p", { class: "di-summary" }, `${d.items.length - nFail}/${d.items.length} passed — ${nFail} failure${nFail === 1 ? "" : "s"} shown expanded`),
-      ...d.items.slice().sort((a, b) => (a.pass === b.pass ? 0 : a.pass ? 1 : -1)).map(itemRow)));
-  } catch (e) {
-    openPanel(title, el("p", {}, "Could not load detail: " + e.message));
-  }
-}
-let MODELS = null;
-async function openCard(model, variant) {
-  if (!MODELS) MODELS = await fetchJSON("data/models.json");
-  const m = MODELS.models.find(x => x.id === model.replace(/\//g, "-") && x.variant === variant)
-        || MODELS.models.find(x => x.lmstudio_id === model && x.variant === variant);
-  if (!m) { openPanel(model, el("p", {}, "No card for this model.")); return; }
-  const spec = m.quantization
-    ? el("div", { class: "mc-specs" },
-        ...[["publisher", m.publisher], ["arch", m.arch], ["quant", m.quantization], ["format", m.format],
-            ["context", m.max_context_length], ["modality", m.modality],
-            ["capabilities", (m.capabilities || []).join(", ")]]
-          .filter(([, v]) => v != null && v !== "")
-          .map(([k, v]) => el("div", { class: "mc-spec" }, el("span", { class: "mc-k" }, k), el("span", {}, String(v)))))
-    : el("p", { class: "mc-nospec" }, "run-derived only (no LM Studio match)");
-  const st = m.stats || {};
-  openPanel(`${m.label}`, el("div", { class: "mc" },
-    el("p", { class: "mc-fam" }, [m.family, m.size].filter(Boolean).join(" · ")),
-    spec,
-    el("div", { class: "mc-stats" },
-      el("span", {}, `median ${st.median_latency_ms} ms`),
-      el("span", {}, `${st.n_calls} calls`),
-      el("span", {}, `truncation ${Math.round((st.truncation_rate || 0) * (st.n_calls || 0))}/${st.n_calls || 0}`),
-      el("span", {}, `errors ${Math.round((st.error_rate || 0) * (st.n_calls || 0))}/${st.n_calls || 0}`)),
-    el("p", { class: "mc-lastrun", style: "color:var(--text-muted)" }, `last run ${m.last_run}`)));
-}
+
 let EXRES = null;
 async function mountExercises() {
   const v = document.getElementById("view"); v.innerHTML = "";
@@ -199,7 +188,7 @@ async function mountExercises() {
     const models = EXRES && EXRES.models;
     if (models) {
       v.append(el("div", { class: "panel ex-colkey" },
-        el("span", { class: "ex-colkey-title" }, "Columns — leaderboard order"),
+        el("span", { class: "ex-colkey-title" }, "Columns — leaderboard order (best config)"),
         ...models.map((m, i) => el("span", { class: "ex-colkey-item" }, el("b", {}, String(i + 1)), m.label))));
     }
     for (const ds of ex.datasets) {
@@ -257,13 +246,13 @@ async function mountSetup() {
 
 async function boot() {
   try {
-    BOARD = await fetchJSON("data/board.json");
+    LB = await fetchJSON("data/leaderboard.json");
     document.getElementById("board-meta").textContent =
-      `${BOARD.rows.length} model-variant rows · generated ${BOARD.generated_at}`;
+      `${LB.rows.length} models · best-config leaderboard · generated ${LB.generated_at}`;
     renderTabs();
     selectTab("leaderboard");
   } catch (e) {
-    document.getElementById("view").innerHTML = `<p class="panel">Could not load board data: ${e.message}</p>`;
+    document.getElementById("view").innerHTML = `<p class="panel">Could not load leaderboard data: ${e.message}</p>`;
   }
 }
 document.addEventListener("DOMContentLoaded", boot);
