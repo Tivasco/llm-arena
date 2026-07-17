@@ -980,13 +980,40 @@ body.panel-open { overflow: hidden; }
 .build-actions { display: flex; flex-wrap: wrap; gap: var(--space); margin-top: calc(var(--space) * 0.75); }
 .btn--sm { padding: 7px 14px; font-size: 0.8rem; }
 
-.arena-plan {
-  font-family: var(--font-mono); font-size: 0.74rem; line-height: 1.6;
-  white-space: pre-wrap; word-break: break-word; color: var(--text);
+/* Rendered markdown (plan + spec artifacts) — arena.js's safe mini-renderer
+   emits h4-h6 (demoted under the dialog's h3), p, lists, tables, pre/code. */
+.arena-md { display: flex; flex-direction: column; gap: calc(var(--space) * 1.5); font-size: 0.9rem; line-height: 1.6; }
+.arena-md h4, .arena-md h5, .arena-md h6 { line-height: 1.2; letter-spacing: -0.02em; text-wrap: balance; }
+.arena-md h4 { font-size: 1.15rem; font-weight: 700; margin-top: calc(var(--space) * 1.25); }
+.arena-md h5 { font-size: 0.95rem; font-weight: 600; margin-top: var(--space); }
+.arena-md h6 { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
+.arena-md ul, .arena-md ol { padding-left: 1.4em; display: flex; flex-direction: column; gap: calc(var(--space) * 0.75); }
+.arena-md li::marker { color: var(--accent); font-family: var(--font-mono); font-size: 0.85em; }
+.arena-md code {
+  font-family: var(--font-mono); font-size: 0.8em;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 5px;
+}
+.arena-md pre {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: calc(var(--space) * 1.5);
-  overflow: auto;
+  overflow-x: auto;
 }
+.arena-md pre code { background: none; border: 0; padding: 0; font-size: 0.74rem; line-height: 1.55; }
+.arena-md table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.arena-md th {
+  font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
+  text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--hairline);
+}
+.arena-md td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.arena-md blockquote {
+  border-left: 3px solid var(--accent-light);
+  padding-left: calc(var(--space) * 1.75);
+  color: var(--text-muted);
+  display: flex; flex-direction: column; gap: calc(var(--space) * 1.25);
+}
+.arena-md hr { border: 0; border-top: 1px solid var(--border); }
 .arena-asserts {
   margin: 0; padding-left: 1.4em;
   display: flex; flex-direction: column; gap: var(--space);

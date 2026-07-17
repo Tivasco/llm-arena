@@ -41,6 +41,86 @@ function activatable(handler, extra = {}) {
   };
 }
 
+/* ── Minimal safe markdown renderer ──────────────────────────────────────────
+   The plan/spec artifacts are markdown; plans are MODEL OUTPUT, so every
+   character is HTML-escaped before any transform — no raw content ever
+   reaches innerHTML. Covers what the artifacts use: headings, paragraphs,
+   bullet/numbered lists (wrapped lines fold into their item), pipe tables,
+   fenced code, blockquotes, hr, **bold**, *italic*, `code`. Headings are
+   demoted three levels so they nest under the dialog's h3 title.
+   Anything unrecognised degrades to an escaped paragraph, never breaks. */
+function mdEscape(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function mdInline(s) {
+  // Code spans out first (placeholders), so emphasis can pair across them
+  // (e.g. **`code` and text**) without ever transforming code content.
+  const codes = [];
+  let t = s.replace(/`([^`]+)`/g, (_, c) => {
+    codes.push("<code>" + mdEscape(c) + "</code>");
+    return "\u0000" + (codes.length - 1) + "\u0000";
+  });
+  t = mdEscape(t);
+  t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  return t.replace(/\u0000(\d+)\u0000/g, (_, i) => codes[+i]);
+}
+function mdToHtml(md) {
+  const out = [], lines = md.replace(/\r\n/g, "\n").split("\n");
+  const isTable = l => /^\s*\|/.test(l);
+  const blockStart = l => /^(#{1,6}\s|```|\s*\||>\s?)/.test(l) || /^\s*[-*]\s+\S/.test(l) || /^\s*\d+\.\s+\S/.test(l) || /^\s*---+\s*$/.test(l);
+  let i = 0;
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^\s*$/.test(l)) { i++; continue; }
+    if (/^```/.test(l)) {
+      const buf = []; i++;
+      while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+      i++;
+      out.push("<pre><code>" + mdEscape(buf.join("\n")) + "</code></pre>");
+      continue;
+    }
+    const h = /^(#{1,6})\s+(.*)$/.exec(l);
+    if (h) { const n = Math.min(h[1].length + 3, 6); out.push(`<h${n}>` + mdInline(h[2]) + `</h${n}>`); i++; continue; }
+    if (/^\s*---+\s*$/.test(l)) { out.push("<hr>"); i++; continue; }
+    if (/^>\s?/.test(l)) {
+      const buf = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ""));
+      out.push("<blockquote>" + mdToHtml(buf.join("\n")) + "</blockquote>");
+      continue;
+    }
+    if (isTable(l)) {
+      const rows = [];
+      while (i < lines.length && isTable(lines[i])) rows.push(lines[i++]);
+      const cells = r => r.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(c => c.trim());
+      let header = null, body = rows.map(cells);
+      if (rows.length > 1 && /^[\s|:-]+$/.test(rows[1])) { header = body[0]; body = body.slice(2); }
+      let t = "<table>";
+      if (header) t += "<thead><tr>" + header.map(c => "<th>" + mdInline(c) + "</th>").join("") + "</tr></thead>";
+      t += "<tbody>" + body.map(r => "<tr>" + r.map(c => "<td>" + mdInline(c) + "</td>").join("") + "</tr>").join("") + "</tbody></table>";
+      out.push(t);
+      continue;
+    }
+    const ol = /^\s*(\d+)\.\s+(.*)$/.exec(l), ul = ol ? null : /^\s*[-*]\s+(.*)$/.exec(l);
+    if (ol || ul) {
+      const re = ol ? /^\s*\d+\.\s+(.*)$/ : /^\s*[-*]\s+(.*)$/;
+      const items = [];
+      while (i < lines.length) {
+        const m = re.exec(lines[i]);
+        if (m) { items.push(m[1]); i++; }
+        else if (/^\s+\S/.test(lines[i]) && !blockStart(lines[i])) { items[items.length - 1] += " " + lines[i].trim(); i++; }
+        else break;
+      }
+      const start = ol && ol[1] !== "1" ? ` start="${ol[1]}"` : "";
+      out.push((ol ? `<ol${start}>` : "<ul>") + items.map(t => "<li>" + mdInline(t) + "</li>").join("") + (ol ? "</ol>" : "</ul>"));
+      continue;
+    }
+    const buf = [l]; i++;
+    while (i < lines.length && !/^\s*$/.test(lines[i]) && !blockStart(lines[i])) buf.push(lines[i++]);
+    out.push("<p>" + mdInline(buf.join(" ")) + "</p>");
+  }
+  return out.join("\n");
+}
+function mdBlock(text) { return el("div", { class: "arena-md", html: mdToHtml(text) }); }
+
 /* ── Overlay panel (same contract as benchmarks/bench.js) ────────────────── */
 let _panelKeydown = null, _lastFocus = null;
 function closePanel() {
@@ -96,7 +176,7 @@ async function openPlan(b) {
   catch (e) { openPanel(b.model, el("p", {}, "Could not load the plan: " + e.message)); return; }
   openPanel(`${b.model} — the plan`, el("div", { class: "mc" },
     el("p", { class: "di-summary" }, "The plan round's artifact — written from the spec alone, before any code. The build round got the spec plus this."),
-    el("pre", { class: "arena-plan" }, text)));
+    mdBlock(text)));
 }
 
 async function openSpec(ch) {
@@ -105,7 +185,7 @@ async function openSpec(ch) {
   catch (e) { openPanel(ch.title, el("p", {}, "Could not load the spec: " + e.message)); return; }
   openPanel(`${ch.title} — the brief`, el("div", { class: "mc" },
     el("p", { class: "di-summary" }, "The challenge spec, verbatim — the only brief every model saw. Each plan and build was produced from this alone."),
-    el("pre", { class: "arena-plan" }, text)));
+    mdBlock(text)));
 }
 
 function openAssertions(ch) {
