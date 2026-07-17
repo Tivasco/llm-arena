@@ -257,6 +257,8 @@ def arena_page():
     except ValueError as e:
         return problems + [f"arena/data/arena.json: invalid JSON ({e})"]
     for ch in m.get("challenges", []):
+        if not (ROOT / "arena" / "data" / ch["id"] / "challenge.md").exists():
+            problems.append(f"arena/data/{ch['id']}/challenge.md missing (the spec exhibit)")
         for b in ch.get("builds", []):
             d = ROOT / "arena" / "data" / b["dir"]
             for f in ("index.html", "plan.md", "card.json"):

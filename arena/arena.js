@@ -99,6 +99,15 @@ async function openPlan(b) {
     el("pre", { class: "arena-plan" }, text)));
 }
 
+async function openSpec(ch) {
+  let text;
+  try { text = await fetchText(`data/${ch.id}/challenge.md`); }
+  catch (e) { openPanel(ch.title, el("p", {}, "Could not load the spec: " + e.message)); return; }
+  openPanel(`${ch.title} — the brief`, el("div", { class: "mc" },
+    el("p", { class: "di-summary" }, "The challenge spec, verbatim — the only brief every model saw. Each plan and build was produced from this alone."),
+    el("pre", { class: "arena-plan" }, text)));
+}
+
 function openAssertions(ch) {
   openPanel(`${ch.title} — what scoring will verify`, el("div", { class: "mc" },
     el("ol", { class: "arena-asserts" }, ...ch.functional.map(a => el("li", {}, a))),
@@ -137,6 +146,9 @@ function renderChallenge(ch) {
     el("h2", {}, ch.title),
     el("p", { class: "arena-brief" }, ch.brief),
     el("div", { class: "arena-rubric" },
+      el("span", { class: "chip chip--accent", "aria-haspopup": "dialog",
+        ...activatable(() => openSpec(ch), { "aria-label": `${ch.title}: read the full challenge spec` }) },
+        "the full spec →"),
       el("span", { class: "chip chip--accent", "aria-haspopup": "dialog",
         ...activatable(() => openAssertions(ch), { "aria-label": `${ch.title}: functional assertions` }) },
         `functional ${ch.rubric.functional} · ${ch.functional.length} assertions →`),

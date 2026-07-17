@@ -1,6 +1,6 @@
 {
   "tier": "webdev-v1",
-  "generated_at": "2026-07-17 17:42 UTC",
+  "generated_at": "2026-07-17 17:56 UTC",
   "protocol": "plan \u2192 build, one shot each \u2014 the harness owns the filesystem, the model only produces the output",
   "challenges": [
     {
