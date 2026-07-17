@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora — Notes, Illuminated</title>
+<script>
+(function () {
+  var stored = localStorage.getItem('aurora-theme');
+  if (stored) {
+    document.documentElement.setAttribute('data-theme', stored);
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+</script>
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-start: #f0e6ff;
+  --bg-mid: #dbeafe;
+  --bg-end: #e0f2fe;
+  --text-primary: #1e1b4b;
+  --text-secondary: #4338ca;
+  --text-muted: #6b7280;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-active: #4338ca;
+  --accent-focus: #818cf8;
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-border: rgba(99, 102, 241, 0.2);
+  --countdown-bg: rgba(255, 255, 255, 0.6);
+  --countdown-border: rgba(99, 102, 241, 0.15);
+  --countdown-label: #6366f1;
+  --input-bg: #ffffff;
+  --input-border: #c7d2fe;
+  --input-focus: #6366f1;
+  --error: #dc2626;
+  --error-bg: #fef2f2;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+  --toggle-bg: #e0e7ff;
+  --toggle-knob: #6366f1;
+  --hero-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+  --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.4);
+}
+
+[data-theme="dark"] {
+  --bg-start: #0f0a1e;
+  --bg-mid: #1a0b2e;
+  --bg-end: #0d1b2a;
+  --text-primary: #f1f0ff;
+  --text-secondary: #c4b5fd;
+  --text-muted: #9ca3af;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --accent-active: #b45309;
+  --accent-focus: #fbbf24;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-border: rgba(245, 158, 11, 0.2);
+  --countdown-bg: rgba(255, 255, 255, 0.06);
+  --countdown-border: rgba(245, 158, 11, 0.15);
+  --countdown-label: #fbbf24;
+  --input-bg: rgba(255, 255, 255, 0.07);
+  --input-border: rgba(245, 158, 11, 0.3);
+  --input-focus: #f59e0b;
+  --error: #fca5a5;
+  --error-bg: rgba(239, 68, 68, 0.15);
+  --success: #86efac;
+  --success-bg: rgba(34, 197, 94, 0.15);
+  --toggle-bg: #1e1b4b;
+  --toggle-knob: #f59e0b;
+  --hero-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #fb923c 100%);
+  --focus-ring: 0 0 0 3px rgba(245, 158, 11, 0.4);
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.bg-animation {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, var(--bg-start), var(--bg-mid), var(--bg-end));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bg-animation {
+    background-size: 400% 400%;
+    animation: bgShift 20s ease infinite;
+  }
+}
+
+@keyframes bgShift {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.theme-toggle {
+  background: var(--toggle-bg);
+  border: 2px solid var(--surface-border);
+  border-radius: 999px;
+  width: 52px;
+  height: 30px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.theme-toggle-knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--toggle-knob);
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+}
+
+[data-theme="dark"] .theme-toggle-knob {
+  transform: translateX(22px);
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 140px);
+  padding: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.countdown {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--countdown-bg);
+  border: 1px solid var(--countdown-border);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  min-width: 80px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.value {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+  min-width: 2.5ch;
+  text-align: center;
+  display: block;
+  position: relative;
+}
+
+.unit label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--countdown-label);
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.live-banner {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--success);
+  margin-bottom: 3rem;
+  padding: 1rem 2rem;
+  background: var(--success-bg);
+  border-radius: 16px;
+  border: 2px solid var(--success);
+}
+
+.signup-form {
+  width: 100%;
+  max-width: 480px;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.signup-form input[type="email"] {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  font-size: 1rem;
+  border: 2px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.signup-form input[type="email"]::placeholder {
+  color: var(--text-muted);
+}
+
+.signup-form input[type="email"]:focus-visible {
+  border-color: var(--input-focus);
+  box-shadow: var(--focus-ring);
+}
+
+.signup-form button[type="submit"] {
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.signup-form button[type="submit"]:hover {
+  background: var(--accent-hover);
+}
+
+.signup-form button[type="submit"]:active {
+  background: var(--accent-active);
+  transform: scale(0.97);
+}
+
+.signup-form button[type="submit"]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.signup-form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.form-message {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  min-height: 1.5em;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.form-message.error {
+  color: var(--error);
+  background: var(--error-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.form-message.success {
+  color: var(--success);
+  background: var(--success-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero h1,
+  .subtitle,
+  .countdown,
+  .signup-form {
+    animation: fadeSlideIn 0.8s ease both;
+  }
+  .subtitle { animation-delay: 0.15s; }
+  .countdown { animation-delay: 0.3s; }
+  .signup-form { animation-delay: 0.45s; }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .value.flip {
+    animation: digitFlip 0.35s ease;
+  }
+
+  @keyframes digitFlip {
+    0% { transform: rotateX(0); }
+    50% { transform: rotateX(-90deg); opacity: 0.5; }
+    100% { transform: rotateX(0); opacity: 1; }
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  .countdown {
+    gap: 0.6rem;
+  }
+
+  .unit {
+    padding: 0.75rem 0.5rem;
+    min-width: 65px;
+    border-radius: 12px;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .signup-form button[type="submit"] {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div class="bg-animation" aria-hidden="true"></div>
+
+<header>
+  <span class="logo" aria-hidden="true">Aurora</span>
+  <button class="theme-toggle" aria-label="Toggle theme" id="themeToggle">
+    <span class="theme-toggle-knob" aria-hidden="true">
+      <span class="icon-sun">☀</span>
+      <span class="icon-moon">☾</span>
+    </span>
+  </button>
+</header>
+
+<main>
+  <h1>Notes, illuminated.</h1>
+  <p class="subtitle">A new way to capture ideas that feels as natural as thought itself. Launching soon.</p>
+
+  <section class="countdown" id="countdown" aria-label="Countdown to launch">
+    <div class="unit">
+      <span class="value" id="days" data-prev="">000</span>
+      <label for="days">Days</label>
+    </div>
+    <div class="unit">
+      <span class="value" id="hours" data-prev="">00</span>
+      <label for="hours">Hours</label>
+    </div>
+    <div class="unit">
+      <span class="value" id="minutes" data-prev="">00</span>
+      <label for="minutes">Minutes</label>
+    </div>
+    <div class="unit">
+      <span class="value" id="seconds" data-prev="">00</span>
+      <label for="seconds">Seconds</label>
+    </div>
+  </section>
+
+  <form class="signup-form" id="signupForm" novalidate>
+    <div class="input-group">
+      <input type="email" id="emailInput" placeholder="your@email.com" aria-label="Email address" required autocomplete="email">
+      <button type="submit" id="submitBtn">Notify me</button>
+    </div>
+    <p class="form-message" id="formMessage" aria-live="polite"></p>
+  </form>
+</main>
+
+<footer>
+  <p>&copy; 2026 Aurora. All rights reserved.</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var LAUNCH_DATE = new Date('2026-09-01T09:00:00').getTime();
+
+  var countdownEl = document.getElementById('countdown');
+  var daysEl = document.getElementById('days');
+  var hoursEl = document.getElementById('hours');
+  var minutesEl = document.getElementById('minutes');
+  var secondsEl = document.getElementById('seconds');
+
+  var prevDays = '';
+  var prevHours = '';
+  var prevMinutes = '';
+  var prevSeconds = '';
+
+  var timerId = null;
+
+  function pad(n, len) {
+    return String(n).padStart(len, '0');
+  }
+
+  function flip(el, newVal, prevVal) {
+    if (newVal !== prevVal) {
+      el.classList.remove('flip');
+      void el.offsetWidth;
+      el.classList.add('flip');
+    }
+  }
+
+  function tick() {
+    var now = Date.now();
+    var diff = LAUNCH_DATE - now;
+
+    if (diff <= 0) {
+      clearInterval(timerId);
+      countdownEl.innerHTML = '';
+      var banner = document.createElement('div');
+      banner.className = 'live-banner';
+      banner.textContent = "We're live!";
+      countdownEl.parentNode.insertBefore(banner, countdownEl);
+      countdownEl.style.display = 'none';
+      return;
+    }
+
+    var totalSeconds = Math.floor(diff / 1000);
+    var d = Math.floor(totalSeconds / 86400);
+    var h = Math.floor((totalSeconds % 86400) / 3600);
+    var m = Math.floor((totalSeconds % 3600) / 60);
+    var s = totalSeconds % 60;
+
+    var dStr = String(d);
+    var hStr = pad(h, 2);
+    var mStr = pad(m, 2);
+    var sStr = pad(s, 2);
+
+    flip(daysEl, dStr, prevDays);
+    flip(hoursEl, hStr, prevHours);
+    flip(minutesEl, mStr, prevMinutes);
+    flip(secondsEl, sStr, prevSeconds);
+
+    daysEl.textContent = dStr;
+    hoursEl.textContent = hStr;
+    minutesEl.textContent = mStr;
+    secondsEl.textContent = sStr;
+
+    prevDays = dStr;
+    prevHours = hStr;
+    prevMinutes = mStr;
+    prevSeconds = sStr;
+
+    var msSinceSecond = Date.now() % 1000;
+    var delay = 1000 - msSinceSecond;
+    timerId = setTimeout(tick, delay);
+  }
+
+  var isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (isReducedMotion) {
+    var now0 = Date.now();
+    var diff0 = LAUNCH_DATE - now0;
+    if (diff0 <= 0) {
+      countdownEl.innerHTML = '';
+      var banner0 = document.createElement('div');
+      banner0.className = 'live-banner';
+      banner0.textContent = "We're live!";
+      countdownEl.parentNode.insertBefore(banner0, countdownEl);
+      countdownEl.style.display = 'none';
+    } else {
+      var ts0 = Math.floor(diff0 / 1000);
+      daysEl.textContent = String(Math.floor(ts0 / 86400));
+      hoursEl.textContent = pad(Math.floor((ts0 % 86400) / 3600), 2);
+      minutesEl.textContent = pad(Math.floor((ts0 % 3600) / 60), 2);
+      secondsEl.textContent = pad(ts0 % 60, 2);
+    }
+  } else {
+    tick();
+  }
+
+  var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var signupForm = document.getElementById('signupForm');
+  var emailInput = document.getElementById('emailInput');
+  var submitBtn = document.getElementById('submitBtn');
+  var formMessage = document.getElementById('formMessage');
+  var isSubmitted = false;
+
+  function showMessage(text, type) {
+    formMessage.textContent = text;
+    formMessage.className = 'form-message ' + type;
+  }
+
+  function clearMessage() {
+    formMessage.textContent = '';
+    formMessage.className = 'form-message';
+  }
+
+  function validateEmail(val) {
+    if (!val || !val.trim()) {
+      showMessage('Please enter your email address.', 'error');
+      return false;
+    }
+    if (!emailRegex.test(val.trim())) {
+      showMessage('Please enter a valid email address.', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  var debounceTimer = null;
+  emailInput.addEventListener('input', function () {
+    if (isSubmitted) return;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      var val = emailInput.value;
+      if (val && !val.trim()) {
+        showMessage('Please enter your email address.', 'error');
+      } else if (val && !emailRegex.test(val.trim())) {
+        showMessage('Please enter a valid email address.', 'error');
+      } else if (val && emailRegex.test(val.trim())) {
+        clearMessage();
+      } else {
+        clearMessage();
+      }
+    }, 500);
+  });
+
+  emailInput.addEventListener('blur', function () {
+    if (isSubmitted) return;
+    var val = emailInput.value;
+    if (val && !emailRegex.test(val.trim())) {
+      showMessage('Please enter a valid email address.', 'error');
+    }
+  });
+
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (isSubmitted) {
+      showMessage('You are already on the list!', 'success');
+      return;
+    }
+
+    var val = emailInput.value;
+
+    if (!validateEmail(val)) {
+      emailInput.focus();
+      return;
+    }
+
+    isSubmitted = true;
+    emailInput.value = '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = "You're on the list!";
+    showMessage("You're on the list! We'll notify you at launch.", 'success');
+  });
+
+  var themeToggle = document.getElementById('themeToggle');
+  var iconSun = themeToggle.querySelector('.icon-sun');
+  var iconMoon = themeToggle.querySelector('.icon-moon');
+
+  function updateToggleIcon() {
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') {
+      iconSun.style.display = 'none';
+      iconMoon.style.display = '';
+    } else {
+      iconSun.style.display = '';
+      iconMoon.style.display = 'none';
+    }
+  }
+
+  updateToggleIcon();
+
+  themeToggle.addEventListener('click', function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('aurora-theme', next);
+    updateToggleIcon();
+  });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+    if (!localStorage.getItem('aurora-theme')) {
+      document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      updateToggleIcon();
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -4,42 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arena — llm-arena</title>
-  <link rel="stylesheet" href="../assets/theme.css" />
+  <meta name="description" content="One spec, one shot: full single-file web builds by every local model, side by side." />
+  <link rel="stylesheet" href="../assets/theme.css?v=20260717" />
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <script src="../assets/chrome.js" defer></script>
+  <script src="arena.js?v=20260717" defer></script>
 </head>
 <body>
   <main class="container">
-    <section class="hero">
-      <span class="eyebrow reveal" data-d="1">Pillar 02 · Seen</span>
-      <h1 class="reveal" data-d="2">Arena</h1>
-      <p class="lede reveal" data-d="3">
-        One open-ended prompt, <strong>rendered by every model</strong>. The
-        gallery puts the results side by side so the only variable on screen is
-        the model that built it. Challenges are being staged.
-      </p>
-    </section>
-
-    <div class="section">
-      <span class="eyebrow">Up next</span>
-      <div class="tiles">
-        <div class="tile">
-          <span class="chip">Challenge</span>
-          <h3>Build a landing page</h3>
-          <p>Same brief, every model. Coming soon.</p>
-        </div>
-        <div class="tile">
-          <span class="chip">Challenge</span>
-          <h3>Render a data widget</h3>
-          <p>Same brief, every model. Coming soon.</p>
-        </div>
-        <div class="tile">
-          <span class="chip">Challenge</span>
-          <h3>Design a small game</h3>
-          <p>Same brief, every model. Coming soon.</p>
-        </div>
-      </div>
-    </div>
+    <p class="eyebrow reveal" data-d="1">Pillar 02 · Seen · webdev-v1</p>
+    <h1 class="reveal" data-d="2">Same brief, <em>every model</em>.</h1>
+    <p class="lede reveal" data-d="3">
+      The benchmarks measure what a pure function can check. Here each model ships a
+      <strong>real page</strong>: one spec, a written plan, then a single self-contained
+      <span class="mono">index.html</span> in one shot — no iterating, no retries. Every build
+      below is the model's untouched output, running live. The functional half of the rubric is
+      testable assertions; the craft half you judge with your own eyes.
+    </p>
+    <p id="arena-meta" class="reveal" data-d="4"></p>
+    <section id="gallery"></section>
+    <div id="panel-root"></div>
   </main>
 </body>
 </html>

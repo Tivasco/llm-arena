@@ -12,6 +12,13 @@ def html_files(): return sorted(ROOT.rglob("*.html"))
 def css_files():  return sorted(ROOT.rglob("*.css"))
 def read(p):      return p.read_text(encoding="utf-8")
 
+def is_exhibit(p):
+    """arena/data/ holds model-built pages published verbatim (the exhibits).
+    They are standalone by design — exempt from the site-chrome contract, but
+    still subject to no_cdn/links_resolve/no_root_absolute (their offline
+    contract is part of the eval)."""
+    return p.relative_to(ROOT).as_posix().startswith("arena/data/")
+
 CHECKS = []
 def check(fn):
     CHECKS.append(fn)
@@ -77,6 +84,8 @@ def chrome_contract():
     chrome_rx = re.compile(r'src\s*=\s*["\'](?:\.\./)*assets/chrome\.js(?:\?[^"\']*)?["\']')
     problems = []
     for p in html_files():
+        if is_exhibit(p):
+            continue
         txt = read(p)
         if theme_rx.search(txt) is None:
             problems.append(f"{p.relative_to(ROOT)}: missing theme.css link")
@@ -86,15 +95,15 @@ def chrome_contract():
 
 @check
 def hub_doors():
-    """index.html is a hub linking the Benchmarks pillar door.
-    (The Arena door is temporarily unlinked; the arena/ scaffold still exists.)"""
+    """index.html is a hub linking both pillar doors."""
     idx = ROOT / "index.html"
     if not idx.exists():
         return ["index.html missing"]
     txt = read(idx)
     problems = []
-    if 'href="benchmarks/"' not in txt:
-        problems.append('index.html: missing door href="benchmarks/"')
+    for door in ("benchmarks/", "arena/"):
+        if f'href="{door}"' not in txt:
+            problems.append(f'index.html: missing door href="{door}"')
     if 'class="door"' not in txt:
         problems.append("index.html: no .door cards")
     return problems
@@ -147,10 +156,10 @@ def chrome_nav():
     txt = read(js)
     problems = []
     # (base-relative ref expected in chrome.js, on-disk target it must resolve to)
-    # Arena is temporarily unlinked from the nav (scaffold kept in arena/).
     nav = [
         ("../", ROOT),                                  # brand → site base
         ("../benchmarks/", ROOT / "benchmarks" / "index.html"),
+        ("../arena/", ROOT / "arena" / "index.html"),
         ("../about.html", ROOT / "about.html"),
     ]
     for rel, target in nav:
@@ -227,6 +236,32 @@ def js_external_resource_allowlist():
             if host not in ALLOWED_EXTERNAL_HOSTS:
                 problems.append(f"{p.relative_to(ROOT)}: external resource host {host!r} not in allowlist "
                                 f"{sorted(ALLOWED_EXTERNAL_HOSTS)}")
+    return problems
+
+@check
+def arena_page():
+    """The arena page wires arena.js + has committed gallery data, and every
+    build the manifest lists exists on disk complete (index/plan/card)."""
+    import json
+    problems = []
+    idx = ROOT / "arena" / "index.html"
+    if not idx.exists(): return ["arena/index.html missing"]
+    if 'src="arena.js' not in read(idx): problems.append("arena/index.html: missing arena.js")
+    if not (ROOT / "arena" / "arena.js").exists(): problems.append("arena/arena.js missing")
+    manifest = ROOT / "arena" / "data" / "arena.json"
+    if not manifest.exists():
+        problems.append("arena/data/arena.json missing")
+        return problems
+    try:
+        m = json.loads(read(manifest))
+    except ValueError as e:
+        return problems + [f"arena/data/arena.json: invalid JSON ({e})"]
+    for ch in m.get("challenges", []):
+        for b in ch.get("builds", []):
+            d = ROOT / "arena" / "data" / b["dir"]
+            for f in ("index.html", "plan.md", "card.json"):
+                if not (d / f).exists():
+                    problems.append(f"arena/data/{b['dir']}/{f} missing (listed in manifest)")
     return problems
 
 def main():

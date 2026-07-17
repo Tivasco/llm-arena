@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora — First Light</title>
+    <style>
+        :root {
+            /* Light Theme Palette */
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+            --error-color: #dc2626;
+            --success-color: #16a34a;
+            --glow-color: rgba(79, 70, 229, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Palette */
+            --bg-color: #020617;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #818cf8;
+            --accent-hover: #a5b4fc;
+            --card-bg: #0f172a;
+            --border-color: #1e293b;
+            --input-bg: #1e293b;
+            --error-color: #f87171;
+            --success-color: #4ade80;
+            --glow-color: rgba(129, 140, 248, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        header {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-color), #c084fc);
+            border-radius: 6px;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-color);
+        }
+
+        .theme-toggle:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.04em;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 3vw, 1.25rem);
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Countdown */
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        .countdown-unit {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            border-radius: 1rem;
+            min-width: 100px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-unit::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 20px var(--glow-color);
+            pointer-events: none;
+        }
+
+        .unit-value {
+            display: block;
+            font-family: 'Courier New', Courier, monospace; /* Monospace to prevent jitter */
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .unit-label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .live-state {
+            grid-column: span 4;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            padding: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 1rem;
+        }
+
+        /* Form */
+        .capture-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .submit-btn:focus {
+            outline: 2px solid var(--text-main);
+            outline-offset: 2px;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Validation Messages */
+        .message {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            min-height: 1.25rem;
+            transition: opacity 0.2s;
+            opacity: 0;
+        }
+
+        .message.visible {
+            opacity: 1;
+        }
+
+        .error-msg { color: var(--error-color); }
+        .success-msg { color: var(--success-color); font-weight: 600; }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tick-anim {
+            animation: tick 0.2s ease-out;
+        }
+
+        @keyframes tick {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .countdown {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .live-state {
+                grid-column: span 2;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                Aurora
+            </div>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme">
+                <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg id="moonIcon" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </header>
+
+        <main class="hero">
+            <div class="hero-content">
+                <h1>Capture your thoughts,<br>illuminate your mind.</h1>
+                <p>Aurora is a minimalist note-taking experience designed for clarity and focus. We're polishing the final details before we launch.</p>
+                
+                <div id="countdown" class="countdown">
+                    <div class="countdown-unit">
+                        <span id="days" class="unit-value">00</span>
+                        <span class="unit-label">Days</span>
+                    </div>
+                    <div class="countdown-unit">
+                        <span id="hours" class="unit-value">00</span>
+                        <span class="unit-label">Hours</span>
+                    </div>
+                    <div class="countdown-unit">
+                        <span id="minutes" class="unit-value">00</span>
+                        <span class="unit-label">Minutes</span>
+                    </div>
+                    <div class="countdown-unit">
+                        <span id="seconds" class="unit-value">00</span>
+                        <span class="unit-label">Seconds</span>
+                    </div>
+                </div>
+
+                <form id="emailForm" class="capture-form" novalidate>
+                    <div class="input-group">
+                        <input type="email" id="emailInput" class="email-input" placeholder="Enter your email address" aria-label="Email Address">
+                        <div id="formMessage" class="message"></div>
+                    </div>
+                    <button type="submit" id="submitBtn" class="submit-btn">Notify Me</button>
+                </form>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                &copy; 2026 Aurora Labs. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        /** 
+         * THEME MANAGER
+         */
+        const ThemeManager = {
+            init() {
+                const storedTheme = localStorage.getItem('aurora-theme');
+                const osPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const initialTheme = storedTheme || (osPrefersDark ? 'dark' : 'light');
+                
+                this.setTheme(initialTheme);
+                this.updateIcons(initialTheme);
+            },
+            setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('aurora-theme', theme);
+            },
+            toggle() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                this.setTheme(next);
+                this.updateIcons(next);
+            },
+            updateIcons(theme) {
+                const sun = document.getElementById('sunIcon');
+                const moon = document.getElementById('moonIcon');
+                if (theme === 'dark') {
+                    sun.style.display = 'block';
+                    moon.style.display = 'none';
+                } else {
+                    sun.style.display = 'none';
+                    moon.style.display = 'block';
+                }
+            }
+        };
+
+        /** 
+         * COUNTDOWN TIMER
+         */
+        const CountdownTimer = {
+            targetDate: new Date('2026-09-01T09:00:00').getTime(),
+            elements: {
+                days: document.getElementById('days'),
+                hours: document.getElementById('hours'),
+                minutes: document.getElementById('minutes'),
+                seconds: document.getElementById('seconds'),
+                container: document.getElementById('countdown')
+            },
+            start() {
+                this.update();
+                setInterval(() => this.update(), 1000);
+            },
+            update() {
+                const now = new Date().getTime();
+                const distance = this.targetDate - now;
+
+                if (distance < 0) {
+                    this.renderLiveState();
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                this.updateUnit(this.elements.days, days);
+                this.updateUnit(this.elements.hours, hours);
+                this.updateUnit(this.elements.minutes, minutes);
+                this.updateUnit(this.elements.seconds, seconds);
+            },
+            updateUnit(el, value) {
+                const padded = String(value).padStart(2, '0');
+                if (el.textContent !== padded) {
+                    el.textContent = padded;
+                    el.classList.remove('tick-anim');
+                    void el.offsetWidth; // Trigger reflow
+                    el.classList.add('tick-anim');
+                }
+            },
+            renderLiveState() {
+                this.elements.container.innerHTML = `<div class="live-state">We're live! 🚀</div>`;
+            }
+        };
+
+        /** 
+         * FORM HANDLER
+         */
+        const FormHandler = {
+            form: document.getElementById('emailForm'),
+            input: document.getElementById('emailInput'),
+            btn: document.getElementById('submitBtn'),
+            msg: document.getElementById('formMessage'),
+            isSubmitted: false,
+
+            init() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            },
+            validateEmail(email) {
+                if (!email) return { valid: false, error: 'Please enter an email address.' };
+                // Strict regex to catch foo@ or a@b as requested
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regex.test(email)) {
+                    return { valid: false, error: 'Please enter a valid email address.' };
+                }
+                return { valid: true };
+            },
+            handleSubmit(e) {
+                e.preventDefault();
+                if (this.isSubmitted) return;
+
+                const email = this.input.value.trim();
+                const validation = this.validateEmail(email);
+
+                if (!validation.valid) {
+                    this.showError(validation.error);
+                } else {
+                    this.showSuccess();
+                }
+            },
+            showError(text) {
+                this.msg.textContent = text;
+                this.msg.className = 'message error-msg visible';
+                this.input.style.borderColor = 'var(--error-color)';
+            },
+            showSuccess() {
+                this.isSubmitted = true;
+                this.msg.textContent = "You're on the list! We'll be in touch soon.";
+                this.msg.className = 'message success-msg visible';
+                this.input.style.borderColor = 'var(--success-color)';
+                this.input.disabled = true;
+                this.btn.disabled = true;
+                this.btn.textContent = 'Subscribed';
+            }
+        };
+
+        // Initialize everything on load
+        window.addEventListener('DOMContentLoaded', () => {
+            ThemeManager.init();
+            CountdownTimer.start();
+            FormHandler.init();
+
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                ThemeManager.toggle();
+            });
+        });
+    </script>
+</body>
+</html>

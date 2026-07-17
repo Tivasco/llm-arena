@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora — Notes that dawn with you</title>
+    <style>
+        :root {
+            --bg-light: #ffffff;
+            --fg-light: #1a1a1a;
+            --accent-light: #0066ff;
+            --bg-dark: #0a0a0a;
+            --fg-dark: #e0e0e0;
+            --accent-dark: #3399ff;
+            --success: #28a745;
+            --error: #dc3545;
+            --transition: 0.3s ease;
+        }
+
+       [data-theme="light"] {
+            --bg: var(--bg-light);
+            --fg: var(--fg-light);
+            --accent: var(--accent-light);
+        }
+
+       [data-theme="dark"] {
+            --bg: var(--bg-dark);
+            --fg: var(--fg-dark);
+            --accent: var(--accent-dark);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            transition: background-color var(--transition), color var(--transition);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero {
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-out 0.2s both;
+            opacity: 0;
+        }
+
+        .countdown div {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .countdown .number {
+            font-size: 3rem;
+            font-weight: bold;
+            display: block;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .countdown .label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .countdown.live {
+            justify-content: center;
+            gap: 0;
+        }
+
+        .countdown.live span {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .email-form {
+            background: rgba(0,0,0,0.02);
+            padding: 2rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 1s ease-out 0.4s both;
+            opacity: 0;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .email-form h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .email-form p {
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            background: rgba(0,0,0,0.03);
+            color: var(--fg);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(0,0,0,0.4);
+        }
+
+        .form-group button {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition), transform var(--transition);
+        }
+
+        .form-group button:hover {
+            background-color: rgba(0, 102, 255, 0.85);
+            transform: translateY(-2px);
+        }
+
+        .form-group button:active {
+            transform: translateY(0);
+        }
+
+        .form-group button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .form-message {
+            min-height: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: center;
+            transition: opacity var(--transition);
+        }
+
+        .form-message.success {
+            color: var(--success);
+        }
+
+        .form-message.error {
+            color: var(--error);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 48px;
+            height: 26px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.25rem;
+            transition: background-color var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        .theme-toggle:focus-visible {
+            outline: 2px solid var(--accent);
+        }
+
+        .theme-toggle::before {
+            content: "";
+            width: 22px;
+            height: 22px;
+            background: var(--fg);
+            border-radius: 50%;
+            transition: transform var(--transition);
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(22px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .countdown {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .countdown div {
+                min-width: 50px;
+            }
+            
+            .countdown .number {
+                font-size: 2.2rem;
+            }
+            
+            .email-form {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>Aurora</h1>
+            <p>Notes that dawn with you — launching soon</p>
+        </div>
+
+        <div class="countdown" id="countdown">
+            <div><span class="number" id="days">00</span><span class="label">Days</span></div>
+            <div><span class="number" id="hours">00</span><span class="label">Hours</span></div>
+            <div><span class="number" id="minutes">00</span><span class="label">Minutes</span></div>
+            <div><span class="number" id="seconds">00</span><span class="label">Seconds</span></div>
+        </div>
+
+        <div class="email-form">
+            <h2>Be the first to know</h2>
+            <p>Join our pre-launch list for early access and updates</p>
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                    <div class="form-message" id="formMessage"></div>
+                </div>
+                <button type="submit">Notify Me</button>
+            </form>
+        </div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+
+    <script>
+        // Theme management
+        const themeToggle = document.getElementById('themeToggle');
+        const rootElement = document.documentElement;
+
+        function setTheme(theme) {
+            rootElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) return savedTheme;
+            
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function initTheme() {
+            const theme = getPreferredTheme();
+            setTheme(theme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = rootElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        });
+
+        // Countdown timer
+        const countdownEl = document.getElementById('countdown');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        
+        const launchTime = new Date('2026-09-01T09:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = launchTime - now;
+            
+            if (distance <= 0) {
+                countdownEl.innerHTML = '<span>We\'re live</span>';
+                countdownEl.classList.add('live');
+                clearInterval(countdownInterval);
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            daysEl.textContent = String(days).padStart(2, '0');
+            hoursEl.textContent = String(hours).padStart(2, '0');
+            minutesEl.textContent = String(minutes).padStart(2, '0');
+            secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown(); // Initial call
+
+        // Email form validation
+        const form = document.getElementById('emailForm');
+        const emailInput = document.getElementById('email');
+        const formMessage = document.getElementById('formMessage');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                showMessage('Please enter your email address', 'error');
+                return;
+            }
+            
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Success
+            showMessage('Thanks! You\'re on the list.', 'success');
+            emailInput.value = '';
+            emailInput.blur();
+            
+            // Optional: temporarily disable form to prevent double submission
+            const submitBtn = form.querySelector('button');
+            submitBtn.disabled = true;
+            setTimeout(() => {
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+
+        function showMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type}`;
+            formMessage.style.opacity = '1';
+            
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                formMessage.style.opacity = '0';
+            }, 5000);
+        }
+
+        // Initialize theme on load
+        document.addEventListener('DOMContentLoaded', initTheme);
+    </script>
+</body>
+</html>

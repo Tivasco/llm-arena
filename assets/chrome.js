@@ -33,6 +33,7 @@
       "</a>" +
       '<nav class="site-nav">' +
       '<a href="' + siteUrl("../benchmarks/") + '">Benchmarks</a>' +
+      '<a href="' + siteUrl("../arena/") + '">Arena</a>' +
       '<a href="' + siteUrl("../about.html") + '">About</a>' +
       "</nav>";
     document.body.prepend(header);

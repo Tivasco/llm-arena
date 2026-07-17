@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launch Hero | Elevate Your Vision</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --bg-dark: #0f172a;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --white: #ffffff;
+            --card-bg: #ffffff;
+            --transition: all 0.3s ease;
+            --max-width: 1200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #334155;
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            line-height: 1.1;
+            font-weight: 800;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(139, 92, 246, 0.05);
+        }
+
+        /* Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.7rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent),
+                        radial-gradient(circle at bottom left, rgba(15, 23, 42, 0.8), transparent);
+            background-color: var(--bg-dark);
+            padding: 10rem 0 8rem;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        .hero .cta-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 8rem 0;
+            background: #fcfcfd;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--bg-dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            background: var(--white);
+            border-radius: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 8rem 0;
+            background: var(--bg-dark);
+            color: var(--white);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: #cbd5e1;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 8rem 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .price-card {
+            padding: 3rem 2rem;
+            border-radius: 2rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .price-card.featured {
+            background: var(--white);
+            border: 3px solid var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .price-card h3 { margin-bottom: 1rem; }
+        .price-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+        }
+        .price-value span { font-size: 1rem; color: var(--text-muted); }
+
+        .price-card ul {
+            list-style: none;
+            margin-bottom: 2.5rem;
+            text-align: left;
+        }
+
+        .price-card li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .price-card li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0 2rem;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            header.scrolled .logo { font-size: 1.2rem; }
+            .price-card.featured { transform: scale(1); }
+            .hero h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body >
+
+    <header id="mainHeader">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    🚀 LaunchHero
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                    <li><a href="#pricing" class="nav-link">Pricing</a></li>
+                    <li><a href="#" class="btn btn-primary">Get Started</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 class="reveal">Ship Your Vision Faster</h1>
+            <p class="reveal" style="animation-delay: 0.2s;">The all-in-one platform designed to take your project from "what if" to "it's live." Stop building infrastructure and start building products.</p>
+            <div class="cta-group reveal" style="animation-delay: 0.4s;">
+                <a href="#pricing" class="btn btn-primary">Start Free Trial</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Built for Creators</h2>
+                <p style="color: var(--text-muted)">Everything you need to scale without the headache.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <h3>Instant Deploy</h3>
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Push to production in seconds with our automated CI/CD pipeline. No more manual configuration.</p>
+                </div>
+                <div class="feature-card reveal" style="animation-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3>Secure by Default</h3>
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Enterprise-grade security baked into every layer. We handle the SOC2 compliance for you.</p>
+                </div>
+                <div class="feature-card reveal" style="animation-delay: 0.4s;">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                    </div>
+                    <h3>Global Scale</h3>
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Reach your audience globally with our low-latency edge network distributed across 50+ regions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2 style="color: var(--white)">Loved by Founders</h2>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card reveal">
+                    <p>"LaunchHero completely changed how we ship updates. We went from weekly releases to multiple times a day."</p>
+                    <div class="author">
+                        <div class="avatar"></div>
+                        <div>
+                            <div style="font-weight: bold;">Sarah Jenkins</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">CEO, Streamline</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal" style="animation-delay: 0.2s;">
+                    <p>"The most intuitive developer experience I've seen in years. It just works."</p>
+                    <div class="author">
+                        <div class="avatar" style="background: #ec4899;"></div>
+                        <div>
+                            <div style="font-weight: bold;">Marcus Chen</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">CTO, PixelFlow</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal" style="animation-delay: 0.4s;">
+                    <p>"I saved dozens of hours in setup alone. If you're building a startup, this is your secret weapon."</p>
+                    <div class="author">
+                        <div class="avatar" style="background: #10b981;"></div>
+                        <div>
+                            <div style="font-weight: bold;">Elena Rodriguez</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Founder, Bloom</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Simple Pricing</h2>
+                <p style="color: var(--text-muted)">No hidden fees. No complex contracts.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="price-card reveal">
+                    <h3>Starter</h3>
+                    <div class="price-value">/bin/zsh<span>/mo</span></div>
+                    <ul>
+                        <li>Up to 3 Projects</li>
+                        <li>Community Support</li>
+                        <li>Shared Resources</li>
+                        <li>Basic Analytics</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary">Get Started</a>
+                </div>
+                <div class="price-card featured reveal" style="animation-delay: 0.2s;">
+                    <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">MOST POPULAR</div>
+                    <h3>Pro</h3>
+                    <div class="price-value"><span>/mo</span></div>
+                    <ul>
+                        <li>Unlimited Projects</li>
+                        <li>Priority Support</li>
+                        <li>Dedicated Resources</li>
+                        <li>Advanced Analytics</li>
+                        <li>Custom Domains</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">Start Pro Trial</a>
+                </div>
+                <div class="price-card reveal" style="animation-delay: 0.4s;">
+                    <h3>Enterprise</h3>
+                    <div class="price-value">Custom</div>
+                    <ul>
+                        <li>White-labeling</li>
+                        <li>SLA Guarantee</li>
+                        <li>Dedicated Manager</li>
+                        <li>Custom Integrations</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="#" class="logo" style="color: #64748b;">🚀 LaunchHero</a>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; max-width: 300px;">Empowering the next generation of builders to create incredible things.</p>
+                </div>
+                <div style="display: flex; gap: 2rem; font-weight: 600; color: var(--text-muted);">
+                    <a href="#" style="color: inherit;">Twitter</a>
+                    <a href="#" style="color: inherit;">GitHub</a>
+                    <a href="#" style="color: inherit;">LinkedIn</a>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2026 LaunchHero Inc. All rights reserved. Built with passion for the builders.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * Navigation Controller
+         * Handles scroll effects, sticky header, and active link detection.
+         */
+        const NavController = {
+            init() {
+                const header = document.getElementById('mainHeader');
+                const links = document.querySelectorAll('.nav-link');
+
+                window.addEventListener('scroll', () => {
+                    // Sticky Header Effect
+                    if (window.scrollY > 50) {
+                        header.classList.add('scrolled');
+                    } else {
+                        header.classList.remove('scrolled');
+                    }
+
+                    // Scroll Spy for Navigation Links
+                    let current = "";
+                    const sections = document.querySelectorAll("section");
+                    
+                    sections.forEach((section) => {
+                        const sectionTop = section.offsetTop;
+                        const sectionHeight = section.clientHeight;
+                        if (window.scrollY >= (sectionTop - 150)) {
+                            current = section.getAttribute("id");
+                        }
+                    });
+
+                    links.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').includes(current)) {
+                            link.classList.add('active');
+                        }
+                    });
+                });
+            }
+        };
+
+        /**
+         * Smooth Scroll Utility
+         */
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === "#") return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        /**
+         * Reveal on Scroll
+         * Simple intersection observer to trigger animations
+         */
+        function initReveal() {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        /**
+         * Form / Button Handler
+         */
+        function initHandlers() {
+            const primaryBtns = document.querySelectorAll('.btn-primary');
+            primaryBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (btn.innerText.toLowerCase().includes('get started') || 
+                        btn.innerText.toLowerCase().includes('start')) {
+                        // Mock behavior for CTA
+                        console.log("Redirecting to signup...");
+                        const pricing = document.getElementById('pricing');
+                        pricing.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            NavController.init();
+            initSmoothScroll();
+            initReveal();
+            initHandlers();
+        });
+    </script>
+</body>
+</html>

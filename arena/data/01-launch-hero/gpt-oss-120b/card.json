@@ -1,0 +1,16 @@
+{
+  "model_key": "gpt-oss-120b",
+  "model": "gpt-oss 120B",
+  "family": "gpt-oss",
+  "size": "120B",
+  "board": true,
+  "provider": "globe",
+  "model_id": "globe/gpt-oss:120b",
+  "variant": null,
+  "reasoning": "off",
+  "temperature": 0,
+  "run_id": "001",
+  "created_at": "2026-07-13T15:30:57Z",
+  "opencode_version": "1.17.18",
+  "harness": "opencode plan\u2192build, one shot each"
+}

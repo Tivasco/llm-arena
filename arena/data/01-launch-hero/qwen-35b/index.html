@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora — Coming Soon</title>
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f7f6f3;
+  --bg-secondary: #edecea;
+  --text: #1a1a2e;
+  --text-secondary: #555568;
+  --accent-start: #6c3fa0;
+  --accent-end: #00b4d8;
+  --surface: #ffffff;
+  --border: #d4d3d0;
+  --error: #c0392b;
+  --error-bg: #fdf0ef;
+  --success: #1a8a5c;
+  --success-bg: #eafaf3;
+  --ring: rgba(108, 63, 160, 0.45);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: "SF Mono", "Cascadia Code", "Consolas", "Liberation Mono", monospace;
+  --transition: 0.25s ease;
+}
+
+[data-theme="dark"] {
+  --bg: #0e0e12;
+  --bg-secondary: #18181f;
+  --text: #eaeaf0;
+  --text-secondary: #9999aa;
+  --accent-start: #a78bfa;
+  --accent-end: #38bdf8;
+  --surface: #1a1a24;
+  --border: #2e2e3a;
+  --error: #f87171;
+  --error-bg: #2a1515;
+  --success: #34d399;
+  --success-bg: #132a22;
+  --ring: rgba(167, 139, 250, 0.5);
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  position: relative;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Animated background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(108, 63, 160, 0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 30%, rgba(0, 180, 216, 0.06) 0%, transparent 55%);
+  z-index: -1;
+  animation: bgShift 20s ease-in-out infinite alternate;
+}
+
+[data-theme="dark"] body::before {
+  background: radial-gradient(ellipse at 20% 50%, rgba(167, 139, 250, 0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 30%, rgba(56, 189, 248, 0.05) 0%, transparent 55%);
+}
+
+@keyframes bgShift {
+  0% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0.7; transform: scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+}
+
+/* Theme toggle */
+.theme-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition), background var(--transition), transform 0.15s ease;
+  z-index: 10;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent-start);
+  transform: scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(15deg);
+}
+
+/* Container */
+.container {
+  max-width: 640px;
+  width: 100%;
+  text-align: center;
+  animation: fadeUp 0.8s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero */
+.hero {
+  margin-bottom: 2.5rem;
+}
+
+.brand {
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.75rem;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+.tagline {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 480px;
+  margin: 0 auto;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+
+/* Countdown */
+.countdown-section {
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+
+.countdown-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.5rem, 3vw, 1.25rem);
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+}
+
+.countdown-value {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  transition: transform 0.2s ease;
+}
+
+.countdown-value.pulse {
+  animation: digitPulse 0.3s ease;
+}
+
+@keyframes digitPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.countdown-label-unit {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+.countdown-separator {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 700;
+  color: var(--text-secondary);
+  opacity: 0.3;
+  align-self: center;
+  padding: 0 0.1rem;
+}
+
+/* Live state */
+.live-state {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeUp 0.5s ease both;
+}
+
+/* Signup form */
+.signup-section {
+  animation: fadeUp 0.8s 0.5s ease both;
+}
+
+.signup-section h2 {
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.signup-section p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+.form-row input[type="email"] {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+  min-width: 0;
+}
+
+.form-row input[type="email"]::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.form-row input[type="email"]:focus-visible {
+  outline: none;
+  border-color: var(--accent-start);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.form-row input[type="email"].valid {
+  border-color: var(--success);
+}
+
+.form-row input[type="email"].invalid {
+  border-color: var(--error);
+}
+
+.form-row button {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font);
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  color: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.form-row button:hover {
+  opacity: 0.9;
+}
+
+.form-row button:active {
+  transform: scale(0.97);
+}
+
+.form-row button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.form-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.validation-msg {
+  font-size: 0.85rem;
+  min-height: 1.25em;
+  transition: opacity 0.2s ease;
+}
+
+.validation-msg.error {
+  color: var(--error);
+}
+
+.validation-msg.success {
+  color: var(--success);
+}
+
+/* Success state */
+.signup-success {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: var(--success-bg);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--success);
+  animation: fadeUp 0.4s ease both;
+}
+
+.signup-success.visible {
+  display: flex;
+}
+
+.signup-success .check-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.signup-success .check-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: #fff;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.signup-success h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.signup-success p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Footer */
+footer {
+  margin-top: 3rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  animation: fadeUp 0.8s 0.6s ease both;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  body {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-row button {
+    width: 100%;
+  }
+
+  .countdown-unit {
+    min-width: 52px;
+  }
+
+  .theme-toggle {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding: 3rem 2rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+  <!-- Sun icon (shown in dark mode) -->
+  <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/>
+    <line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+  <!-- Moon icon (shown in light mode) -->
+  <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+</button>
+
+<!-- Main content -->
+<div class="container">
+  <header class="hero">
+    <p class="brand">Aurora</p>
+    <h1>Your thoughts, beautifully organized.</h1>
+    <p class="tagline">A new kind of note-taking app that adapts to the way you think. Launching soon.</p>
+  </header>
+
+  <section class="countdown-section" aria-label="Countdown to launch">
+    <p class="countdown-label">Launching in</p>
+    <div class="countdown" id="countdown">
+      <div class="countdown-unit">
+        <span class="countdown-value" id="cd-days" data-label="days">00</span>
+        <span class="countdown-label-unit">Days</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="cd-hours" data-label="hours">00</span>
+        <span class="countdown-label-unit">Hours</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="cd-minutes" data-label="minutes">00</span>
+        <span class="countdown-label-unit">Minutes</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="cd-seconds" data-label="seconds">00</span>
+        <span class="countdown-label-unit">Seconds</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="signup-section" aria-label="Email signup">
+    <h2>Be the first to know</h2>
+    <p>Join the waitlist and get early access on day one.</p>
+    <div class="form-wrapper" id="form-wrapper">
+      <form class="form-row" id="signup-form" novalidate>
+        <label for="email-input" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email address</label>
+        <input type="email" id="email-input" placeholder="you@example.com" autocomplete="email" required>
+        <button type="submit" id="submit-btn">Join waitlist</button>
+      </form>
+      <p class="validation-msg" id="validation-msg" aria-live="polite"></p>
+    </div>
+    <div class="signup-success" id="signup-success">
+      <div class="check-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>You're on the list!</h3>
+      <p>We'll notify you when Aurora launches.</p>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2026 Aurora. All rights reserved.
+  </footer>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  /* ---- Theme module ---- */
+  function initTheme() {
+    var html = document.documentElement;
+    var toggle = document.querySelector(".theme-toggle");
+    var sunIcon = toggle.querySelector(".icon-sun");
+    var moonIcon = toggle.querySelector(".icon-moon");
+    var stored = localStorage.getItem("aurora-theme");
+    var osDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var theme = stored || (osDark ? "dark" : "light");
+
+    function applyTheme(t) {
+      html.setAttribute("data-theme", t);
+      toggle.setAttribute("aria-pressed", t === "dark" ? "true" : "false");
+      if (t === "dark") {
+        sunIcon.style.display = "";
+        moonIcon.style.display = "none";
+      } else {
+        sunIcon.style.display = "none";
+        moonIcon.style.display = "";
+      }
+    }
+
+    applyTheme(theme);
+
+    toggle.addEventListener("click", function() {
+      var next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      localStorage.setItem("aurora-theme", next);
+      applyTheme(next);
+    });
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(e) {
+      if (!localStorage.getItem("aurora-theme")) {
+        applyTheme(e.matches ? "dark" : "light");
+      }
+    });
+  }
+
+  /* ---- Countdown module ---- */
+  function initCountdown() {
+    var target = new Date("2026-09-01T09:00:00").getTime();
+    var daysEl = document.getElementById("cd-days");
+    var hoursEl = document.getElementById("cd-hours");
+    var minutesEl = document.getElementById("cd-minutes");
+    var secondsEl = document.getElementById("cd-seconds");
+    var countdownSection = document.getElementById("countdown");
+    var countdownLabel = countdownSection.previousElementSibling;
+    var lastTick = { d: -1, h: -1, m: -1, s: -1 };
+    var running = true;
+
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function pulse(el) {
+      el.classList.remove("pulse");
+      void el.offsetWidth;
+      el.classList.add("pulse");
+    }
+
+    function tick() {
+      if (!running) return;
+      var now = Date.now();
+      var diff = target - now;
+
+      if (diff <= 0) {
+        running = false;
+        clearInterval(intervalId);
+        countdownSection.innerHTML = '<span class="live-state">&#128640; We\'re live!</span>';
+        if (countdownLabel) countdownLabel.style.display = "none";
+        return;
+      }
+
+      var totalSec = Math.floor(diff / 1000);
+      var d = Math.floor(totalSec / 86400);
+      var h = Math.floor((totalSec % 86400) / 3600);
+      var m = Math.floor((totalSec % 3600) / 60);
+      var s = totalSec % 60;
+
+      var dStr = String(d);
+      var hStr = pad(h);
+      var mStr = pad(m);
+      var sStr = pad(s);
+
+      if (daysEl.textContent !== dStr) { daysEl.textContent = dStr; pulse(daysEl); }
+      if (hoursEl.textContent !== hStr) { hoursEl.textContent = hStr; pulse(hoursEl); }
+      if (minutesEl.textContent !== mStr) { minutesEl.textContent = mStr; pulse(minutesEl); }
+      if (secondsEl.textContent !== sStr) { secondsEl.textContent = sStr; pulse(secondsEl); }
+    }
+
+    tick();
+    var intervalId = setInterval(tick, 1000);
+  }
+
+  /* ---- Form module ---- */
+  function initForm() {
+    var form = document.getElementById("signup-form");
+    var input = document.getElementById("email-input");
+    var btn = document.getElementById("submit-btn");
+    var msg = document.getElementById("validation-msg");
+    var formWrapper = document.getElementById("form-wrapper");
+    var success = document.getElementById("signup-success");
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var submitted = false;
+    var debounceTimer = null;
+
+    function showError(text) {
+      msg.textContent = text;
+      msg.className = "validation-msg error";
+      input.classList.add("invalid");
+      input.classList.remove("valid");
+    }
+
+    function showInlineValid() {
+      msg.textContent = "";
+      input.classList.remove("invalid");
+      input.classList.add("valid");
+    }
+
+    function showInlineInvalid() {
+      msg.textContent = "";
+      input.classList.remove("valid");
+      input.classList.add("invalid");
+    }
+
+    function clearValidation() {
+      msg.textContent = "";
+      msg.className = "validation-msg";
+      input.classList.remove("valid", "invalid");
+    }
+
+    // Inline validation on input (stretch)
+    input.addEventListener("input", function() {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function() {
+        var val = input.value.trim();
+        if (val === "") {
+          clearValidation();
+        } else if (emailRegex.test(val)) {
+          showInlineValid();
+        } else {
+          showInlineInvalid();
+        }
+      }, 300);
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      if (submitted) return;
+
+      var val = input.value.trim();
+
+      if (val === "") {
+        showError("Please enter your email address.");
+        input.focus();
+        return;
+      }
+
+      if (!emailRegex.test(val)) {
+        showError("Please enter a valid email address.");
+        input.focus();
+        return;
+      }
+
+      submitted = true;
+      formWrapper.style.display = "none";
+      success.classList.add("visible");
+    });
+  }
+
+  /* ---- Init ---- */
+  initTheme();
+  initCountdown();
+  initForm();
+})();
+</script>
+</body>
+</html>

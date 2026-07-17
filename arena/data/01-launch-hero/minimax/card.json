@@ -1,0 +1,16 @@
+{
+  "model_key": "minimax",
+  "model": "MiniMax M2.7",
+  "family": "minimax-m2",
+  "size": null,
+  "board": true,
+  "provider": "globe",
+  "model_id": "globe/minimax-m2.7",
+  "variant": null,
+  "reasoning": "off",
+  "temperature": 0,
+  "run_id": "001",
+  "created_at": "2026-07-14T10:12:05Z",
+  "opencode_version": "1.17.20",
+  "harness": "opencode plan\u2192build, one shot each"
+}

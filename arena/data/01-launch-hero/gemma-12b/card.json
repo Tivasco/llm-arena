@@ -1,0 +1,16 @@
+{
+  "model_key": "gemma-12b",
+  "model": "Gemma 12B",
+  "family": "gemma4",
+  "size": "12B",
+  "board": true,
+  "provider": "globe",
+  "model_id": "globe/gemma4:12b",
+  "variant": null,
+  "reasoning": "off",
+  "temperature": 0,
+  "run_id": "001",
+  "created_at": "2026-07-13T16:10:03Z",
+  "opencode_version": "1.17.18",
+  "harness": "opencode plan\u2192build, one shot each"
+}

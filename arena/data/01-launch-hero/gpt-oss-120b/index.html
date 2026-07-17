@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aurora – Coming Soon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radius: 0.5rem;
+
+    /* Light theme */
+    --bg-light: #e0f7fa;
+    --text-light: #1a1a1a;
+    --accent-light: #00695c;
+    --input-bg-light: #ffffff;
+    --input-border-light: #b0bec5;
+
+    /* Dark theme */
+    --bg-dark: #121212;
+    --text-dark: #e0e0e0;
+    --accent-dark: #80cbc4;
+    --input-bg-dark: #1e1e1e;
+    --input-border-dark: #424242;
+
+    /* Theme vars (set by JS) */
+    --bg: var(--bg-light);
+    --text: var(--text-light);
+    --accent: var(--accent-light);
+    --input-bg: var(--input-bg-light);
+    --input-border: var(--input-border-light);
+  }
+
+  [data-theme="dark"] {
+    --bg: var(--bg-dark);
+    --text: var(--text-dark);
+    --accent: var(--accent-dark);
+    --input-bg: var(--input-bg-dark);
+    --input-border: var(--input-border-dark);
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-stack);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  header {
+    text-align: center;
+    margin-top: 2rem;
+    animation: fadeIn 1s ease-out forwards;
+    opacity: 0;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    margin: 0;
+    color: var(--accent);
+  }
+
+  p.subhead {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    margin-top: 0.5rem;
+    color: var(--text);
+  }
+
+  #theme-toggle {
+    margin-top: 1rem;
+    background: none;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  #theme-toggle:hover,
+  #theme-toggle:focus-visible {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  main {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  #countdown, #live-message {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    animation: slideUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  #countdown.show, #live-message.show { opacity: 1; }
+
+  .unit {
+    background: var(--input-bg);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    min-width: 4rem;
+    text-align: center;
+  }
+  .unit span.value {
+    display: block;
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-weight: bold;
+    color: var(--accent);
+  }
+  .unit span.label {
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  label {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+  input[type="email"] {
+    padding: 0.6rem;
+    border: 2px solid var(--input-border);
+    border-radius: var(--radius);
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  input[type="email"]:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+  }
+  button {
+    padding: 0.6rem;
+    border: none;
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+  }
+  button:hover, button:focus-visible {
+    background: var(--accent);
+    filter: brightness(1.1);
+  }
+
+  .msg {
+    font-size: 0.9rem;
+    min-height: 1.2em;
+  }
+  .msg.error { color: #e53935; }
+  .msg.success { color: #43a047; }
+
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0s !important; transition-duration: 0s !important; }
+  }
+</style>
+</head>
+<body data-theme="" >
+<header>
+  <h1>Aurora</h1>
+  <p class="subhead">Your notes, illuminated. Launching soon.</p>
+  <button id="theme-toggle" aria-label="Toggle light/dark theme">Toggle Theme</button>
+</header>
+<main>
+  <section id="countdown" class="show">
+    <div class="unit" data-unit="days"><span class="value">00</span><span class="label">Days</span></div>
+    <div class="unit" data-unit="hours"><span class="value">00</span><span class="label">Hours</span></div>
+    <div class="unit" data-unit="minutes"><span class="value">00</span><span class="label">Minutes</span></div>
+    <div class="unit" data-unit="seconds"><span class="value">00</span><span class="label">Seconds</span></div>
+  </section>
+  <section id="live-message" class="">
+    <h2>We&#39;re live!</h2>
+  </section>
+  <form id="signup" novalidate>
+    <label for="email-input">Stay updated – enter your email</label>
+    <input type="email" id="email-input" placeholder="you@example.com" required aria-describedby="msg">
+    <button type="submit" id="submit-btn">Notify Me</button>
+    <div id="msg" class="msg" aria-live="polite"></div>
+  </form>
+</main>
+<script>
+(function(){
+  const TARGET = "2026-09-01T09:00:00"; // ISO local time
+  const countdownEl = document.getElementById('countdown');
+  const liveEl = document.getElementById('live-message');
+
+  // ---------- Timer Module ----------
+  const timer = {
+    start(iso){
+      const target = new Date(iso).getTime();
+      function update(){
+        const now = Date.now();
+        let diff = target - now;
+        if(diff <= 0){
+          clearInterval(this.interval);
+          countdownEl.classList.remove('show');
+          liveEl.classList.add('show');
+          return;
+        }
+        const sec = Math.floor(diff/1000)%60;
+        const min = Math.floor(diff/(1000*60))%60;
+        const hrs = Math.floor(diff/(1000*60*60))%24;
+        const days = Math.floor(diff/(1000*60*60*24));
+        this.render({days, hrs, min, sec});
+      }
+      this.interval = setInterval(update, 1000);
+      update();
+    },
+    render({days, hrs, min, sec}){
+      const map = {days, hours:hrs, minutes:min, seconds:sec};
+      for(const [unit,val] of Object.entries(map)){
+        const el = countdownEl.querySelector(`.unit[data-unit="${unit}"] .value`);
+        if(el){
+          el.textContent = unit==='days' ? String(val) : String(val).padStart(2,'0');
+        }
+      }
+    }
+  };
+
+  // ---------- Validation Module ----------
+  const validation = {
+    emailRegex:/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+    handle(form){
+      const input = form.querySelector('#email-input');
+      const msg = form.querySelector('#msg');
+      let submitted = false;
+      form.addEventListener('submit', e=>{
+        e.preventDefault();
+        if(submitted){ return; }
+        const value = input.value.trim();
+        if(!value){
+          msg.textContent='Email is required.'; msg.className='msg error';
+        } else if(!this.emailRegex.test(value)){
+          msg.textContent='Please enter a valid email address.'; msg.className='msg error';
+        } else {
+          msg.textContent='Thanks! You\'re on the list.'; msg.className='msg success';
+          input.value='';
+          input.disabled=true; form.querySelector('#submit-btn').disabled=true;
+          submitted = true;
+        }
+      });
+    }
+  };
+
+  // ---------- Theme Module ----------
+  const theme = {
+    init(){
+      const root = document.body;
+      const stored = localStorage.getItem('theme');
+      if(stored){ root.dataset.theme=stored; }
+      else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.dataset.theme=prefersDark?'dark':'light';
+      }
+      const btn = document.getElementById('theme-toggle');
+      btn.addEventListener('click',()=>{
+        const newTheme = root.dataset.theme==='dark' ? 'light' : 'dark';
+        root.dataset.theme=newTheme;
+        localStorage.setItem('theme',newTheme);
+      });
+    }
+  };
+
+  // ---------- Init ----------
+  timer.start(TARGET);
+  validation.handle(document.getElementById('signup'));
+  theme.init();
+})();
+</script>
+</body>
+</html>
