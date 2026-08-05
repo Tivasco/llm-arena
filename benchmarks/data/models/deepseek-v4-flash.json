@@ -1,0 +1,375 @@
+{
+  "model_key": "deepseek-v4-flash",
+  "model": "DeepSeek V4 Flash",
+  "family": "deepseek4",
+  "size": null,
+  "configs": [
+    {
+      "model_id": "deepseek/deepseek-v4-flash",
+      "config": {
+        "reasoning": "off",
+        "temp": "0.5",
+        "quant": null
+      },
+      "label": "off\u00b7t0.5",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 3844,
+          "median_ct": 25,
+          "tok_s": 6.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 12996,
+          "median_ct": 74,
+          "tok_s": 5.3,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 25913,
+          "median_ct": 152,
+          "tok_s": 6.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 136904,
+          "median_ct": 901,
+          "tok_s": 6.6,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 6.6,
+        "median_latency_ms": 12246,
+        "total_completion_tokens": 10152,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-04T23:30:43Z"
+    },
+    {
+      "model_id": "deepseek/deepseek-v4-flash",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "off\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 28,
+          "total": 30,
+          "rate": 0.9333,
+          "median_latency_ms": 5145,
+          "median_ct": 27,
+          "tok_s": 4.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 23,
+          "total": 25,
+          "rate": 0.92,
+          "median_latency_ms": 14516,
+          "median_ct": 81,
+          "tok_s": 5.4,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 25384,
+          "median_ct": 137,
+          "tok_s": 5.7,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 137168,
+          "median_ct": 901,
+          "tok_s": 6.3,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 66,
+        "total": 75,
+        "rate": 0.88
+      },
+      "cost": {
+        "tok_s": 4.8,
+        "median_latency_ms": 13620,
+        "total_completion_tokens": 9420,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-04T23:03:47Z"
+    },
+    {
+      "model_id": "deepseek/deepseek-v4-flash",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": null
+      },
+      "label": "on\u00b7t0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 29,
+          "total": 30,
+          "rate": 0.9667,
+          "median_latency_ms": 18408,
+          "median_ct": 126,
+          "tok_s": 6.8,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 18751,
+          "median_ct": 112,
+          "tok_s": 6.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 32201,
+          "median_ct": 197,
+          "tok_s": 6.1,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 296785,
+          "median_ct": 1819,
+          "tok_s": 6.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 6.8,
+        "median_latency_ms": 23050,
+        "total_completion_tokens": 19788,
+        "truncation": 0,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-05T00:28:51Z"
+    },
+    {
+      "model_id": "deepseek/deepseek-v4-flash",
+      "config": {
+        "reasoning": "on",
+        "temp": "0.5",
+        "quant": null
+      },
+      "label": "on\u00b7t0.5",
+      "scores": {
+        "formatting-v1": {
+          "pass": 29,
+          "total": 30,
+          "rate": 0.9667,
+          "median_latency_ms": 20526,
+          "median_ct": 138,
+          "tok_s": 6.7,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 16443,
+          "median_ct": 100,
+          "tok_s": 6.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 30320,
+          "median_ct": 175,
+          "tok_s": 6.1,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 356496,
+          "median_ct": 1138,
+          "tok_s": 6.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 6.7,
+        "median_latency_ms": 25792,
+        "total_completion_tokens": 27320,
+        "truncation": 0,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-05T01:40:16Z"
+    },
+    {
+      "model_id": "deepseek/deepseek-v4-flash",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": null
+      },
+      "label": "on\u00b7t1.0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 26,
+          "total": 30,
+          "rate": 0.8667,
+          "median_latency_ms": 27544,
+          "median_ct": 171,
+          "tok_s": 5.1,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 18896,
+          "median_ct": 114,
+          "tok_s": 6.1,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 31956,
+          "median_ct": 194,
+          "tok_s": 6.1,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 3,
+          "total": 5,
+          "rate": 0.6,
+          "median_latency_ms": 292008,
+          "median_ct": 1833,
+          "tok_s": 6.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 64,
+        "total": 75,
+        "rate": 0.8533
+      },
+      "cost": {
+        "tok_s": 5.1,
+        "median_latency_ms": 24922,
+        "total_completion_tokens": 21848,
+        "truncation": 0,
+        "errors": 1,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-05T03:12:00Z"
+    },
+    {
+      "model_id": "deepseek/deepseek-v4-flash",
+      "config": {
+        "reasoning": "off",
+        "temp": "1.0",
+        "quant": null
+      },
+      "label": "off\u00b7t1.0",
+      "scores": {
+        "formatting-v1": {
+          "pass": 25,
+          "total": 30,
+          "rate": 0.8333,
+          "median_latency_ms": 3547,
+          "median_ct": 23,
+          "tok_s": 6.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 14059,
+          "median_ct": 75,
+          "tok_s": 5.4,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 25862,
+          "median_ct": 149,
+          "tok_s": 5.9,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 1,
+          "total": 5,
+          "rate": 0.2,
+          "median_latency_ms": 169892,
+          "median_ct": 1118,
+          "tok_s": 6.5,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 60,
+        "total": 75,
+        "rate": 0.8
+      },
+      "cost": {
+        "tok_s": 6.6,
+        "median_latency_ms": 12524,
+        "total_completion_tokens": 11326,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-04T23:58:13Z"
+    }
+  ],
+  "generated_at": "2026-08-05T03:12:00Z"
+}

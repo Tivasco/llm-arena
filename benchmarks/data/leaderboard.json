@@ -387,6 +387,77 @@
       "detail": "models/minimax.json"
     },
     {
+      "model_key": "deepseek-v4-flash",
+      "model": "DeepSeek V4 Flash",
+      "family": "deepseek4",
+      "size": null,
+      "best": {
+        "label": "off\u00b7t0.5",
+        "config": {
+          "reasoning": "off",
+          "temp": "0.5",
+          "quant": null
+        },
+        "scores": {
+          "formatting-v1": {
+            "pass": 27,
+            "total": 30,
+            "rate": 0.9,
+            "median_latency_ms": 3844,
+            "median_ct": 25,
+            "tok_s": 6.6,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v2": {
+            "pass": 24,
+            "total": 25,
+            "rate": 0.96,
+            "median_latency_ms": 12996,
+            "median_ct": 74,
+            "tok_s": 5.3,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v3": {
+            "pass": 14,
+            "total": 15,
+            "rate": 0.9333,
+            "median_latency_ms": 25913,
+            "median_ct": 152,
+            "tok_s": 6.0,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "coding-v1": {
+            "pass": 2,
+            "total": 5,
+            "rate": 0.4,
+            "median_latency_ms": 136904,
+            "median_ct": 901,
+            "tok_s": 6.6,
+            "trunc": 0,
+            "verdict": "escalate"
+          }
+        },
+        "overall": {
+          "pass": 67,
+          "total": 75,
+          "rate": 0.8933
+        },
+        "cost": {
+          "tok_s": 6.6,
+          "median_latency_ms": 12246,
+          "total_completion_tokens": 10152,
+          "truncation": 0,
+          "errors": 0,
+          "n_items": 75
+        }
+      },
+      "n_configs": 6,
+      "detail": "models/deepseek-v4-flash.json"
+    },
+    {
       "model_key": "gemma-12b",
       "model": "Gemma 12B",
       "family": "gemma4",
@@ -670,5 +741,8 @@
       "n_configs": 1,
       "detail": "models/gemma-e4b.json"
     }
+  ],
+  "notes": [
+    "2026-08-05: the formatting-v1 CSV checkers (csv_2col, csv_count) were corrected to parse RFC4180 quoting; they previously undercounted columns on correctly-quoted output. Rows measured before this date were scored with the older checkers and may be understated by up to 2 items on formatting-v1. DeepSeek V4 Flash is the first row scored with the corrected checkers (+1 on formatting-v1 versus the legacy behaviour)."
   ]
 }

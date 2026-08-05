@@ -87,6 +87,7 @@ function mountLeaderboard() {
       el("span", { class: "chip v-stop" }, "escalate <60%"),
       el("span", { class: "lb-note" }, "each model at its best single config · click a row for every config")),
     el("div", { class: "lb-scroll" }, renderLeaderboard()));
+  for (const note of (LB.notes || [])) v.append(el("p", { class: "cm-caveat" }, note));
 }
 
 const TABS = [
