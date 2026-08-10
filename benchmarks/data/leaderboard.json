@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T12:00:00Z",
+  "generated_at": "2026-08-10T07:24:11Z",
   "tiers": [
     {
       "id": "formatting-v1",
@@ -103,25 +103,25 @@
       "detail": "models/qwen-27b.json"
     },
     {
-      "model_key": "gemma-31b",
-      "model": "Gemma 31B",
+      "model_key": "gemma-12b",
+      "model": "Gemma 12B",
       "family": "gemma4",
-      "size": "31B",
+      "size": "12B",
       "best": {
-        "label": "on\u00b7t0.5",
+        "label": "on\u00b7t0\u00b7mlx-8bit",
         "config": {
           "reasoning": "on",
-          "temp": "0.5",
-          "quant": null
+          "temp": "0",
+          "quant": "mlx-8bit"
         },
         "scores": {
           "formatting-v1": {
-            "pass": 26,
+            "pass": 29,
             "total": 30,
-            "rate": 0.8667,
-            "median_latency_ms": 13068,
-            "median_ct": 248,
-            "tok_s": 19.1,
+            "rate": 0.9667,
+            "median_latency_ms": 6991,
+            "median_ct": 313,
+            "tok_s": 44.4,
             "trunc": 0,
             "verdict": "automate"
           },
@@ -129,31 +129,31 @@
             "pass": 25,
             "total": 25,
             "rate": 1.0,
-            "median_latency_ms": 6916,
-            "median_ct": 119,
-            "tok_s": 17.0,
+            "median_latency_ms": 3761,
+            "median_ct": 128,
+            "tok_s": 0,
             "trunc": 0,
             "verdict": "automate"
           },
           "tooluse-v3": {
-            "pass": 15,
+            "pass": 14,
             "total": 15,
-            "rate": 1.0,
-            "median_latency_ms": 13398,
-            "median_ct": 224,
-            "tok_s": 17.5,
+            "rate": 0.9333,
+            "median_latency_ms": 4902,
+            "median_ct": 186,
+            "tok_s": 0,
             "trunc": 0,
             "verdict": "automate"
           },
           "coding-v1": {
-            "pass": 3,
+            "pass": 1,
             "total": 5,
-            "rate": 0.6,
-            "median_latency_ms": 135963,
-            "median_ct": 2600,
-            "tok_s": 19.1,
+            "rate": 0.2,
+            "median_latency_ms": 167924,
+            "median_ct": 2539,
+            "tok_s": 0,
             "trunc": 0,
-            "verdict": "supervise"
+            "verdict": "escalate"
           }
         },
         "overall": {
@@ -162,16 +162,16 @@
           "rate": 0.92
         },
         "cost": {
-          "tok_s": 19.1,
-          "median_latency_ms": 13233,
-          "total_completion_tokens": 37670,
+          "tok_s": 44.4,
+          "median_latency_ms": 5662,
+          "total_completion_tokens": 43534,
           "truncation": 0,
-          "errors": 0,
+          "errors": 2,
           "n_items": 75
         }
       },
-      "n_configs": 6,
-      "detail": "models/gemma-31b.json"
+      "n_configs": 3,
+      "detail": "models/gemma-12b.json"
     },
     {
       "model_key": "nemotron-120b",
@@ -458,57 +458,57 @@
       "detail": "models/deepseek-v4-flash.json"
     },
     {
-      "model_key": "gemma-12b",
-      "model": "Gemma 12B",
+      "model_key": "gemma-31b",
+      "model": "Gemma 31B",
       "family": "gemma4",
-      "size": "12B",
+      "size": "31B",
       "best": {
-        "label": "off\u00b7t0",
+        "label": "off\u00b7t0\u00b7mlx-6bit",
         "config": {
           "reasoning": "off",
           "temp": "0",
-          "quant": null
+          "quant": "mlx-6bit"
         },
         "scores": {
           "formatting-v1": {
-            "pass": 26,
+            "pass": 25,
             "total": 30,
-            "rate": 0.8667,
-            "median_latency_ms": 972,
-            "median_ct": 32,
-            "tok_s": 33.6,
+            "rate": 0.8333,
+            "median_latency_ms": 1591,
+            "median_ct": 26,
+            "tok_s": 17.6,
             "trunc": 0,
-            "verdict": "automate"
+            "verdict": "supervise"
           },
           "tooluse-v2": {
             "pass": 25,
             "total": 25,
             "rate": 1.0,
-            "median_latency_ms": 960,
+            "median_latency_ms": 2486,
             "median_ct": 30,
-            "tok_s": 27.4,
+            "tok_s": 0,
             "trunc": 0,
             "verdict": "automate"
           },
           "tooluse-v3": {
-            "pass": 14,
+            "pass": 13,
             "total": 15,
-            "rate": 0.9333,
-            "median_latency_ms": 1916,
-            "median_ct": 54,
-            "tok_s": 29.0,
+            "rate": 0.8667,
+            "median_latency_ms": 3337,
+            "median_ct": 51,
+            "tok_s": 0,
             "trunc": 0,
             "verdict": "automate"
           },
           "coding-v1": {
-            "pass": 1,
+            "pass": 3,
             "total": 5,
-            "rate": 0.2,
-            "median_latency_ms": 26627,
-            "median_ct": 1129,
-            "tok_s": 42.4,
+            "rate": 0.6,
+            "median_latency_ms": 36150,
+            "median_ct": 805,
+            "tok_s": 0,
             "trunc": 0,
-            "verdict": "escalate"
+            "verdict": "supervise"
           }
         },
         "overall": {
@@ -517,16 +517,16 @@
           "rate": 0.88
         },
         "cost": {
-          "tok_s": 33.6,
-          "median_latency_ms": 1444,
-          "total_completion_tokens": 9275,
+          "tok_s": 17.6,
+          "median_latency_ms": 2015,
+          "total_completion_tokens": 6865,
           "truncation": 0,
           "errors": 0,
           "n_items": 75
         }
       },
-      "n_configs": 1,
-      "detail": "models/gemma-12b.json"
+      "n_configs": 2,
+      "detail": "models/gemma-31b.json"
     },
     {
       "model_key": "qwen-35b",
@@ -743,6 +743,7 @@
     }
   ],
   "notes": [
-    "2026-08-05: the formatting-v1 CSV checkers (csv_2col, csv_count) were corrected to parse RFC4180 quoting; they previously undercounted columns on correctly-quoted output. Rows measured before this date were scored with the older checkers and may be understated by up to 2 items on formatting-v1. DeepSeek V4 Flash is the first row scored with the corrected checkers (+1 on formatting-v1 versus the legacy behaviour)."
+    "2026-08-05: the formatting-v1 CSV checkers (csv_2col, csv_count) were corrected to parse RFC4180 quoting; they previously undercounted columns on correctly-quoted output. Rows measured before this date were scored with the older checkers and may be understated by up to 2 items on formatting-v1. DeepSeek V4 Flash is the first row scored with the corrected checkers (+1 on formatting-v1 versus the legacy behaviour).",
+    "2026-08-09: both Gemma builds were updated to MLX (12B \u2192 8-bit, new unified arch with a native reasoning toggle; 31B \u2192 6-bit instruct). Configs measured on the retired builds (GGUF Q6 31B including its hub-template thinking config, and the previous 12B build) were removed from the board; their runs remain in Langfuse. The new 31B build has no working thinking mode, so its rows are reasoning-off only; the 12B's \u201con\u201d row uses reasoning_effort=high. All new rows are scored with the corrected CSV checkers."
   ]
 }

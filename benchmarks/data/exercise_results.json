@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T12:00:00Z",
+  "generated_at": "2026-08-10T07:24:11Z",
   "models": [
     {
       "key": "qwen-27b",
@@ -7,7 +7,7 @@
     },
     {
       "key": "gemma-31b",
-      "label": "Gemma 31B \u00b7 on\u00b7t0.5"
+      "label": "Gemma 31B \u00b7 off\u00b7t0\u00b7mlx-6bit"
     },
     {
       "key": "nemotron-120b",
@@ -23,7 +23,7 @@
     },
     {
       "key": "gemma-12b",
-      "label": "Gemma 12B \u00b7 off\u00b7t0"
+      "label": "Gemma 12B \u00b7 on\u00b7t0\u00b7mlx-8bit"
     },
     {
       "key": "qwen-35b",
@@ -57,7 +57,7 @@
         true,
         false,
         true,
-        false,
+        true,
         false,
         false,
         false
@@ -119,7 +119,7 @@
       ],
       "t5-rewrite-question-trap": [
         true,
-        true,
+        false,
         true,
         true,
         true,
@@ -145,7 +145,7 @@
         true,
         true,
         true,
-        false,
+        true,
         true,
         true,
         false
@@ -163,7 +163,7 @@
       ],
       "t4-instruction-at-top": [
         false,
-        false,
+        true,
         false,
         false,
         false,
@@ -174,7 +174,7 @@
       ],
       "t4-banned-words": [
         true,
-        true,
+        false,
         false,
         true,
         true,
@@ -255,7 +255,7 @@
         true,
         true,
         true,
-        false,
+        true,
         false,
         false,
         false
@@ -662,18 +662,18 @@
       ],
       "tooluse-v3:ask-reminder-time": [
         true,
-        true,
-        true,
-        true,
-        true,
         false,
+        true,
+        true,
+        true,
+        true,
         true,
         false,
         true
       ],
       "tooluse-v3:ask-flight-origin": [
         true,
-        true,
+        false,
         true,
         true,
         true,
@@ -732,7 +732,7 @@
         true,
         true,
         true,
-        true,
+        false,
         true,
         true,
         false
@@ -829,7 +829,7 @@
       ],
       "coding-v1:json-parse": [
         true,
-        false,
+        true,
         true,
         true,
         false,
@@ -840,7 +840,7 @@
       ],
       "coding-v1:parse-query": [
         false,
-        true,
+        false,
         false,
         true,
         false,
