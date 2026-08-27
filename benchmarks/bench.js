@@ -114,13 +114,13 @@ function closePanel() {
   if (_lastFocus && typeof _lastFocus.focus === "function") _lastFocus.focus();
   _lastFocus = null;
 }
-function openPanel(title, body) {
+function openPanel(title, body, { wide = false } = {}) {
   if (_panelKeydown) { document.removeEventListener("keydown", _panelKeydown); _panelKeydown = null; }
   _lastFocus = document.activeElement;
   const root = document.getElementById("panel-root");
   root.innerHTML = "";
   const closeBtn = el("button", { class: "btn panel-close", type: "button", "aria-label": "Close", onclick: closePanel }, "✕");
-  const dialog = el("div", { class: "panel bench-panel", role: "dialog", "aria-modal": "true", "aria-labelledby": "bench-panel-title" },
+  const dialog = el("div", { class: `panel bench-panel${wide ? " bench-panel--wide" : ""}`, role: "dialog", "aria-modal": "true", "aria-labelledby": "bench-panel-title" },
     el("div", { class: "panel-head" }, el("h3", { id: "bench-panel-title" }, title), closeBtn),
     el("div", { class: "panel-body" }, body));
   const overlay = el("div", { class: "panel-overlay", onclick: (e) => { if (e.target === overlay) closePanel(); } }, dialog);
@@ -177,7 +177,8 @@ async function openModel(row) {
     el("p", { class: "mc-fam" }, [m.family, m.size].filter(Boolean).join(" · ") + ` · ${m.configs.length} configs tested`),
     table,
     el("p", { class: "cm-caveat" },
-      "tok/s is end-to-end throughput (tokens ÷ total call latency), not decode speed — short reasoning-off answers read low because a fixed prefill+network cost dominates. time = median item latency; tokens = total completion (reasoning + answer) over 75 items.")));
+      "tok/s is end-to-end throughput (tokens ÷ total call latency), not decode speed — short reasoning-off answers read low because a fixed prefill+network cost dominates. time = median item latency; tokens = total completion (reasoning + answer) over 75 items.")),
+    { wide: true });
 }
 
 let EXRES = null;

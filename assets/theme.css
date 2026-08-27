@@ -713,6 +713,13 @@ body.panel-open { overflow: hidden; }
   from { opacity: 0; transform: translateY(14px) scale(0.99); }
   to   { opacity: 1; transform: none; }
 }
+/* Opt-in width for the benchmarks config matrix: a 10-column table that needs
+   ~895px to sit flat, where 720px left it scrolling ~240px sideways.
+   The default stays 720px for arena's prose dialogs (plan / brief / scoring),
+   whose ~654px content area is a ~70-character reading measure -- widening
+   those would hurt them. Below ~1060px viewport this collapses back to a
+   scroll inside .cm-scroll, which is intended. */
+.bench-panel--wide { width: min(980px, 100%); }
 .panel-head {
   flex: none;
   display: flex; align-items: flex-start; justify-content: space-between;
