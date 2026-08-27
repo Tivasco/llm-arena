@@ -1,0 +1,133 @@
+{
+  "model_key": "qwen38-27b-q8",
+  "model": "Qwen 3.8 27B Q8_0",
+  "family": "qwen3.8",
+  "size": "27B",
+  "configs": [
+    {
+      "model_id": "qwen-q8/qwen3.8-27b",
+      "config": {
+        "reasoning": "off",
+        "temp": "0",
+        "quant": "q8"
+      },
+      "label": "off\u00b7t0\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 27,
+          "total": 30,
+          "rate": 0.9,
+          "median_latency_ms": 1345,
+          "median_ct": 24,
+          "tok_s": 17.7,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 3078,
+          "median_ct": 49,
+          "tok_s": 14.7,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 4408,
+          "median_ct": 77,
+          "tok_s": 18.8,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 31614,
+          "median_ct": 897,
+          "tok_s": 28.4,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 17.7,
+        "median_latency_ms": 3743,
+        "total_completion_tokens": 8241,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-18T11:55:22Z",
+      "n_reps": 3
+    },
+    {
+      "model_id": "qwen-q8/qwen3.8-27b",
+      "config": {
+        "reasoning": "on",
+        "temp": "0",
+        "quant": "q8"
+      },
+      "label": "on\u00b7t0\u00b7q8",
+      "scores": {
+        "formatting-v1": {
+          "pass": 30,
+          "total": 30,
+          "rate": 1.0,
+          "median_latency_ms": 4918,
+          "median_ct": 129,
+          "tok_s": 25.7,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 21,
+          "total": 25,
+          "rate": 0.84,
+          "median_latency_ms": 5478,
+          "median_ct": 100,
+          "tok_s": 19.7,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 15,
+          "total": 15,
+          "rate": 1.0,
+          "median_latency_ms": 8423,
+          "median_ct": 183,
+          "tok_s": 22.4,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 0,
+          "total": 5,
+          "rate": 0.0,
+          "median_latency_ms": 317864,
+          "median_ct": 7983,
+          "tok_s": 25.1,
+          "trunc": 5
+        }
+      },
+      "overall": {
+        "pass": 66,
+        "total": 75,
+        "rate": 0.88
+      },
+      "cost": {
+        "tok_s": 25.7,
+        "median_latency_ms": 6950,
+        "total_completion_tokens": 53111,
+        "truncation": 5,
+        "errors": 5,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-18T12:13:22Z",
+      "n_reps": 3
+    }
+  ],
+  "generated_at": "2026-08-27T09:00:53Z"
+}
