@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T09:03:37Z",
+  "generated_at": "2026-08-28T14:11:23Z",
   "tiers": [
     {
       "id": "formatting-v1",
@@ -101,77 +101,6 @@
       },
       "n_configs": 12,
       "detail": "models/qwen-27b.json"
-    },
-    {
-      "model_key": "gemma-12b",
-      "model": "Gemma 12B",
-      "family": "gemma4",
-      "size": "12B",
-      "best": {
-        "label": "on\u00b7t0\u00b7mlx-8bit",
-        "config": {
-          "reasoning": "on",
-          "temp": "0",
-          "quant": "mlx-8bit"
-        },
-        "scores": {
-          "formatting-v1": {
-            "pass": 29,
-            "total": 30,
-            "rate": 0.9667,
-            "median_latency_ms": 6991,
-            "median_ct": 313,
-            "tok_s": 44.4,
-            "trunc": 0,
-            "verdict": "automate"
-          },
-          "tooluse-v2": {
-            "pass": 25,
-            "total": 25,
-            "rate": 1.0,
-            "median_latency_ms": 3761,
-            "median_ct": 128,
-            "tok_s": 0,
-            "trunc": 0,
-            "verdict": "automate"
-          },
-          "tooluse-v3": {
-            "pass": 14,
-            "total": 15,
-            "rate": 0.9333,
-            "median_latency_ms": 4902,
-            "median_ct": 186,
-            "tok_s": 0,
-            "trunc": 0,
-            "verdict": "automate"
-          },
-          "coding-v1": {
-            "pass": 1,
-            "total": 5,
-            "rate": 0.2,
-            "median_latency_ms": 167924,
-            "median_ct": 2539,
-            "tok_s": 0,
-            "trunc": 0,
-            "verdict": "escalate"
-          }
-        },
-        "overall": {
-          "pass": 69,
-          "total": 75,
-          "rate": 0.92
-        },
-        "cost": {
-          "tok_s": 44.4,
-          "median_latency_ms": 5662,
-          "total_completion_tokens": 43534,
-          "truncation": 0,
-          "errors": 2,
-          "n_items": 75
-        }
-      },
-      "n_configs": 3,
-      "detail": "models/gemma-12b.json"
     },
     {
       "model_key": "qwen38-27b",
@@ -316,77 +245,6 @@
       "detail": "models/nemotron-120b.json"
     },
     {
-      "model_key": "gpt-oss-120b",
-      "model": "gpt-oss 120B",
-      "family": "gpt-oss",
-      "size": "120B",
-      "best": {
-        "label": "off\u00b7t0.5\u00b78bit",
-        "config": {
-          "reasoning": "off",
-          "temp": "0.5",
-          "quant": "8bit"
-        },
-        "scores": {
-          "formatting-v1": {
-            "pass": 28,
-            "total": 30,
-            "rate": 0.9333,
-            "median_latency_ms": 1332,
-            "median_ct": 56,
-            "tok_s": 44.6,
-            "trunc": 0,
-            "verdict": "automate"
-          },
-          "tooluse-v2": {
-            "pass": 22,
-            "total": 25,
-            "rate": 0.88,
-            "median_latency_ms": 1467,
-            "median_ct": 53,
-            "tok_s": 38.1,
-            "trunc": 0,
-            "verdict": "automate"
-          },
-          "tooluse-v3": {
-            "pass": 13,
-            "total": 15,
-            "rate": 0.8667,
-            "median_latency_ms": 2518,
-            "median_ct": 92,
-            "tok_s": 37.5,
-            "trunc": 0,
-            "verdict": "automate"
-          },
-          "coding-v1": {
-            "pass": 5,
-            "total": 5,
-            "rate": 1.0,
-            "median_latency_ms": 17622,
-            "median_ct": 1084,
-            "tok_s": 61.5,
-            "trunc": 0,
-            "verdict": "automate"
-          }
-        },
-        "overall": {
-          "pass": 68,
-          "total": 75,
-          "rate": 0.9067
-        },
-        "cost": {
-          "tok_s": 44.6,
-          "median_latency_ms": 1992,
-          "total_completion_tokens": 10886,
-          "truncation": 0,
-          "errors": 0,
-          "n_items": 75
-        }
-      },
-      "n_configs": 8,
-      "detail": "models/gpt-oss-120b.json"
-    },
-    {
       "model_key": "qwen38-27b-mlx",
       "model": "Qwen 3.8 27B MLX 8-bit",
       "family": "qwen3.8",
@@ -458,75 +316,147 @@
       "detail": "models/qwen38-27b-mlx.json"
     },
     {
-      "model_key": "minimax",
-      "model": "MiniMax M2.7",
-      "family": "minimax-m2",
+      "model_key": "qwen38-flash-next",
+      "model": "Qwen 3.8 Flash Next",
+      "family": "qwen3.8 MoE",
       "size": null,
       "best": {
-        "label": "off\u00b7t0\u00b7q6",
+        "config": {
+          "reasoning": "on",
+          "temp": "1.0",
+          "quant": "q4_k_xl"
+        },
+        "label": "on\u00b7t1.0\u00b7q4_k_xl",
+        "scores": {
+          "formatting-v1": {
+            "pass": 29,
+            "total": 30,
+            "rate": 0.9667,
+            "median_latency_ms": 5632,
+            "median_ct": 142,
+            "tok_s": 25.2,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v2": {
+            "pass": 22,
+            "total": 25,
+            "rate": 0.88,
+            "median_latency_ms": 4845,
+            "median_ct": 95,
+            "tok_s": 21.5,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v3": {
+            "pass": 13,
+            "total": 15,
+            "rate": 0.8667,
+            "median_latency_ms": 8779,
+            "median_ct": 185,
+            "tok_s": 21.2,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "coding-v1": {
+            "pass": 4,
+            "total": 5,
+            "rate": 0.8,
+            "median_latency_ms": 98537,
+            "median_ct": 2536,
+            "tok_s": 25.9,
+            "trunc": 0,
+            "verdict": "supervise"
+          }
+        },
+        "overall": {
+          "pass": 68,
+          "total": 75,
+          "rate": 0.9067
+        },
+        "cost": {
+          "tok_s": 25.2,
+          "median_latency_ms": 7206,
+          "total_completion_tokens": 38701,
+          "truncation": 0,
+          "errors": 0,
+          "n_items": 75
+        },
+        "n_reps": 1
+      },
+      "n_configs": 4,
+      "detail": "models/qwen38-flash-next.json"
+    },
+    {
+      "model_key": "gpt-oss-120b",
+      "model": "gpt-oss 120B",
+      "family": "gpt-oss",
+      "size": "120B",
+      "best": {
+        "label": "off\u00b7t0.5\u00b78bit",
         "config": {
           "reasoning": "off",
-          "temp": "0",
-          "quant": "q6"
+          "temp": "0.5",
+          "quant": "8bit"
         },
         "scores": {
           "formatting-v1": {
             "pass": 28,
             "total": 30,
             "rate": 0.9333,
-            "median_latency_ms": 10981,
-            "median_ct": 309,
-            "tok_s": 27.9,
+            "median_latency_ms": 1332,
+            "median_ct": 56,
+            "tok_s": 44.6,
             "trunc": 0,
             "verdict": "automate"
           },
           "tooluse-v2": {
-            "pass": 23,
+            "pass": 22,
             "total": 25,
-            "rate": 0.92,
-            "median_latency_ms": 4756,
-            "median_ct": 91,
-            "tok_s": 22.3,
+            "rate": 0.88,
+            "median_latency_ms": 1467,
+            "median_ct": 53,
+            "tok_s": 38.1,
             "trunc": 0,
             "verdict": "automate"
           },
           "tooluse-v3": {
-            "pass": 14,
+            "pass": 13,
             "total": 15,
-            "rate": 0.9333,
-            "median_latency_ms": 8582,
-            "median_ct": 201,
-            "tok_s": 22.6,
+            "rate": 0.8667,
+            "median_latency_ms": 2518,
+            "median_ct": 92,
+            "tok_s": 37.5,
             "trunc": 0,
             "verdict": "automate"
           },
           "coding-v1": {
-            "pass": 2,
+            "pass": 5,
             "total": 5,
-            "rate": 0.4,
-            "median_latency_ms": 778872,
-            "median_ct": 14148,
-            "tok_s": 18.2,
+            "rate": 1.0,
+            "median_latency_ms": 17622,
+            "median_ct": 1084,
+            "tok_s": 61.5,
             "trunc": 0,
-            "verdict": "escalate"
+            "verdict": "automate"
           }
         },
         "overall": {
-          "pass": 67,
+          "pass": 68,
           "total": 75,
-          "rate": 0.8933
+          "rate": 0.9067
         },
         "cost": {
-          "tok_s": 27.9,
-          "median_latency_ms": 9782,
-          "total_completion_tokens": 86739,
+          "tok_s": 44.6,
+          "median_latency_ms": 1992,
+          "total_completion_tokens": 10886,
           "truncation": 0,
           "errors": 0,
           "n_items": 75
         }
       },
-      "n_configs": 2,
-      "detail": "models/minimax.json"
+      "n_configs": 8,
+      "detail": "models/gpt-oss-120b.json"
     },
     {
       "model_key": "deepseek-v4-flash",
@@ -598,6 +528,77 @@
       },
       "n_configs": 6,
       "detail": "models/deepseek-v4-flash.json"
+    },
+    {
+      "model_key": "minimax",
+      "model": "MiniMax M2.7",
+      "family": "minimax-m2",
+      "size": null,
+      "best": {
+        "label": "off\u00b7t0\u00b7q6",
+        "config": {
+          "reasoning": "off",
+          "temp": "0",
+          "quant": "q6"
+        },
+        "scores": {
+          "formatting-v1": {
+            "pass": 28,
+            "total": 30,
+            "rate": 0.9333,
+            "median_latency_ms": 10981,
+            "median_ct": 309,
+            "tok_s": 27.9,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v2": {
+            "pass": 23,
+            "total": 25,
+            "rate": 0.92,
+            "median_latency_ms": 4756,
+            "median_ct": 91,
+            "tok_s": 22.3,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v3": {
+            "pass": 14,
+            "total": 15,
+            "rate": 0.9333,
+            "median_latency_ms": 8582,
+            "median_ct": 201,
+            "tok_s": 22.6,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "coding-v1": {
+            "pass": 2,
+            "total": 5,
+            "rate": 0.4,
+            "median_latency_ms": 778872,
+            "median_ct": 14148,
+            "tok_s": 18.2,
+            "trunc": 0,
+            "verdict": "escalate"
+          }
+        },
+        "overall": {
+          "pass": 67,
+          "total": 75,
+          "rate": 0.8933
+        },
+        "cost": {
+          "tok_s": 27.9,
+          "median_latency_ms": 9782,
+          "total_completion_tokens": 86739,
+          "truncation": 0,
+          "errors": 0,
+          "n_items": 75
+        }
+      },
+      "n_configs": 2,
+      "detail": "models/minimax.json"
     },
     {
       "model_key": "qwen38-27b-q8",
@@ -813,6 +814,78 @@
       "detail": "models/qwen-35b.json"
     },
     {
+      "model_key": "gemma-12b",
+      "model": "Gemma 12B",
+      "family": "gemma4",
+      "size": "12B",
+      "best": {
+        "config": {
+          "reasoning": "on",
+          "temp": "0",
+          "quant": "q4_0-qat"
+        },
+        "label": "on\u00b7t0\u00b7q4_0-qat",
+        "scores": {
+          "formatting-v1": {
+            "pass": 26,
+            "total": 30,
+            "rate": 0.8667,
+            "median_latency_ms": 5245,
+            "median_ct": 304,
+            "tok_s": 59.5,
+            "trunc": 2,
+            "verdict": "automate"
+          },
+          "tooluse-v2": {
+            "pass": 25,
+            "total": 25,
+            "rate": 1.0,
+            "median_latency_ms": 3231,
+            "median_ct": 111,
+            "tok_s": 34.9,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "tooluse-v3": {
+            "pass": 13,
+            "total": 15,
+            "rate": 0.8667,
+            "median_latency_ms": 5668,
+            "median_ct": 195,
+            "tok_s": 35.0,
+            "trunc": 0,
+            "verdict": "automate"
+          },
+          "coding-v1": {
+            "pass": 0,
+            "total": 5,
+            "rate": 0.0,
+            "median_latency_ms": 430438,
+            "median_ct": 16384,
+            "tok_s": 38.1,
+            "trunc": 5,
+            "verdict": "escalate"
+          }
+        },
+        "overall": {
+          "pass": 64,
+          "total": 75,
+          "rate": 0.8533
+        },
+        "cost": {
+          "tok_s": 59.5,
+          "median_latency_ms": 5456,
+          "total_completion_tokens": 135274,
+          "truncation": 7,
+          "errors": 7,
+          "n_items": 75
+        },
+        "n_reps": 1
+      },
+      "n_configs": 2,
+      "detail": "models/gemma-12b.json"
+    },
+    {
       "model_key": "qwen-coder",
       "model": "Qwen3 Coder Next",
       "family": "qwen3.6",
@@ -958,6 +1031,7 @@
   "notes": [
     "2026-08-05: the formatting-v1 CSV checkers (csv_2col, csv_count) were corrected to parse RFC4180 quoting; they previously undercounted columns on correctly-quoted output. Rows measured before this date were scored with the older checkers and may be understated by up to 2 items on formatting-v1. DeepSeek V4 Flash is the first row scored with the corrected checkers (+1 on formatting-v1 versus the legacy behaviour).",
     "2026-08-09: both Gemma builds were updated to MLX (12B \u2192 8-bit, new unified arch with a native reasoning toggle; 31B \u2192 6-bit instruct). Configs measured on the retired builds (GGUF Q6 31B including its hub-template thinking config, and the previous 12B build) were removed from the board; their runs remain in Langfuse. The new 31B build has no working thinking mode, so its rows are reasoning-off only; the 12B's \u201con\u201d row uses reasoning_effort=high. All new rows are scored with the corrected CSV checkers.",
-    "2026-08-27: Qwen 3.8 27B added as three separate entries -- the GGUF Q4_K_M build (qwen38-27b), the GGUF Q8_0 build (qwen38-27b-q8) and the MLX 8-bit build (qwen38-27b-mlx). They are distinct builds on two backends, not quantisations of one row. Qwen 3.8 reports the same LM Studio arch as Qwen 3.6 (qwen35); board identity is now declared per model in publish/model_registry.yaml rather than derived from arch, so 3.8 no longer inherits 3.6's family label. Where a config cell was repeated (the n=3 A/B passes) the published figure is the MEDIAN rep, chosen whole, not the newest or a pool of reps -- so qwen38-27b off-t0 reads 68/75 here against the 69/75 single run reported in docs/results-2026-08-15-qwen38.md. Rows measured before this date are unchanged."
+    "2026-08-27: Qwen 3.8 27B added as three separate entries -- the GGUF Q4_K_M build (qwen38-27b), the GGUF Q8_0 build (qwen38-27b-q8) and the MLX 8-bit build (qwen38-27b-mlx). They are distinct builds on two backends, not quantisations of one row. Qwen 3.8 reports the same LM Studio arch as Qwen 3.6 (qwen35); board identity is now declared per model in publish/model_registry.yaml rather than derived from arch, so 3.8 no longer inherits 3.6's family label. Where a config cell was repeated (the n=3 A/B passes) the published figure is the MEDIAN rep, chosen whole, not the newest or a pool of reps -- so qwen38-27b off-t0 reads 68/75 here against the 69/75 single run reported in docs/results-2026-08-15-qwen38.md. Rows measured before this date are unchanged.",
+    "2026-08-28: Gemma 12B is now the QAT GGUF (Q4_0) that globe serves, re-measured after the 2026-08-28 build cutover; its previous 69/75 was the MLX 8-bit build, which silently ignored top_p/top_k and so was never scored at a valid operating point. Its best config here has 7 truncated (unmeasured) items, 5 of them the whole coding tier, so 64/75 is a lower bound. Qwen 3.8 Flash Next is new."
   ]
 }

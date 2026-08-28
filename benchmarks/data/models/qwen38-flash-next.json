@@ -1,0 +1,257 @@
+{
+  "model_key": "qwen38-flash-next",
+  "model": "Qwen 3.8 Flash Next",
+  "family": "qwen3.8 MoE",
+  "size": null,
+  "configs": [
+    {
+      "model_id": "Qwen3.8-Flash-Next-GGUF",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": "q4_k_xl"
+      },
+      "label": "on\u00b7t1.0\u00b7q4_k_xl",
+      "scores": {
+        "formatting-v1": {
+          "pass": 29,
+          "total": 30,
+          "rate": 0.9667,
+          "median_latency_ms": 5632,
+          "median_ct": 142,
+          "tok_s": 25.2,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 22,
+          "total": 25,
+          "rate": 0.88,
+          "median_latency_ms": 4845,
+          "median_ct": 95,
+          "tok_s": 21.5,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 8779,
+          "median_ct": 185,
+          "tok_s": 21.2,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 4,
+          "total": 5,
+          "rate": 0.8,
+          "median_latency_ms": 98537,
+          "median_ct": 2536,
+          "tok_s": 25.9,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 68,
+        "total": 75,
+        "rate": 0.9067
+      },
+      "cost": {
+        "tok_s": 25.2,
+        "median_latency_ms": 7206,
+        "total_completion_tokens": 38701,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-27T18:05:31Z",
+      "n_reps": 1
+    },
+    {
+      "model_id": "Qwen3.8-Flash-Next-GGUF",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": "q4_k_xl"
+      },
+      "label": "on\u00b7t1.0\u00b7q4_k_xl",
+      "scores": {
+        "formatting-v1": {
+          "pass": 30,
+          "total": 30,
+          "rate": 1.0,
+          "median_latency_ms": 4137,
+          "median_ct": 102,
+          "tok_s": 24.4,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 20,
+          "total": 25,
+          "rate": 0.8,
+          "median_latency_ms": 4960,
+          "median_ct": 93,
+          "tok_s": 20.7,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 13,
+          "total": 15,
+          "rate": 0.8667,
+          "median_latency_ms": 8579,
+          "median_ct": 186,
+          "tok_s": 21.8,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 4,
+          "total": 5,
+          "rate": 0.8,
+          "median_latency_ms": 103206,
+          "median_ct": 2814,
+          "tok_s": 26.3,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 24.4,
+        "median_latency_ms": 6770,
+        "total_completion_tokens": 37716,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-27T17:38:35Z",
+      "n_reps": 1
+    },
+    {
+      "model_id": "Qwen3.8-Flash-Next-GGUF",
+      "config": {
+        "reasoning": "off",
+        "temp": "0.7",
+        "quant": "q4_k_xl"
+      },
+      "label": "off\u00b7t0.7\u00b7q4_k_xl",
+      "scores": {
+        "formatting-v1": {
+          "pass": 29,
+          "total": 30,
+          "rate": 0.9667,
+          "median_latency_ms": 1381,
+          "median_ct": 26,
+          "tok_s": 19.6,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 24,
+          "total": 25,
+          "rate": 0.96,
+          "median_latency_ms": 2982,
+          "median_ct": 51,
+          "tok_s": 16.2,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 12,
+          "total": 15,
+          "rate": 0.8,
+          "median_latency_ms": 4422,
+          "median_ct": 81,
+          "tok_s": 18.2,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 39480,
+          "median_ct": 1060,
+          "tok_s": 26.2,
+          "trunc": 0
+        }
+      },
+      "overall": {
+        "pass": 67,
+        "total": 75,
+        "rate": 0.8933
+      },
+      "cost": {
+        "tok_s": 19.6,
+        "median_latency_ms": 3702,
+        "total_completion_tokens": 8900,
+        "truncation": 0,
+        "errors": 0,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-27T17:27:55Z",
+      "n_reps": 1
+    },
+    {
+      "model_id": "Qwen3.8-Flash-Next-GGUF",
+      "config": {
+        "reasoning": "on",
+        "temp": "1.0",
+        "quant": "q4_k_xl"
+      },
+      "label": "on\u00b7t1.0\u00b7q4_k_xl",
+      "scores": {
+        "formatting-v1": {
+          "pass": 30,
+          "total": 30,
+          "rate": 1.0,
+          "median_latency_ms": 5092,
+          "median_ct": 129,
+          "tok_s": 24.7,
+          "trunc": 0
+        },
+        "tooluse-v2": {
+          "pass": 19,
+          "total": 25,
+          "rate": 0.76,
+          "median_latency_ms": 5606,
+          "median_ct": 126,
+          "tok_s": 22.0,
+          "trunc": 0
+        },
+        "tooluse-v3": {
+          "pass": 14,
+          "total": 15,
+          "rate": 0.9333,
+          "median_latency_ms": 8551,
+          "median_ct": 176,
+          "tok_s": 21.0,
+          "trunc": 0
+        },
+        "coding-v1": {
+          "pass": 2,
+          "total": 5,
+          "rate": 0.4,
+          "median_latency_ms": 1421297,
+          "median_ct": 32768,
+          "tok_s": 23.1,
+          "trunc": 3
+        }
+      },
+      "overall": {
+        "pass": 65,
+        "total": 75,
+        "rate": 0.8667
+      },
+      "cost": {
+        "tok_s": 24.7,
+        "median_latency_ms": 7078,
+        "total_completion_tokens": 141606,
+        "truncation": 3,
+        "errors": 3,
+        "n_items": 75
+      },
+      "generated_at": "2026-08-27T18:30:47Z",
+      "n_reps": 1
+    }
+  ],
+  "generated_at": "2026-08-28T14:05:27Z"
+}
