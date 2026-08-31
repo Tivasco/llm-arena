@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Board v2 — llm-arena</title>
+  <meta name="description" content="Eval battery v2: one scored axis, no total. Bands instead of ranks, a 95% interval on every cell, gates reported as pass/fail." />
+  <link rel="stylesheet" href="../../assets/theme.css?v=20260827" />
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+  <script src="../../assets/chrome.js" defer></script>
+  <script src="board2.js?v=20260831" defer></script>
+  <style>
+    /* ── board v2 (page-local) ────────────────────────────────────────────
+       Extends the Field Notes system in assets/theme.css using its tokens
+       only. Nothing here is shared with the v1 board, so it lives on this
+       page rather than in theme.css. All hooks are emitted by board2.js. */
+
+    /* Claim / counter-claim: the first thing on the page. */
+    .b2-claim { border-color: var(--accent-light); }
+    .b2-claim-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+      gap: clamp(18px, 2.6vw, 32px);
+      margin-top: calc(var(--space) * 2);
+    }
+    .b2-claim-col h3 { font-size: 1.02rem; font-weight: 600; }
+    .b2-claim-col ul {
+      list-style: none;
+      margin-top: calc(var(--space) * 1.5);
+      display: flex; flex-direction: column; gap: var(--space);
+      font-size: 0.92rem; line-height: 1.5;
+    }
+    .b2-claim-col li { display: flex; gap: calc(var(--space) * 1.25); align-items: flex-start; }
+    .b2-claim-col li::before {
+      content: "✓"; flex: none;
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+      line-height: 1.6; color: var(--accent);
+    }
+    .b2-claim-col--not li::before { content: "✕"; color: var(--verdict-stop); }
+    .b2-claim-col--not li { color: var(--text-muted); }
+    .b2-claim-note {
+      margin-top: clamp(18px, 2.4vw, 26px);
+      padding-top: calc(var(--space) * 2);
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.92rem; line-height: 1.6; max-width: 78ch;
+    }
+
+    /* Section scaffolding */
+    .b2-section { margin-top: var(--space-section); }
+    .b2-section > .eyebrow { margin-bottom: calc(var(--space) * 2); }
+    .b2-section > h2 { margin-bottom: calc(var(--space) * 1.5); }
+    .b2-lede { color: var(--text-muted); max-width: 74ch; font-size: 0.98rem; line-height: 1.6; }
+
+    /* The axis card */
+    .b2-axis-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 2); }
+    .b2-axis-head h3 { font-size: clamp(1.3rem, 2.2vw, 1.6rem); }
+    .b2-axis-job { color: var(--text-muted); font-size: 0.98rem; line-height: 1.6; margin-top: var(--space); max-width: 70ch; }
+    .b2-axis-facts {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+      gap: calc(var(--space) * 1.5);
+      margin-top: calc(var(--space) * 2.5);
+    }
+    .b2-fact {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--surface); padding: calc(var(--space) * 1.5) calc(var(--space) * 1.75);
+    }
+    .b2-fact-k {
+      display: block;
+      font-family: var(--font-mono); font-size: 0.58rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint);
+    }
+    .b2-fact-v {
+      display: block; margin-top: 4px;
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.9rem; color: var(--text);
+    }
+    /* The unit note is load-bearing — without it the number reads as a safety score. */
+    .b2-unitnote {
+      margin-top: calc(var(--space) * 2.5);
+      padding: calc(var(--space) * 2) calc(var(--space) * 2.25);
+      border: 1px solid var(--accent-light);
+      border-left-width: 3px;
+      border-radius: var(--radius-md);
+      background: var(--accent-tint);
+      color: var(--accent-ink);
+      font-size: 0.95rem; line-height: 1.6;
+    }
+    .b2-unitnote b {
+      display: block; margin-bottom: 5px;
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase; opacity: 0.85;
+    }
+
+    /* ── Bands ────────────────────────────────────────────────────────────
+       A band is a SET, not a list. Deliberately no ordinal, no position
+       number, no sort affordance, and every card gets identical weight —
+       a reader must not be able to read a ranking out of a band. */
+    .b2-band { padding: 0; overflow: hidden; }
+    .b2-band + .b2-band { margin-top: clamp(16px, 2vw, 24px); }
+    .b2-band-head {
+      display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--space) * 1.5);
+      padding: clamp(18px, 2.4vw, 24px) clamp(20px, 2.6vw, 28px) calc(var(--space) * 1.5);
+    }
+    .b2-band-head h3 { font-size: 1.05rem; font-weight: 600; }
+    .b2-band-count {
+      margin-left: auto;
+      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);
+      text-align: right;
+    }
+    .b2-band-note {
+      padding: 0 clamp(20px, 2.6vw, 28px) calc(var(--space) * 2);
+      color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; max-width: 82ch;
+    }
+    .b2-band-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+      gap: clamp(14px, 1.8vw, 20px);
+      padding: 0 clamp(20px, 2.6vw, 28px) clamp(20px, 2.6vw, 28px);
+      border-top: 1px solid var(--border);
+      padding-top: clamp(20px, 2.6vw, 26px);
+      list-style: none;
+    }
+    .b2-mcard {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--card); padding: calc(var(--space) * 2);
+      display: flex; flex-direction: column; gap: calc(var(--space) * 1.5);
+    }
+    .b2-mcard-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space); }
+    .b2-mcard-head h4 { font-size: 0.98rem; font-weight: 600; letter-spacing: -0.015em; }
+    .b2-mkey { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-faint); letter-spacing: 0.02em; }
+
+    /* Rate + interval. The interval always ships with the point estimate. */
+    .b2-rate { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 1.25); }
+    .b2-rate-num {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 1.45rem; font-weight: 600; letter-spacing: -0.03em; color: var(--text);
+    }
+    .b2-rate-ci {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.7rem; letter-spacing: 0.01em; color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .b2-rate-noci { font-family: var(--font-mono); font-size: 0.68rem; color: #d32f27; }
+    .b2-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    /* Error bar: a range spanning the 95% interval with a tick at the estimate. */
+    .b2-bar { margin-top: 2px; }
+    .b2-bar-track {
+      position: relative; height: 10px;
+      border: 1px solid var(--border); border-radius: var(--radius-pill);
+      background: var(--surface);
+    }
+    .b2-bar-mid {
+      position: absolute; top: -3px; bottom: -3px; left: 50%; width: 1px;
+      background: var(--hairline);
+    }
+    .b2-bar-range {
+      position: absolute; top: 1px; bottom: 1px;
+      min-width: 3px;
+      border-radius: var(--radius-pill);
+      background: color-mix(in srgb, var(--accent) 34%, var(--card));
+    }
+    .b2-bar-point {
+      position: absolute; top: -3px; bottom: -3px; width: 3px;
+      margin-left: -1.5px;
+      border-radius: 2px;
+      background: var(--accent-hover);
+    }
+    .b2-bar-scale {
+      display: flex; justify-content: space-between;
+      margin-top: 5px;
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.56rem; letter-spacing: 0.06em; color: var(--text-faint);
+    }
+    .b2-detail { display: flex; flex-wrap: wrap; gap: 5px; }
+    .b2-detail .chip { text-transform: none; letter-spacing: 0.01em; }
+    .b2-mcard-missing { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
+
+    /* ── Gates ───────────────────────────────────────────────────────────── */
+    .b2-gate-scroll { overflow-x: auto; margin-top: calc(var(--space) * 2.5); }
+    .b2-gates { width: 100%; }
+    .b2-gates th { white-space: nowrap; }
+    .b2-gates td { white-space: nowrap; }
+    .b2-gates td.b2-gate-model { white-space: normal; font-weight: 600; letter-spacing: -0.015em; }
+    .b2-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; border-radius: var(--radius-pill);
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: var(--font-mono); font-size: 0.66rem; font-weight: 600;
+      letter-spacing: 0.06em; color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .b2-badge--pass { color: #1f8f3e; background: color-mix(in srgb, var(--verdict-go) 14%, #fff); border-color: color-mix(in srgb, var(--verdict-go) 36%, var(--border)); }
+    .b2-badge--fail { color: #d32f27; background: color-mix(in srgb, var(--verdict-stop) 12%, #fff); border-color: color-mix(in srgb, var(--verdict-stop) 34%, var(--border)); }
+    .b2-badge--unrun { color: var(--text-faint); background: var(--bg); border-style: dashed; }
+
+    /* ── Excluded ────────────────────────────────────────────────────────── */
+    .b2-excluded { display: flex; flex-direction: column; gap: clamp(12px, 1.6vw, 18px); margin-top: calc(var(--space) * 2.5); list-style: none; }
+    .b2-exc {
+      border: 1px solid var(--border); border-left: 3px solid var(--verdict-warn);
+      border-radius: var(--radius-md); background: var(--card);
+      padding: calc(var(--space) * 2) calc(var(--space) * 2.25);
+      display: flex; flex-direction: column; gap: var(--space);
+    }
+    .b2-exc-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 1.5); }
+    .b2-exc-head h3 { font-size: 1rem; font-weight: 600; }
+    .b2-exc p { font-size: 0.9rem; line-height: 1.55; color: var(--text-muted); max-width: 82ch; }
+    .b2-exc-note { border-top: 1px dashed var(--border); padding-top: var(--space); }
+
+    /* ── Method: separation tests + multiplicity ──────────────────────────── */
+    .b2-sep-scroll { overflow-x: auto; margin-top: calc(var(--space) * 2.5); }
+    .b2-sep { width: 100%; font-size: 0.9rem; }
+    .b2-sep td.num, .b2-sep td.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .b2-sep th { white-space: nowrap; }
+    .b2-mult {
+      margin-top: calc(var(--space) * 2.5);
+      padding-top: calc(var(--space) * 2);
+      border-top: 1px solid var(--border);
+    }
+    .b2-mult-stats { display: flex; flex-wrap: wrap; gap: var(--space); margin-bottom: calc(var(--space) * 1.5); }
+    .b2-mult p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; max-width: 82ch; }
+
+    /* ── Archive ─────────────────────────────────────────────────────────── */
+    .b2-archive { border-left: 3px solid var(--hairline); }
+    .b2-archive-link {
+      display: inline-flex; align-items: center; gap: calc(var(--space) * 1.1);
+      margin-top: var(--space);
+      font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .b2-warning {
+      margin-top: calc(var(--space) * 1.75);
+      color: var(--text); font-size: 0.92rem; line-height: 1.6; max-width: 82ch;
+    }
+    .b2-evidence { margin-top: var(--space); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); letter-spacing: 0.02em; word-break: break-word; }
+
+    /* ── Reporting rules (collapsed footer block) ─────────────────────────── */
+    .b2-rules { margin-top: clamp(16px, 2vw, 24px); }
+    .b2-rules > summary {
+      cursor: pointer; list-style: none;
+      display: flex; align-items: center; gap: calc(var(--space) * 1.25);
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+    }
+    .b2-rules > summary::-webkit-details-marker { display: none; }
+    .b2-rules > summary::after { content: "＋"; margin-left: auto; color: var(--text-faint); font-size: 0.85rem; }
+    .b2-rules[open] > summary::after { content: "－"; }
+    .b2-rules ol {
+      margin-top: calc(var(--space) * 2); padding-left: 1.5em;
+      display: flex; flex-direction: column; gap: var(--space);
+      font-size: 0.92rem; line-height: 1.55; color: var(--text);
+    }
+    .b2-rules li::marker { font-family: var(--font-mono); font-size: 0.8em; color: var(--accent); font-weight: 600; }
+    .b2-doc { margin-top: calc(var(--space) * 2); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); letter-spacing: 0.02em; }
+
+    /* ── Load failure ────────────────────────────────────────────────────── */
+    .b2-error { border-left: 3px solid var(--verdict-stop); }
+    .b2-error h2 { font-size: clamp(1.3rem, 2.4vw, 1.7rem); margin-bottom: var(--space); }
+    .b2-error p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; max-width: 74ch; }
+    .b2-error code {
+      font-family: var(--font-mono); font-size: 0.8em;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1px 5px;
+    }
+
+    @media (max-width: 720px) {
+      .b2-band-count { margin-left: 0; width: 100%; text-align: left; }
+      .b2-gates { min-width: 520px; }
+      .b2-sep { min-width: 600px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <p class="eyebrow reveal" data-d="1">Eval battery v2</p>
+    <h1 class="reveal" data-d="2">One scored axis. <em>No total.</em></h1>
+    <p id="board-meta" class="reveal" data-d="3"></p>
+    <div id="board" class="reveal" data-d="4"></div>
+  </main>
+</body>
+</html>
