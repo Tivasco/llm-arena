@@ -32,7 +32,7 @@
       '<span class="brand__mark" aria-hidden="true"></span>llm-arena' +
       "</a>" +
       '<nav class="site-nav">' +
-      '<a href="' + siteUrl("../benchmarks/") + '">Benchmarks</a>' +
+      '<a href="' + siteUrl("../benchmarks/v2/") + '">Benchmarks</a>' +
       '<a href="' + siteUrl("../arena/") + '">Arena</a>' +
       '<a href="' + siteUrl("../about.html") + '">About</a>' +
       "</nav>";
