@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Board v2 — llm-arena</title>
-  <meta name="description" content="Eval battery v2: one section per scored axis, each on its own terms and never combined. Every cell carries an interval, tied rows are marked as tied, and every scored run drills down." />
+  <meta name="description" content="Eval battery v2: one section per scored axis, each on its own terms and never combined. A row is a model plus a serving configuration, comparisons are claimed inside one configuration only, every cell carries an interval, and every scored run drills down." />
   <link rel="stylesheet" href="../../assets/theme.css?v=20260827" />
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
   <script src="../../assets/chrome.js" defer></script>
-  <script src="board2.js?v=20260831e" defer></script>
+  <script src="board2.js?v=20260831f" defer></script>
   <style>
     /* ── board v2 (page-local) ────────────────────────────────────────────
        Extends the Field Notes system in assets/theme.css using its tokens
@@ -631,6 +631,113 @@
       color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; max-width: 32ch;
     }
 
+    /* ── configuration: a row is a (model, configuration) pair ───────────────
+       The 2026-08-31 correction. Two arms of one build support opposite
+       conclusions about size, so configuration is drawn AT the number, rows are
+       cut by configuration, and a cross-configuration comparison is visibly not
+       a claim. All of it is inert markup — nothing here sorts or ranks. */
+
+    /* The callout above the table. Accent, not warning: this is how the board is
+       read, not a defect in it. */
+    .b2-scopebox {
+      margin-top: calc(var(--space) * 2.5);
+      padding: clamp(12px, 1.6vw, 18px);
+      border-left: 3px solid var(--accent);
+    }
+
+    /* The tag under the value. Small, but it sits inside the number's own cell so
+       the two cannot be separated by a wandering eye. */
+    .b2-cfg-tag {
+      display: inline-flex; align-items: baseline; gap: 4px;
+      margin-top: 6px;
+      padding: 2px 8px 2px 6px; border-radius: var(--radius-pill);
+      background: var(--accent-tint); border: 1px solid var(--accent-light);
+      color: var(--accent-ink);
+      font-family: var(--font-mono); font-size: 0.58rem; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+    }
+    /* The value cell wraps now — the tag sits under the number rather than beside
+       it — so the column is only as wide as the wider of the two. */
+    .b2-c-rate { white-space: normal; max-width: 20ch; }
+    .b2-c-rate .b2-cfg-tag { display: inline-flex; }
+    .b2-cfg-dot { font-size: 0.5rem; line-height: 1; opacity: 0.7; }
+
+    /* A configuration group header: heavier than a band header, because crossing
+       one means the numbers stop being comparable. */
+    .b2-grprow--scope > td {
+      background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+      border-top: 2px solid var(--accent-light);
+      border-bottom: 1px solid var(--accent-light);
+    }
+    .b2-results tbody.b2-grp > tr.b2-grprow--scope:hover {
+      background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+    }
+    .b2-grp-label--scope { font-size: 1rem; letter-spacing: -0.02em; }
+    .b2-grp-note--sub { color: var(--text-faint); font-size: 0.8rem; }
+
+    /* The arm strip inside the model cell: the other arm's value, linked. This is
+       the most important relationship on the board — same weights, one flag
+       apart, opposite answers — so it is drawn on the row and not in a note. */
+    .b2-chip-arm {
+      text-transform: none; letter-spacing: 0.01em;
+      background: var(--accent-tint); border-color: var(--accent-light); color: var(--accent-ink);
+    }
+    .b2-armstrip {
+      margin-top: var(--space);
+      padding: calc(var(--space) * 1.1) calc(var(--space) * 1.25);
+      border: 1px dashed var(--accent-light); border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--accent) 4%, var(--card));
+    }
+    .b2-armlist { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+    .b2-armlink {
+      display: inline-flex; align-items: baseline; gap: 6px;
+      padding: 3px 9px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--card);
+      text-decoration: none;
+    }
+    a.b2-armlink:hover { border-color: var(--accent); background: var(--accent-tint); }
+    .b2-armlink--self { border-color: var(--accent); background: var(--accent-tint); }
+    .b2-arm-cfg {
+      font-family: var(--font-mono); font-size: 0.56rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
+    }
+    .b2-armlink--self .b2-arm-cfg { color: var(--accent-ink); }
+    .b2-arm-val {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.86rem; font-weight: 600; color: var(--text);
+    }
+
+    /* A cross-configuration separation row: shown, and visibly not a claim. */
+    .b2-sep--cross > td { opacity: 0.6; color: var(--text-muted); }
+    .b2-sep--cross > td.num { font-style: italic; }
+    .b2-sep-mark { margin-left: 8px; vertical-align: 1px; }
+    .b2-badge--cross {
+      color: var(--text-muted); background: var(--bg); border-style: dashed;
+      text-transform: none; letter-spacing: 0.02em;
+    }
+    .b2-sep-cross-note {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space);
+      margin-bottom: calc(var(--space) * 2);
+      color: var(--text-muted); font-size: 0.86rem; line-height: 1.55; max-width: 92ch;
+    }
+
+    /* The notes card: each scope, and the arms table where the reversal is one
+       glance rather than a paragraph. */
+    .b2-scopecard { grid-column: 1 / -1; }
+    .b2-scopecard .b2-grp-note { max-width: 92ch; }
+    .b2-armtable td:first-child { font-weight: 600; }
+    .b2-armcell-v {
+      display: block;
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+    .b2-armcell-c {
+      display: block; margin-top: 2px;
+      font-family: var(--font-mono); font-size: 0.56rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);
+    }
+    .b2-armtable td.num { text-align: left; }
+
     @media (max-width: 900px) {
       .b2-results { min-width: 780px; }
       .b2-res-jump { margin-left: 0; width: 100%; }
@@ -642,8 +749,9 @@
   <main class="container">
     <p class="eyebrow reveal" data-d="1">Eval battery v2</p>
     <h1 class="reveal" data-d="2">One scored axis. <em>No total.</em></h1>
-    <p id="board-meta" class="reveal" data-d="3"></p>
-    <div id="board" class="reveal" data-d="4"></div>
+    <p class="b2-lede reveal" data-d="3" style="margin-top:var(--space)">A row is a model <em>plus the configuration it ran under</em>. On this axis the same weights score differently — and in opposite directions by size — depending on one reasoning flag, so a number is only comparable with another taken under the same setting.</p>
+    <p id="board-meta" class="reveal" data-d="4"></p>
+    <div id="board" class="reveal" data-d="5"></div>
   </main>
 </body>
 </html>

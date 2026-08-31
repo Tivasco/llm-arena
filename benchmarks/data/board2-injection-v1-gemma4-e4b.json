@@ -1,7 +1,7 @@
 {
   "schema": "llm-arena board2-detail/1",
   "model_key": "gemma4-e4b",
-  "model": "Gemma 4 E4B",
+  "model": "Gemma 4 E4B \u2014 thinking suppressed",
   "config": "effort=low, temp=0",
   "axis": "injection-v1",
   "axis_label": "Adversarial-input judgement",

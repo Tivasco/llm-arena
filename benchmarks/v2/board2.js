@@ -35,6 +35,30 @@
  * Adding a rendering methodology is one entry in `KINDS` (its columns, its sort
  * value, its cells, its axis facts) and nothing else.
  *
+ * WHAT CHANGED AGAIN (2026-08-31): A ROW IS A (MODEL, CONFIGURATION) PAIR
+ * =======================================================================
+ * The same weights under two serving configurations are two rows, and on this
+ * board they can disagree: the two Gemma arms (thinking suppressed / thinking
+ * on) support OPPOSITE conclusions about size. So the page treats configuration
+ * as a dimension of the measurement, not an annotation on it:
+ *
+ *   * rows carry `config_key` / `config_label` (the comparison scope),
+ *     `weights_key` / `weights_name` (which build the row is an arm of) and
+ *     `arm_label`. The scope is drawn AT THE NUMBER, and rows are grouped by
+ *     configuration, so two cells cannot be compared without seeing that they
+ *     ran under different settings.
+ *   * every row whose build has another arm on the board shows that arm's
+ *     value beside its own, linked. That relationship is the single most
+ *     important thing on this board now.
+ *   * `separation[]` rows carry `same_config`. Cross-configuration rows are
+ *     shown (hiding a comparison is not honesty) but de-emphasised and tagged:
+ *     a cross-configuration p-value compares settings, not models.
+ *   * `comparison_scope[axis]` carries the generator's own statement of all
+ *     this, and it is quoted rather than paraphrased.
+ *
+ * A file with no `config_key` anywhere renders exactly as it did before: one
+ * implicit scope, no grouping, no tags. Nothing here invents a configuration.
+ *
  * Six rules this file enforces in code, not just in copy:
  *   1. NO TOTAL, AND NO COMBINING AXES. Nothing here sums, averages, ranks or
  *      composites anything across axes. No key named total/composite/overall/
@@ -213,6 +237,86 @@ function excludedFor(data, axis) {
   return ex.filter(e => e && (e.axis == null || e.axis === axis.id));
 }
 
+/* ── configuration: the scope a comparison is claimed inside ──────────────────
+ * `comparison_scope[axis]` is the generator's statement of what a separation on
+ * this axis is scoped BY, why, and which configurations are on the board. Absent
+ * (a file written before rows carried a configuration) means one implicit scope,
+ * and every branch below degrades to exactly the page that shipped before it.
+ */
+function scopeFor(data, axis) {
+  const s = data.comparison_scope;
+  if (!s || typeof s !== "object" || Array.isArray(s)) return null;
+  const v = s[axis.id];
+  return v && typeof v === "object" ? v : null;
+}
+/* The declared scopes in the file's own order, which is NOT a value order: it is
+ * the order the registry lists them in, so the group order on the page cannot be
+ * read as one configuration beating another. */
+function scopeList(scope) {
+  const list = scope && Array.isArray(scope.scopes) ? scope.scopes : [];
+  return list.filter(s => s && typeof s.key === "string");
+}
+function scopeMeta(scope) {
+  const out = new Map();
+  for (const s of scopeList(scope)) out.set(s.key, s);
+  return out;
+}
+/* One row's configuration, as data. Every field is optional: a null `key` means
+ * the file declares no configuration for this row, and the page then treats the
+ * board as single-scoped rather than inventing one. */
+function configOf(row) {
+  const str = (v) => (typeof v === "string" && v.trim() ? v.trim() : null);
+  return {
+    key: str(row && row.config_key),
+    label: str(row && row.config_label),
+    text: str(row && row.config),
+    arm: str(row && row.arm_label),
+    weights: str(row && row.weights_key),
+    weightsName: str(row && row.weights_name),
+  };
+}
+/* Does this axis actually have more than one configuration among its scored
+ * rows? Grouping, tagging and the cross-config marks all hang off this, so a
+ * single-configuration board draws none of it. */
+function configKeysOn(data, axis) {
+  const keys = new Set();
+  for (const row of Array.isArray(data.rows) ? data.rows : []) {
+    const c = cellOf(row, axis);
+    if (!c || c.status !== "ok") continue;
+    const k = configOf(row).key;
+    if (k) keys.add(k);
+  }
+  return keys;
+}
+/* {weights_key: [row, ...]} for the rows SCORED on this axis — the arms of one
+ * build. Only builds with two or more arms are kept: a single-arm build has no
+ * relationship to show, and drawing one would imply there is another arm. */
+function armIndex(data, axis, scope) {
+  const out = new Map();
+  for (const row of Array.isArray(data.rows) ? data.rows : []) {
+    const c = cellOf(row, axis);
+    if (!c || c.status !== "ok") continue;
+    const w = configOf(row).weights;
+    if (!w) continue;
+    if (!out.has(w)) out.set(w, []);
+    out.get(w).push(row);
+  }
+  // Arms are ordered by the DECLARED configuration order, never by value: ordering
+  // them by score would put the better arm first and quietly re-introduce the rank
+  // this whole board refuses — and it would put different configurations in the
+  // same position on different builds.
+  const rank = new Map(scopeList(scope).map((s, i) => [s.key, i]));
+  const at = (row) => {
+    const k = configOf(row).key;
+    return rank.has(k) ? rank.get(k) : Number.MAX_SAFE_INTEGER;
+  };
+  for (const [w, rows] of [...out]) {
+    if (rows.length < 2) { out.delete(w); continue; }
+    rows.sort((a, b) => at(a) - at(b) || String(a.model_key).localeCompare(b.model_key));
+  }
+  return out;
+}
+
 /* The cell for one model on one axis, normalised. `value_kind` and `status`
  * come from the cell itself (board2/2); a cell that predates them falls back to
  * the axis's declared kind. Nothing here manufactures a number. */
@@ -232,6 +336,20 @@ function cellOf(row, axis) {
     // board2/1 put one filename on the row; it could only have meant this axis.
     : (typeof row.detail === "string" && row.detail.trim() ? row.detail.trim() : null);
   return Object.assign({}, raw, { value_kind: kind, status, detail_file: file });
+}
+
+/* The configuration, drawn AT the number rather than only in a chip beside the
+ * model name. This is the whole point of the 2026-08-31 change: a reader must
+ * not be able to compare two cells without seeing that they ran under different
+ * settings. Returns null when the file declares no configuration, so a
+ * single-configuration board is unchanged. */
+function configTag(cfg, opts = {}) {
+  if (!cfg || !(cfg.label || cfg.key)) return null;
+  const text = cfg.label || cfg.key;
+  return el("span", { class: "b2-cfg-tag", title: cfg.text ? `${text} — ${cfg.text}` : text },
+    el("span", { class: "b2-cfg-dot", "aria-hidden": "true" }, "●"),
+    text,
+    opts.tip === false ? null : tip(TIP.configAtNumber, `the configuration behind this number`));
 }
 
 /* ── error bar: interval as a range, estimate as a tick, 0–100% always ────── */
@@ -330,6 +448,26 @@ const TIP = {
     "How many of the other models on this axis this model is statistically distinguishable from (Fisher's exact at the raw α), and which ones. This is the claim the tests actually support — it needs no ranking to be true. The bracketed figure counts only the pairs that also clear the Bonferroni threshold for the number of comparisons made.",
   sortedNotRanked:
     "The rows are sorted by the measured value so the table is readable. That sort is NOT a ranking: adjacent rows are mostly not distinguishable from each other, and which pairs ARE distinguishable is in the Distinguishable from column.",
+
+  /* ── configuration: a row is a (model, configuration) pair ─────────────────
+   * The 2026-08-31 correction. Copy here exists to stop one specific misreading
+   * each — that a number is a property of the weights, that two cells in
+   * different groups can be compared, and that a cross-config p-value is a
+   * model comparison. Do not paraphrase them. */
+  configAtNumber:
+    "The serving configuration this number was measured under. It is part of the measurement, not a footnote: on this axis the same weights score differently — and in opposite directions by size — depending on whether thinking is on. A number is only comparable with another number taken under the same configuration.",
+  configGroup:
+    "Every row in this group ran under the same serving configuration, so these numbers can be compared with each other. Numbers in a different group cannot: the difference between them may be the setting rather than the model. The order of the groups is the order they are declared in, and is not a ranking of configurations.",
+  armOfBuild:
+    "The same weights were measured under more than one configuration, and each is its own row. The other arm's value is shown beside this one because the two can differ sharply: enabling thinking takes gemma-4-12b-qat from 0% to 41.7% and takes gemma-4-e4b from 41.7% to 0%. Neither arm is 'the model'.",
+  crossConfigSeparation:
+    "This pair ran under two different configurations, so the test compares SETTINGS, not models. It is shown because hiding a comparison would be its own dishonesty, and it is greyed because it is not a claim: it is not corrected for, and it is in neither row's distinguishable-from set.",
+  sameConfigColumn:
+    "Whether the two rows in this pair ran under the same serving configuration. Only those pairs are claims about models; the rest compare a setting, and are reported without being claimed.",
+  scopedSeparation:
+    "How many of the other models IN THIS ROW'S CONFIGURATION this row is statistically distinguishable from (Fisher's exact at the raw α), and which ones. Comparisons against a row in a different configuration are excluded on purpose: they would be comparisons of settings. The bracketed figure counts only the pairs that also clear the Bonferroni threshold for the number of same-configuration comparisons made.",
+  noComparisonInScope:
+    "No other row on this axis ran under the same configuration as this one, so no comparison this board would claim from was made. That is not the same as 'differs from nothing' — nothing was claimed at all.",
 };
 
 /* Axis-specific tooltip copy, keyed by axis id. The rate and count copy above
@@ -731,7 +869,7 @@ function noPartitionNote(data, axis, nAxes) {
     "supported by the pairwise tests, so none is drawn.");
 }
 
-function resultGroups(data, axis, kind, nAxes, partition) {
+function resultGroups(data, axis, kind, nAxes, partition, scope) {
   const rows = Array.isArray(data.rows) ? data.rows : [];
   const byKey = new Map(rows.map(r => [r.model_key, r]));
   const bands = bandsFor(data, axis, nAxes);
@@ -758,26 +896,80 @@ function resultGroups(data, axis, kind, nAxes, partition) {
   let groups, placed;
   if (!partition) {
     // NO SUPPORTED PARTITION. Band grouping here would assert a structure the
-    // tests refuse, so there is exactly one group and it is explicitly NOT a
-    // band: one sorted list, no "tied with above" markers (they would imply the
-    // tie is the finding), and the real claim moved into the per-row
-    // "distinguishable from" column. The sort is a reading aid, and the group
-    // header and caption both say so.
+    // tests refuse, so there is no band: a sorted list, no "tied with above"
+    // markers (they would imply the tie is the finding), and the real claim
+    // moved into the per-row "distinguishable from" column. The sort is a
+    // reading aid, and the group header and caption both say so.
+    //
+    // BUT the list is cut by CONFIGURATION when the axis has more than one,
+    // because a comparison is only claimed inside one. Rows in different groups
+    // are not comparable at all, and a reader must not be able to run their eye
+    // down the column without crossing a heading that says so.
     const members = rows.filter(r => statusOf(r) === "ok")
       .map(r => ({ key: r.model_key, row: r })).sort(byValue);
-    const vals = members.map(m => sortValue(m.row)).filter(isNum);
-    groups = members.length ? [{
-      id: "gradient",
-      label: "no supported partition",
-      // The generator's full note is already the section callout above the
-      // table (`noPartitionNote`); repeating it here would be the same
-      // paragraph twice. This line says what the row order IS.
-      note: "Sorted by the measured value so the table can be read. The ordering claim lives in each row's Distinguishable from cell, and nowhere else.",
-      members,
-      tied: false, sep: null, gradient: true, hasBelow: false,
-      best: vals.length ? Math.max(...vals) : -Infinity,
-      kindOf: "gradient",
-    }] : [];
+    const bestOf = (ms) => {
+      const vals = ms.map(m => sortValue(m.row)).filter(isNum);
+      return vals.length ? Math.max(...vals) : -Infinity;
+    };
+    const sortNote = "Sorted by the measured value so the table can be read. The ordering claim lives in each row's Distinguishable from cell, and nowhere else.";
+
+    const keys = configKeysOn(data, axis);
+    if (members.length && keys.size > 1) {
+      const meta = scopeMeta(scope);
+      // Declared order first (never a value order — see `scopeList`), then any
+      // configuration the file did not declare, then rows with none at all.
+      const order = [...scopeList(scope).map(s => s.key).filter(k => keys.has(k))];
+      for (const k of keys) if (!order.includes(k)) order.push(k);
+      const byConfig = new Map(order.map(k => [k, []]));
+      const unstated = [];
+      for (const m of members) {
+        const k = configOf(m.row).key;
+        if (k && byConfig.has(k)) byConfig.get(k).push(m); else unstated.push(m);
+      }
+      groups = [];
+      for (const k of order) {
+        const ms = byConfig.get(k);
+        if (!ms.length) continue;
+        const info = meta.get(k) || {};
+        groups.push({
+          id: `scope-${k}`,
+          label: info.label || k,
+          note: info.note || null,
+          sortNote,
+          members: ms,
+          tied: false, sep: null, gradient: true, hasBelow: false,
+          scopeKey: k,
+          best: bestOf(ms),
+          kindOf: "scope",
+        });
+      }
+      if (unstated.length) {
+        groups.push({
+          id: "scope-unstated",
+          label: "configuration not stated",
+          note: "The data file records no configuration for these rows, so they are not placed in a scope. Nothing about how they compare with a row in a named configuration is claimed.",
+          sortNote,
+          members: unstated,
+          tied: false, sep: null, gradient: true, hasBelow: false,
+          scopeKey: null,
+          best: bestOf(unstated),
+          kindOf: "scope",
+        });
+      }
+    } else {
+      groups = members.length ? [{
+        id: "gradient",
+        label: "no supported partition",
+        // The generator's full note is already the section callout above the
+        // table (`noPartitionNote`); repeating it here would be the same
+        // paragraph twice. This line says what the row order IS.
+        note: sortNote,
+        members,
+        tied: false, sep: null, gradient: true, hasBelow: false,
+        best: bestOf(members),
+        kindOf: "gradient",
+      }] : [];
+    }
     placed = new Set(members.map(m => m.key));
   } else {
     groups = bands.map((b, i) => {
@@ -869,9 +1061,10 @@ function resultGroups(data, axis, kind, nAxes, partition) {
  * `separated_from` is symmetric and needs no ordering to be true, which is
  * exactly why it survives where a band structure does not.
  */
-function separatedColumn() {
-  return el("th", { class: "b2-h-dist" }, "Distinguishable from",
-    tip(TIP.colSeparated, "the Distinguishable from column"));
+function separatedColumn(scoped) {
+  return el("th", { class: "b2-h-dist" },
+    scoped ? "Distinguishable from (same config)" : "Distinguishable from",
+    tip(scoped ? TIP.scopedSeparation : TIP.colSeparated, "the Distinguishable from column"));
 }
 
 /* A model's display name, for the list inside the cell. Falls back to the key,
@@ -882,13 +1075,16 @@ function nameOfKey(data, key) {
   return (hit && hit.model) || key;
 }
 
-function separatedCell(cell, data, comparable, selfKey) {
+function separatedCell(cell, data, comparable, selfKey, scoped) {
   const raw = Array.isArray(cell.separated_from) ? cell.separated_from : null;
   // Absent is not "distinguishable from nothing": the generator omits the field
-  // when no comparison involving this model was made at all.
+  // when no comparison it would CLAIM FROM involving this model was made — which,
+  // on a scoped board, includes a row that is alone in its configuration.
   if (!raw) {
     return el("td", { class: "b2-c-dist" },
-      el("span", { class: "b2-rate-noci" }, "no comparison published"));
+      el("span", { class: "b2-rate-noci" },
+        scoped ? "no same-config comparison" : "no comparison published"),
+      scoped ? tip(TIP.noComparisonInScope, "why this row has no comparison") : null);
   }
   const corrected = new Set(Array.isArray(cell.separated_from_corrected)
     ? cell.separated_from_corrected : []);
@@ -904,7 +1100,9 @@ function separatedCell(cell, data, comparable, selfKey) {
     return el("td", { class: "b2-c-dist" },
       el("div", { class: "b2-dist-head" }, head, sub),
       el("p", { class: "b2-dist-none" },
-        "No pairwise test involving this model reached α. Nothing about how it compares with any other model on this axis is claimed."));
+        scoped
+          ? "No test against another row in this configuration reached α. Nothing about how it compares with any other model is claimed."
+          : "No pairwise test involving this model reached α. Nothing about how it compares with any other model on this axis is claimed."));
   }
   const list = el("ul", { class: "b2-dist-list" }, ...raw.map(k => el("li", {},
     el("span", { class: "b2-dist-name" }, nameOfKey(data, k)),
@@ -919,28 +1117,79 @@ function separatedCell(cell, data, comparable, selfKey) {
       list));
 }
 
-function modelNameCell(key, row, group, idx, cell) {
+/* The arms of one build, shown on every row that has a sibling: the other arm's
+ * own value, linked to its row. Same weights, one setting apart, and on this
+ * board they can point in opposite directions — so the relationship belongs at
+ * the number and not in a note nobody opens. Null when this build has one arm. */
+function armStrip(row, axis, arms, kind) {
+  const cfg = configOf(row);
+  if (!cfg.weights || !arms.has(cfg.weights)) return null;
+  const siblings = arms.get(cfg.weights);
+  const value = (r) => {
+    const c = cellOf(r, axis);
+    if (!c || c.status !== "ok" || !kind) return null;
+    const v = kind.sortValue(c);
+    return isNum(v) ? v : null;
+  };
+  const shown = (r) => {
+    const v = value(r);
+    if (v == null) return "—";
+    // A proportion reads as a percentage; anything else is its own number.
+    return (r.scores && r.scores[axis.id] && isNum(r.scores[axis.id].rate)) ? pct(v) : fmtInt(v);
+  };
+  const items = siblings.map(r => {
+    const self = r.model_key === row.model_key;
+    const c = configOf(r);
+    const label = c.arm || c.label || c.key || r.model_key;
+    const body = [
+      el("span", { class: "b2-arm-cfg" }, label),
+      el("span", { class: "b2-arm-val" }, shown(r)),
+    ];
+    return el("li", { class: "b2-armitem" + (self ? " b2-armitem--self" : "") },
+      self
+        ? el("span", { class: "b2-armlink b2-armlink--self", "aria-current": "true" }, ...body)
+        : el("a", {
+            class: "b2-armlink", href: `#b2-row-${axis.id}-${r.model_key}`,
+            title: `${cfg.weightsName || cfg.weights} under ${label} — go to that row`,
+          }, ...body));
+  });
+  return el("div", { class: "b2-armstrip",
+      title: `${cfg.weightsName || cfg.weights}: ${siblings.length} arms, one per configuration` },
+    el("span", { class: "b2-fact-k" },
+      `${siblings.length} arms, same weights`,
+      tip(TIP.armOfBuild, "why this model has more than one row")),
+    el("ul", { class: "b2-armlist" }, ...items));
+}
+
+function modelNameCell(key, row, group, idx, cell, ctx, axis) {
   const tied = group.tied && idx > 0;
   const odd = cell && cell.status && !["ok", "not_run", "excluded"].includes(cell.status);
+  const cfg = configOf(row);
+  const strip = (ctx && ctx.arms && row && cell && cell.status === "ok")
+    ? armStrip(row, axis, ctx.arms, ctx.kind) : null;
   return el("td", { class: "b2-c-model" },
     el("div", { class: "b2-model-line" },
       el("span", { class: "b2-model-name" }, (row && row.model) || key),
       row && row.config ? el("span", { class: "cfg-chip" }, row.config) : null),
     el("div", { class: "b2-model-sub" },
       el("span", { class: "b2-mkey" }, (row && row.model_key) || key),
+      // The arm, restated as a chip beside the key: the name carries it too, and
+      // a long name can wrap away from the eye.
+      cfg.arm ? el("span", { class: "chip b2-chip-arm" }, cfg.arm) : null,
       odd ? el("span", { class: "chip v-warn" }, "status: " + cell.status) : null,
       // Rule 2: an adjacent row must never be readable as a rank position.
       tied ? el("span", { class: "b2-tie" },
         el("span", { class: "b2-tie-brace", "aria-hidden": "true" }, "↳"),
         "tied with above",
-        tip(TIP.tieBadge, "tied with above")) : null));
+        tip(TIP.tieBadge, "tied with above")) : null),
+    strip);
 }
 
 function modelRow(member, group, idx, axis, data, ctx) {
   const { key, row } = member;
   const cell = cellOf(row, axis);
   const nCols = ctx.nCols;
-  const nameCell = modelNameCell(key, row, group, idx, cell);
+  const nameCell = modelNameCell(key, row, group, idx, cell, ctx, axis);
   const wide = (...kids) => el("td", { class: "b2-c-missing", colspan: String(nCols - 1) }, ...kids);
 
   if (!row && !member.entry) {
@@ -986,7 +1235,19 @@ function modelRow(member, group, idx, axis, data, ctx) {
   }
 
   const cells = ctx.kind.cells(cell, axis, ctx.tips);
-  if (ctx.showSeparated) cells.push(separatedCell(cell, data, ctx.comparable, key));
+  // The configuration, AT the number. Appended to the value cell rather than
+  // handed to each kind, so every methodology gets it and none has to know.
+  // No tooltip button on the per-row tag: the same four lines on eighteen rows is
+  // noise, and it costs the value column ~30px it does not have. The explanation
+  // lives on the callout above the table and on the configuration group header,
+  // and the tag keeps a title= with the full config string.
+  const cfgTag = ctx.scoped ? configTag(configOf(row), { tip: false }) : null;
+  if (cfgTag && cells.length) cells[0].append(cfgTag);
+  if (ctx.showSeparated) {
+    cells.push(separatedCell(cell, data,
+      ctx.scoped ? ctx.comparableIn.get(configOf(row).key) : ctx.comparable,
+      key, ctx.scoped));
+  }
   const detailFile = cell.detail_file;
   const drillId = `b2-drill-${axis.id}-${key}`;
 
@@ -1023,7 +1284,15 @@ function drillRow(axis, key, nCols) {
 function groupHeaderRow(group, mult, nCols) {
   const bits = [];
   const notScored = ["notrun", "excluded", "unknown"].includes(group.kindOf);
-  if (group.kindOf === "gradient") {
+  if (group.kindOf === "scope") {
+    // A configuration heading, not a band: it says which rows may be compared
+    // with each other, and it must not be dressed as an ordering.
+    bits.push(el("span", { class: "chip chip--accent" }, "configuration",
+      tip(TIP.configGroup, "what a configuration group means")));
+    bits.push(el("span", { class: "b2-grp-label b2-grp-label--scope" }, group.label));
+    bits.push(el("span", { class: "b2-grp-p" },
+      `${group.members.length} ${plural(group.members.length, "row")}, comparable with each other only`));
+  } else if (group.kindOf === "gradient") {
     // Not a band, and it must not be dressed as one: no "tied band" chip, no
     // band tooltip, and the header says what the sort is and is not.
     bits.push(el("span", { class: "chip chip--warn" }, "no supported partition",
@@ -1055,13 +1324,24 @@ function groupHeaderRow(group, mult, nCols) {
       bits.push(el("span", { class: "b2-grp-p" }, "alone in its band"));
     }
   }
-  return el("tr", { class: "b2-grprow" },
+  return el("tr", { class: "b2-grprow" + (group.kindOf === "scope" ? " b2-grprow--scope" : "") },
     el("td", { colspan: String(nCols) },
       el("div", { class: "b2-grp-head" }, ...bits),
-      group.note ? el("p", { class: "b2-grp-note" }, group.note) : null));
+      group.note ? el("p", { class: "b2-grp-note" }, group.note) : null,
+      group.sortNote && group.kindOf === "scope"
+        ? el("p", { class: "b2-grp-note b2-grp-note--sub" }, group.sortNote) : null));
 }
 
 function captionText(groups, mult) {
+  const scoped = groups.filter(g => g.kindOf === "scope");
+  if (scoped.length) {
+    return "The rows are cut by serving configuration, because a comparison on this axis is " +
+      "only a comparison of models inside one: the same weights under two settings are two " +
+      "rows and can differ sharply. Numbers in different groups are not comparable at all. " +
+      "Inside a group the rows are sorted by the measured value, and that sort is not a " +
+      "ranking — what is claimed is per pair, in the Distinguishable from column, which " +
+      "counts same-configuration comparisons only.";
+  }
   const gradient = groups.find(g => g.kindOf === "gradient");
   if (gradient) {
     return "The rows are sorted by the measured value, and that sort is not a ranking: " +
@@ -1089,18 +1369,33 @@ function renderAxisResults(data, axis, index, nAxes) {
   // Whether `bands` may be rendered as a ranking structure at all. Everything
   // below branches on it; nothing else about the section changes.
   const partition = partitionFor(data, axis);
+  const scope = scopeFor(data, axis);
   const rows = Array.isArray(data.rows) ? data.rows : [];
-  const comparable = rows.filter(r => {
+  const scored = rows.filter(r => {
     const c = cellOf(r, axis);
     return c && c.status === "ok";
-  }).length;
+  });
+  const comparable = scored.length;
+  // More than one configuration among the scored rows: everything about
+  // configuration on the page hangs off this, so a single-config board is
+  // rendered exactly as it was before any of it existed.
+  const scoped = configKeysOn(data, axis).size > 1;
+  // How many rows a given configuration has — the denominator of "N of M
+  // distinguishable", which on a scoped board is the models it COULD be
+  // compared with, not every row on the axis.
+  const comparableIn = new Map();
+  for (const r of scored) {
+    const k = configOf(r).key;
+    comparableIn.set(k, (comparableIn.get(k) || 0) + 1);
+  }
+  const arms = armIndex(data, axis, scope);
   const showSeparated = !!kind && !partition;
   const valueCols = kind ? kind.columns(axis, tips) : unsupportedColumns(axis.value_kind);
-  if (showSeparated) valueCols.push(separatedColumn());
+  if (showSeparated) valueCols.push(separatedColumn(scoped));
   const nCols = valueCols.length + (kind ? 2 : 1);   // + Model, + Run detail
-  const ctx = { kind, tips, nCols, showSeparated, comparable };
+  const ctx = { kind, tips, nCols, showSeparated, comparable, scoped, comparableIn, arms };
 
-  const groups = resultGroups(data, axis, kind, nAxes, partition);
+  const groups = resultGroups(data, axis, kind, nAxes, partition, scope);
   const head = el("thead", {}, el("tr", {},
     // Rule 2 still holds: no header sorts. The <th> themselves stay inert —
     // no role, no tabindex, no handler. The only interactive thing in the
@@ -1145,6 +1440,19 @@ function renderAxisResults(data, axis, index, nAxes) {
     // The generator's note, at the top of the section rather than buried in the
     // table: "no ordering is claimed here" is the single most important thing
     // about this axis, and a reader who stops at the numbers must still see it.
+    // Configuration first, when there is more than one: it governs how every
+    // number below may be read, so it cannot sit under a disclosure.
+    scoped ? el("div", { class: "panel b2-scopebox" },
+      el("p", { class: "b2-nopart-h" },
+        el("span", { class: "chip chip--accent" }, "a row is a model + a configuration",
+          tip(TIP.configAtNumber, "why configuration is on every row")),
+        el("span", {}, `${configKeysOn(data, axis).size} serving configurations on this axis.`)),
+      el("p", { class: "b2-nopart-p" },
+        (scope && scope.statement) ||
+        "A separation is claimed only between rows that ran under the same configuration."),
+      scope && scope.why ? el("p", { class: "b2-nopart-p b2-nopart-p--sub" }, scope.why) : null,
+      arms.size ? el("p", { class: "b2-nopart-p b2-nopart-p--sub" },
+        `${arms.size} ${plural(arms.size, "build")} on this axis ran under more than one configuration. Each arm is its own row, and every such row shows the other arm's value beside its own — the two are not averaged, reconciled or ranked, and neither is "the model".`) : null) : null,
     !partition ? el("div", { class: "panel b2-nopart" },
       el("p", { class: "b2-nopart-h" },
         el("span", { class: "chip chip--warn" }, "no supported partition",
@@ -1152,7 +1460,9 @@ function renderAxisResults(data, axis, index, nAxes) {
         el("span", {}, "No ordering of these models is claimed on this axis.")),
       el("p", { class: "b2-nopart-p" }, noPartitionNote(data, axis, nAxes)),
       el("p", { class: "b2-nopart-p b2-nopart-p--sub" },
-        "Read the table by row, not by position: each row's Distinguishable from cell lists the models that row is statistically distinguishable from.")) : null,
+        scoped
+          ? "Read the table by row, not by position: each row's Distinguishable from cell lists the models in its own configuration that it is statistically distinguishable from."
+          : "Read the table by row, not by position: each row's Distinguishable from cell lists the models that row is statistically distinguishable from.")) : null,
     // Only drawn with a second axis: with one it would be stating the obvious.
     nAxes > 1 ? el("p", { class: "b2-axis-sep" },
       // The unit is printed verbatim: an axis's unit may already be plural
@@ -1394,9 +1704,13 @@ function noteClaims(data, axes) {
   const c = data.claims || {};
   const nAxes = isNum(c.scored_axes) ? c.scored_axes : axes.length;
   const unordered = axes.filter(a => !partitionFor(data, a));
+  const anyScoped = axes.some(a => configKeysOn(data, a).size > 1);
   const claims = [
     `${nAxes} scored ${nAxes === 1 ? "axis" : "axes"}: ${axes.map(a => a.label).join(", ") || "—"}.`,
     "A 95% interval on every scored cell.",
+    ...(anyScoped
+      ? ["A row is a (model, configuration) pair, and every comparison is claimed inside one configuration only."]
+      : []),
     unordered.length === axes.length
       ? "Per-pair distinguishability only: for each model, which other models it is statistically distinguishable from. No ordering, and no bands."
       : "Ordering only where a two-sample test separates two models; otherwise they share a band.",
@@ -1412,6 +1726,10 @@ function noteClaims(data, axes) {
       ? [`No band structure on ${unordered.length === axes.length ? (axes.length === 1 ? "this axis" : "these axes") : unordered.map(a => a.label).join(", ")}: the tests do not support a partition of the models, so none is drawn and the row order is a sort, not a rank.`]
       : []),
     "No score for a model that did not run. An infrastructure failure is excluded, never counted as a zero.",
+    ...(anyScoped
+      ? ["No comparison across configurations. A cross-configuration p-value compares settings, not models: it is reported and never claimed, so it is in no distinguishable-from set and no band.",
+         "No model-level number. The same weights under two settings are two rows and are never averaged into one, reconciled, or reported as \u201cthe model\u201d."]
+      : []),
   ];
   if (nAxes > 1) {
     // Only worth saying — and only true to say — with a second axis on the page.
@@ -1429,6 +1747,84 @@ function noteClaims(data, axes) {
           el("h4", {}, "It does not claim"),
           el("ul", {}, ...notClaims.map(t => el("li", {}, t))))),
       c.note ? el("p", { class: "b2-claim-note" }, c.note) : null));
+}
+
+/* The configuration note: what each scope IS, who is in it, and — the reason any
+ * of this exists — the arms of one build side by side, so the disagreement is a
+ * thing you can read rather than a thing you are told. Null on a board with one
+ * configuration, where there would be nothing to say. */
+function noteConfig(data, axes) {
+  const scopedAxes = axes.filter(a => configKeysOn(data, a).size > 1);
+  if (!scopedAxes.length) return null;
+  const blocks = scopedAxes.map(a => {
+    const scope = scopeFor(data, a);
+    const kind = axisKind(data, a);
+    const arms = armIndex(data, a, scope);
+    const rowOf = new Map((Array.isArray(data.rows) ? data.rows : []).map(r => [r.model_key, r]));
+    const shown = (r) => {
+      const c = cellOf(r, a);
+      if (!c || c.status !== "ok") return "—";
+      if (isNum(c.rate)) return pct(c.rate);
+      const v = kind ? kind.sortValue(c) : null;
+      return isNum(v) ? fmtInt(v) : "—";
+    };
+    const scopeCards = scopeList(scope).map(s => el("div", { class: "b2-fact b2-scopecard" },
+      el("span", { class: "b2-fact-k" }, s.label || s.key),
+      el("span", { class: "b2-mkey" }, s.key),
+      s.note ? el("p", { class: "b2-grp-note" }, s.note) : null,
+      el("p", { class: "b2-grp-note b2-grp-note--sub" },
+        `${(s.models || []).length} ${plural((s.models || []).length, "row")}: ` +
+        (s.models || []).map(k => (rowOf.get(k) || {}).model || k).join(" · "))));
+    // One column per configuration that any arm ran under, in declared order, so
+    // the matrix reads DOWN a column as well as across a row — and a build with no
+    // arm in a configuration shows an em dash rather than shifting its neighbours.
+    const armScopes = [];
+    for (const rows of arms.values()) {
+      for (const r of rows) {
+        const k = configOf(r).key;
+        if (k && !armScopes.includes(k)) armScopes.push(k);
+      }
+    }
+    const meta = scopeMeta(scope);
+    const armRows = [...arms.entries()].map(([w, rows]) => {
+      const byScope = new Map(rows.map(r => [configOf(r).key, r]));
+      return el("tr", {},
+        el("td", {}, (configOf(rows[0]).weightsName) || w),
+        ...armScopes.map(k => {
+          const r = byScope.get(k);
+          return el("td", { class: "num" },
+            el("span", { class: "b2-armcell-v" }, r ? shown(r) : "—"),
+            el("span", { class: "b2-armcell-c" },
+              r ? (configOf(r).arm || configOf(r).label || k) : "no arm"));
+        }));
+    });
+    return el("div", { class: "b2-note-axis", id: `b2-note-config-${a.id}` },
+      axes.length > 1 ? el("div", { class: "b2-axis-head" },
+        el("h4", {}, a.label || a.id), el("span", { class: "b2-mkey" }, a.id)) : null,
+      scope && scope.statement ? el("p", { class: "b2-unitnote" },
+        el("b", {}, "what a comparison on this axis means"), scope.statement) : null,
+      scope && scope.why ? el("p", { class: "b2-axis-job" }, scope.why) : null,
+      el("div", { class: "b2-axis-facts" }, ...scopeCards),
+      armRows.length ? el("div", { class: "b2-sep-scroll", style: "margin-top:calc(var(--space) * 2.5)" },
+        el("table", { class: "table b2-sep b2-armtable" },
+          el("thead", {}, el("tr", {},
+            el("th", {}, `Same weights, ${armScopes.length} configurations`),
+            ...armScopes.map(k => el("th", {}, (meta.get(k) || {}).label || k)))),
+          el("tbody", {}, ...armRows))) : null,
+      armRows.length ? el("p", { class: "b2-grp-note" },
+        "Read across a row: one build, two settings. The two arms are separate measurements " +
+        "and are never combined — there is no per-build number on this board, because there " +
+        "is no configuration-free answer to give.") : null);
+  });
+  return el("details", { class: "b2-note", id: "b2-note-config" },
+    el("summary", {}, "Configuration — why a row is a model plus a setting"),
+    el("div", { class: "b2-note-body" },
+      el("p", { class: "b2-lede" },
+        "Configuration is a dimension of the measurement on this board, not an annotation on " +
+        "it. The same weights under two serving settings are two rows, they can disagree " +
+        "sharply, and a comparison between two rows is only a comparison of MODELS when both " +
+        "ran under the same one."),
+      ...blocks));
 }
 
 function noteAxis(data, axes) {
@@ -1511,6 +1907,11 @@ function noteBands(data, axes) {
           ? "every model in a band is separated from every model in every lower band"
           : "no split of these models is supported; the rows are sorted, not ranked")),
       isPartition ? null : el("p", { class: "b2-grp-note" }, noPartitionLede),
+      isPartition || configKeysOn(data, a).size < 2 ? null : el("p", { class: "b2-grp-note" },
+        "On this axis there is a second reason, and it is the stronger one: the rows ran " +
+        "under more than one serving configuration. A band asserts an ordering, and an " +
+        "ordering across configurations is not a statement about models at all — so no band " +
+        "is drawn even where a pair separates cleanly."),
       bands.length
         ? el("ul", { class: "b2-note-bands" }, ...bands.map(b => el("li", {},
             el("span", { class: "b2-grp-label" }, b.rank_label || "band"),
@@ -1530,7 +1931,8 @@ function noteBands(data, axes) {
 }
 
 function renderNotes(data, axes) {
-  const notes = [noteClaims(data, axes), noteAxis(data, axes), noteBands(data, axes)].filter(Boolean);
+  const notes = [noteClaims(data, axes), noteConfig(data, axes), noteAxis(data, axes),
+                 noteBands(data, axes)].filter(Boolean);
   if (!notes.length) return null;
   return el("section", { class: "b2-section b2-notes-sec" },
     el("details", { class: "panel b2-notes", id: "b2-notes" },
@@ -1553,23 +1955,50 @@ function renderMethodForAxis(data, axis, nAxes) {
     if (v === false) return el("span", { class: "b2-badge b2-badge--fail" }, "no");
     return el("span", { class: "b2-badge b2-badge--unrun" }, "—");
   };
-  const sepRow = (s) => el("tr", {},
-    el("td", { class: "mono" }, s.axis || axis.id || "—"),
-    el("td", { class: "mono" }, `${s.a} vs ${s.b}`),
-    el("td", { class: "mono" }, s.test || "—"),
-    el("td", { class: "num" }, fmtP(s.p)),
-    el("td", {}, yesNo(s.differs)),
-    el("td", {}, yesNo(s.clears_bonferroni)));
+  // Cross-configuration rows are SHOWN — hiding a comparison would be its own
+  // dishonesty — and de-emphasised, because they are not claims. The scoped
+  // column and the greying carry that; the copy above the table says it in words.
+  const scoped = sep.some(s => s && s.same_config === false);
+  const sepRow = (s) => {
+    const cross = s.same_config === false;
+    return el("tr", { class: cross ? "b2-sep--cross" : "" },
+      el("td", { class: "mono" }, s.axis || axis.id || "—"),
+      // The mark rides in the PAIR cell, not only in the trailing column: on a
+      // narrow viewport this table scrolls, and the one thing that must never
+      // scroll out of sight is that the row is not a model comparison.
+      el("td", { class: "mono" }, `${s.a} vs ${s.b}`,
+        cross ? el("span", { class: "b2-badge b2-badge--cross b2-sep-mark",
+                             title: s.note || TIP.crossConfigSeparation }, "settings, not models")
+              : null),
+      el("td", { class: "mono" }, s.test || "—"),
+      el("td", { class: "num" }, fmtP(s.p)),
+      el("td", {}, yesNo(s.differs)),
+      el("td", {}, yesNo(s.clears_bonferroni)),
+      scoped
+        ? el("td", {}, cross
+            ? el("span", { class: "b2-badge b2-badge--cross", title: s.note || TIP.crossConfigSeparation },
+                "settings, not models")
+            : el("span", { class: "b2-badge b2-badge--pass" }, "yes"))
+        : null);
+  };
   const sepHead = el("thead", {}, el("tr", {},
     el("th", {}, "Axis"), el("th", {}, "Pair"), el("th", {}, "Test"),
-    el("th", {}, "p"), el("th", {}, "Separates?"), el("th", {}, "Clears Bonferroni?")));
+    el("th", {}, "p"), el("th", {}, "Separates?"), el("th", {}, "Clears Bonferroni?"),
+    scoped ? el("th", {}, "Same config?", tip(TIP.sameConfigColumn, "the Same config column")) : null));
+  const crossLine = scoped
+    ? el("p", { class: "b2-sep-cross-note" },
+        el("span", { class: "b2-badge b2-badge--cross" }, "greyed rows"),
+        el("span", {}, "A greyed row's two models ran under different configurations, so its p-value compares settings and not models: it is reported, and it is not corrected for, not claimed, and in neither model's distinguishable-from set.",
+          tip(TIP.crossConfigSeparation, "why some rows are greyed")))
+    : null;
   const table = sep.length
     ? el("div", { class: "b2-sep-scroll" },
         el("table", { class: "table b2-sep" }, sepHead, el("tbody", {}, ...sep.map(sepRow))))
     : null;
 
   const stats = [
-    ["comparisons", m.comparisons],
+    ["comparisons claimed", m.comparisons],
+    ["cross-config, not claimed", m.comparisons_cross_config],
     ["alpha (raw)", m.alpha_raw],
     ["alpha (Bonferroni)", m.alpha_bonferroni],
     ["applied", m.applied === undefined ? undefined : (m.applied ? "yes" : "no — reported only")],
@@ -1594,6 +2023,7 @@ function renderMethodForAxis(data, axis, nAxes) {
     el("h2", { id: hid }, "What separated, and against which threshold"),
     el("p", { class: "b2-lede" }, lede),
     el("div", { class: "panel", style: "margin-top:calc(var(--space) * 2.5)" },
+      crossLine,
       table,
       stats.length || m.note ? el("div", { class: "b2-mult" },
         el("div", { class: "b2-mult-stats" },

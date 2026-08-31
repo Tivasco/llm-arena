@@ -1,7 +1,7 @@
 {
   "schema": "llm-arena board2-detail/1",
   "model_key": "gemma4-26b-a4b-qat",
-  "model": "Gemma 4 26B-A4B QAT",
+  "model": "Gemma 4 26B-A4B QAT \u2014 thinking suppressed",
   "config": "effort=low, temp=0",
   "axis": "injection-v1",
   "axis_label": "Adversarial-input judgement",
