@@ -1,6 +1,6 @@
 {
   "schema": "llm-arena board2/1",
-  "generated_at": "2026-08-31T08:52:54Z",
+  "generated_at": "2026-08-31T09:45:40Z",
   "battery": "v2",
   "battery_doc": "docs/eval-battery-v2.md",
   "claims": {
@@ -44,7 +44,8 @@
       "gates": {
         "formatting-gate-v1": "unrun",
         "tooluse-gate-v1": "PASS 12/12"
-      }
+      },
+      "detail": "board2-qwen38-27b.json"
     },
     {
       "model_key": "gemma4-12b-qat",
@@ -69,7 +70,8 @@
       "gates": {
         "formatting-gate-v1": "unrun",
         "tooluse-gate-v1": "PASS 12/12"
-      }
+      },
+      "detail": "board2-gemma4-12b-qat.json"
     },
     {
       "model_key": "qwen36-35b-a3b",
@@ -94,7 +96,8 @@
       "gates": {
         "formatting-gate-v1": "unrun",
         "tooluse-gate-v1": "PASS 12/12"
-      }
+      },
+      "detail": "board2-qwen36-35b-a3b.json"
     }
   ],
   "bands": [
