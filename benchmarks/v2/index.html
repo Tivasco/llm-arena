@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Board v2 — llm-arena</title>
-  <meta name="description" content="Eval battery v2: one scored axis, no total. Comparable pass rates with a 95% interval on every row, tied rows marked as tied, and a drill-down into every scored pair." />
+  <meta name="description" content="Eval battery v2: one section per scored axis, each on its own terms and never combined. Every cell carries an interval, tied rows are marked as tied, and every scored run drills down." />
   <link rel="stylesheet" href="../../assets/theme.css?v=20260827" />
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
   <script src="../../assets/chrome.js" defer></script>
-  <script src="board2.js?v=20260831c" defer></script>
+  <script src="board2.js?v=20260831e" defer></script>
   <style>
     /* ── board v2 (page-local) ────────────────────────────────────────────
        Extends the Field Notes system in assets/theme.css using its tokens
@@ -480,6 +480,155 @@
       font-family: var(--font-mono); font-size: 0.8em;
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 4px; padding: 1px 5px;
+    }
+
+    /* ── board2/2: one section per axis ──────────────────────────────────────
+       Everything below is reached only by a shape board2/1 could not carry: a
+       second axis, a value_kind other than `proportion`, or a cell whose status
+       is not `ok`. A single-axis proportion board renders without any of it, so
+       the page it always was is the page it still is. */
+
+    /* Axis sections stack; the second onward gets a rule above it so two tables
+       cannot be misread as one. */
+    .b2-results-sec--next {
+      margin-top: clamp(30px, 4.4vw, 56px);
+      padding-top: clamp(22px, 3vw, 34px);
+      border-top: 1px solid var(--border);
+    }
+    /* Drawn only with 2+ axes: says out loud that this table stands alone. */
+    .b2-axis-sep {
+      margin-top: calc(var(--space) * 1.75);
+      padding-left: calc(var(--space) * 1.75);
+      border-left: 2px solid var(--accent-light);
+      color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; max-width: 84ch;
+    }
+
+    /* Reason copy inside a cell that has no number: not run, excluded,
+       unsupported kind. Never blank, never a zero. */
+    .b2-why-p {
+      margin-top: var(--space);
+      color: var(--text-muted); font-size: 0.86rem; line-height: 1.55; max-width: 78ch;
+    }
+    .b2-why-p--sub { color: var(--text-faint); font-size: 0.82rem; }
+    .b2-chip-sp { margin-left: 6px; text-transform: none; letter-spacing: 0.01em; }
+    /* "not run" must read as absent, not as low. Dashed and unfilled, so it is
+       visibly not on the same scale as a measured value. */
+    .b2-chip-notrun {
+      border-style: dashed; background: var(--bg); color: var(--text-faint);
+    }
+    .b2-mrow--notrun > td:first-child { opacity: 0.82; }
+    .b2-mrow--excluded > td:first-child { border-left: 3px solid color-mix(in srgb, var(--verdict-stop) 45%, var(--border)); }
+
+    /* ── value_kind: threshold ───────────────────────────────────────────────
+       A threshold has no rate and no 0–100% domain: the number IS the
+       measurement, and its interval is a bracket between two MEASURED levels.
+       So the "scale" column is the level ladder rather than an error bar. */
+    .b2-c-crit { min-width: 200px; max-width: 34ch; }
+    .b2-criterion { color: var(--text); font-size: 0.86rem; line-height: 1.5; }
+    .b2-lvl-below {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.02em;
+      color: var(--text-muted); white-space: normal; display: inline-block; max-width: 16ch;
+    }
+    .b2-lvl-bracket { display: inline-flex; align-items: baseline; gap: 3px; }
+    .b2-lvl-brace {
+      font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600;
+      line-height: 1; color: var(--accent);
+    }
+    .b2-ladder { min-width: 190px; }
+    .b2-ladder-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .b2-lvl {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.66rem; letter-spacing: 0.01em; color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .b2-lvl--met {
+      border-color: var(--accent-light);
+      background: color-mix(in srgb, var(--accent) 16%, var(--card));
+      color: var(--accent-ink);
+    }
+    .b2-lvl--unmet { border-style: dashed; color: var(--text-faint); }
+    /* The two levels the threshold sits between — the bracket, drawn on the
+       ladder so it reads as an interval and not as a point. */
+    .b2-lvl--edge { box-shadow: 0 0 0 2px var(--accent-tint); border-color: var(--accent); }
+    .b2-lvl-mark { font-size: 0.62rem; line-height: 1; }
+
+    /* ── no supported partition ─────────────────────────────────────────────
+       When the pairwise tests do not support cutting the models into bands,
+       the section says so ABOVE the table and the table grows a per-row
+       "distinguishable from" column carrying the claim instead. The callout is
+       a warning colour on purpose: "we cannot order these" is a limitation of
+       the evidence, not a result to celebrate. */
+    .b2-nopart {
+      margin-top: calc(var(--space) * 2.5);
+      padding: clamp(12px, 1.6vw, 18px);
+      border-left: 3px solid color-mix(in srgb, var(--verdict-warn) 55%, var(--border));
+    }
+    .b2-nopart-h {
+      display: flex; flex-wrap: wrap; align-items: center;
+      gap: calc(var(--space) * 1.5); font-weight: 600;
+    }
+    .b2-nopart-p {
+      margin-top: var(--space);
+      color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; max-width: 88ch;
+    }
+    .b2-nopart-p--sub { color: var(--text-faint); font-size: 0.84rem; }
+
+    /* The distinguishable-from cell: a count, the corrected count beside it,
+       and the list of models behind a disclosure. */
+    /* Two classes on purpose: `.b2-results th { white-space: nowrap }` is more
+       specific than a bare `.b2-h-dist`, and an unwrapped header overflows into
+       the Run detail column. */
+    .b2-results--dist .b2-h-dist { white-space: normal; max-width: 14ch; }
+    .b2-c-dist { min-width: 130px; max-width: 24ch; }
+    /* The extra column has to fit beside everything the axis already shows, so
+       the table tightens rather than pushing the new claim off-screen: the two
+       widest columns give up their slack and the count stacks over its
+       corrected figure. It still scrolls on a narrow viewport. */
+    .b2-results--dist .b2-c-model { min-width: 200px; }
+    .b2-results--dist .b2-c-bar { min-width: 130px; width: 18%; }
+    .b2-results--dist .b2-h-bar,
+    .b2-results--dist .b2-h-n { white-space: normal; max-width: 13ch; }
+    .b2-dist-head { display: flex; flex-direction: column; gap: 2px; }
+    .b2-dist-count {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+    .b2-dist-sub {
+      font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.03em;
+      color: var(--text-muted);
+    }
+    .b2-distbox > summary {
+      cursor: pointer; list-style: none;
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+    }
+    .b2-distbox > summary::-webkit-details-marker { display: none; }
+    .b2-distbox > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .b2-dist-toggle {
+      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--accent); border-bottom: 1px dotted var(--accent-light);
+    }
+    .b2-distbox[open] .b2-dist-toggle { border-bottom-style: solid; }
+    .b2-dist-list {
+      margin: calc(var(--space) * 1.25) 0 0; padding: 0; list-style: none;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .b2-dist-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+    .b2-dist-name { font-size: 0.84rem; color: var(--text); }
+    .b2-dist-flag {
+      font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-faint);
+    }
+    .b2-dist-flag--strong {
+      color: var(--accent-ink); background: var(--accent-tint);
+      border-radius: var(--radius-sm); padding: 1px 5px;
+    }
+    .b2-dist-none {
+      margin-top: var(--space);
+      color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; max-width: 32ch;
     }
 
     @media (max-width: 900px) {
