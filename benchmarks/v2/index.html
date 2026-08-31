@@ -4,47 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Board v2 — llm-arena</title>
-  <meta name="description" content="Eval battery v2: one scored axis, no total. Bands instead of ranks, a 95% interval on every cell, gates reported as pass/fail." />
+  <meta name="description" content="Eval battery v2: one scored axis, no total. Comparable pass rates with a 95% interval on every row, tied rows marked as tied, and a drill-down into every scored pair." />
   <link rel="stylesheet" href="../../assets/theme.css?v=20260827" />
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
   <script src="../../assets/chrome.js" defer></script>
-  <script src="board2.js?v=20260831" defer></script>
+  <script src="board2.js?v=20260831b" defer></script>
   <style>
     /* ── board v2 (page-local) ────────────────────────────────────────────
        Extends the Field Notes system in assets/theme.css using its tokens
        only. Nothing here is shared with the v1 board, so it lives on this
-       page rather than in theme.css. All hooks are emitted by board2.js. */
+       page rather than in theme.css. All hooks are emitted by board2.js.
 
-    /* Claim / counter-claim: the first thing on the page. */
-    .b2-claim { border-color: var(--accent-light); }
-    .b2-claim-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-      gap: clamp(18px, 2.6vw, 32px);
-      margin-top: calc(var(--space) * 2);
-    }
-    .b2-claim-col h3 { font-size: 1.02rem; font-weight: 600; }
-    .b2-claim-col ul {
-      list-style: none;
-      margin-top: calc(var(--space) * 1.5);
-      display: flex; flex-direction: column; gap: var(--space);
-      font-size: 0.92rem; line-height: 1.5;
-    }
-    .b2-claim-col li { display: flex; gap: calc(var(--space) * 1.25); align-items: flex-start; }
-    .b2-claim-col li::before {
-      content: "✓"; flex: none;
-      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
-      line-height: 1.6; color: var(--accent);
-    }
-    .b2-claim-col--not li::before { content: "✕"; color: var(--verdict-stop); }
-    .b2-claim-col--not li { color: var(--text-muted); }
-    .b2-claim-note {
-      margin-top: clamp(18px, 2.4vw, 26px);
-      padding-top: calc(var(--space) * 2);
-      border-top: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 0.92rem; line-height: 1.6; max-width: 78ch;
-    }
+       Page order is load-bearing: the comparable results table sits directly
+       under the title, and every word of methodology lives below it inside
+       collapsed notes. */
 
     /* Section scaffolding */
     .b2-section { margin-top: var(--space-section); }
@@ -52,101 +25,89 @@
     .b2-section > h2 { margin-bottom: calc(var(--space) * 1.5); }
     .b2-lede { color: var(--text-muted); max-width: 74ch; font-size: 0.98rem; line-height: 1.6; }
 
-    /* The axis card */
-    .b2-axis-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 2); }
-    .b2-axis-head h3 { font-size: clamp(1.3rem, 2.2vw, 1.6rem); }
-    .b2-axis-job { color: var(--text-muted); font-size: 0.98rem; line-height: 1.6; margin-top: var(--space); max-width: 70ch; }
-    .b2-axis-facts {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
-      gap: calc(var(--space) * 1.5);
-      margin-top: calc(var(--space) * 2.5);
+    /* ── The results view — the page ─────────────────────────────────────── */
+    .b2-results-sec { margin-top: clamp(22px, 3vw, 34px); }
+    .b2-res-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 1.5); }
+    .b2-res-head h2 { font-size: clamp(1.35rem, 2.4vw, 1.75rem); letter-spacing: -0.02em; }
+    .b2-res-jump { margin-left: auto; display: flex; flex-wrap: wrap; gap: calc(var(--space) * 2); }
+    .b2-why {
+      font-family: var(--font-mono); font-size: 0.66rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent); border-bottom: 1px dotted var(--accent-light);
     }
-    .b2-fact {
-      border: 1px solid var(--border); border-radius: var(--radius-md);
-      background: var(--surface); padding: calc(var(--space) * 1.5) calc(var(--space) * 1.75);
-    }
-    .b2-fact-k {
-      display: block;
-      font-family: var(--font-mono); font-size: 0.58rem; font-weight: 600;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint);
-    }
-    .b2-fact-v {
-      display: block; margin-top: 4px;
-      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-      font-size: 0.9rem; color: var(--text);
-    }
-    /* The unit note is load-bearing — without it the number reads as a safety score. */
-    .b2-unitnote {
-      margin-top: calc(var(--space) * 2.5);
-      padding: calc(var(--space) * 2) calc(var(--space) * 2.25);
-      border: 1px solid var(--accent-light);
-      border-left-width: 3px;
-      border-radius: var(--radius-md);
-      background: var(--accent-tint);
-      color: var(--accent-ink);
-      font-size: 0.95rem; line-height: 1.6;
-    }
-    .b2-unitnote b {
-      display: block; margin-bottom: 5px;
-      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
-      letter-spacing: 0.13em; text-transform: uppercase; opacity: 0.85;
-    }
+    .b2-why:hover { color: var(--accent-hover); border-bottom-style: solid; }
+    .b2-res-job { margin-top: var(--space); color: var(--text-muted); font-size: 0.98rem; line-height: 1.6; max-width: 78ch; }
+    .b2-res-panel { margin-top: calc(var(--space) * 2.5); padding: clamp(14px, 1.8vw, 20px); }
+    .b2-res-scroll { overflow-x: auto; }
 
-    /* ── Bands ────────────────────────────────────────────────────────────
-       A band is a SET, not a list. Deliberately no ordinal, no position
-       number, no sort affordance, and every card gets identical weight —
-       a reader must not be able to read a ranking out of a band. */
-    .b2-band { padding: 0; overflow: hidden; }
-    .b2-band + .b2-band { margin-top: clamp(16px, 2vw, 24px); }
-    .b2-band-head {
-      display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--space) * 1.5);
-      padding: clamp(18px, 2.4vw, 24px) clamp(20px, 2.6vw, 28px) calc(var(--space) * 1.5);
+    .b2-results { width: 100%; }
+    /* Caption below the table so the numbers are the first thing rendered. */
+    .b2-results > caption {
+      caption-side: bottom;
+      text-align: left;
+      padding: calc(var(--space) * 2) calc(var(--space) * 1.75) calc(var(--space) * 0.5);
+      color: var(--text-muted); font-size: 0.86rem; line-height: 1.55; max-width: 96ch;
     }
-    .b2-band-head h3 { font-size: 1.05rem; font-weight: 600; }
-    .b2-band-count {
-      margin-left: auto;
-      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);
-      text-align: right;
+    /* Rule 2: the headers are inert. No sort, no cursor, no focus ring. */
+    .b2-results th { cursor: default; white-space: nowrap; }
+    .b2-results th.b2-h-model { white-space: normal; }
+    .b2-results td { vertical-align: top; padding-top: calc(var(--space) * 1.5); padding-bottom: calc(var(--space) * 1.5); }
+
+    /* A band is one bracketed row group. Tied groups carry a vertical brace. */
+    .b2-grp + .b2-grp > tr > td { border-top: 1px solid var(--hairline); }
+    .b2-grp--tied > tr > td:first-child { border-left: 3px solid var(--accent-light); }
+    .b2-grprow > td {
+      padding-top: calc(var(--space) * 1.25); padding-bottom: calc(var(--space) * 1.25);
+      background: var(--surface); border-bottom: 1px solid var(--border);
     }
-    .b2-band-note {
-      padding: 0 clamp(20px, 2.6vw, 28px) calc(var(--space) * 2);
-      color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; max-width: 82ch;
+    .b2-grp tbody, .b2-grprow:hover, .b2-drillrow:hover { background: transparent; }
+    .b2-results tbody.b2-grp > tr.b2-grprow:hover { background: var(--surface); }
+    .b2-grp-head { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--space) * 1.5); }
+    .b2-grp-label { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.015em; }
+    .b2-grp-p {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.68rem; letter-spacing: 0.02em; color: var(--text-muted);
     }
-    .b2-band-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-      gap: clamp(14px, 1.8vw, 20px);
-      padding: 0 clamp(20px, 2.6vw, 28px) clamp(20px, 2.6vw, 28px);
-      border-top: 1px solid var(--border);
-      padding-top: clamp(20px, 2.6vw, 26px);
-      list-style: none;
-    }
-    .b2-mcard {
-      border: 1px solid var(--border); border-radius: var(--radius-md);
-      background: var(--card); padding: calc(var(--space) * 2);
-      display: flex; flex-direction: column; gap: calc(var(--space) * 1.5);
-    }
-    .b2-mcard-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space); }
-    .b2-mcard-head h4 { font-size: 0.98rem; font-weight: 600; letter-spacing: -0.015em; }
+    .b2-grp-note { margin-top: 6px; color: var(--text-muted); font-size: 0.84rem; line-height: 1.5; max-width: 92ch; }
+
+    /* Model cell */
+    .b2-c-model { min-width: 240px; }
+    .b2-model-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space); }
+    .b2-model-name { font-size: 1rem; font-weight: 600; letter-spacing: -0.015em; }
+    .b2-model-sub { margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space); }
     .b2-mkey { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-faint); letter-spacing: 0.02em; }
+    .b2-submetrics { margin-top: var(--space); display: flex; flex-wrap: wrap; gap: 5px; }
+    .b2-submetrics .chip { text-transform: none; letter-spacing: 0.01em; font-size: 0.62rem; }
+    /* The tie marker: a reader must not be able to read a rank off two rows. */
+    .b2-tie {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: var(--radius-pill);
+      background: var(--accent-tint); border: 1px solid var(--accent-light);
+      color: var(--accent-ink);
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .b2-tie-brace { font-size: 0.85rem; line-height: 1; }
+    .b2-c-missing { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; }
 
     /* Rate + interval. The interval always ships with the point estimate. */
-    .b2-rate { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 1.25); }
+    .b2-c-rate, .b2-c-ci, .b2-c-n { white-space: nowrap; }
     .b2-rate-num {
       font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-      font-size: 1.45rem; font-weight: 600; letter-spacing: -0.03em; color: var(--text);
+      font-size: 1.4rem; font-weight: 600; letter-spacing: -0.03em; color: var(--text);
     }
     .b2-rate-ci {
       font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-      font-size: 0.7rem; letter-spacing: 0.01em; color: var(--text-muted);
-      white-space: nowrap;
+      font-size: 0.74rem; letter-spacing: 0.01em; color: var(--text-muted);
     }
-    .b2-rate-noci { font-family: var(--font-mono); font-size: 0.68rem; color: #d32f27; }
-    .b2-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .b2-rate-noci { font-family: var(--font-mono); font-size: 0.66rem; color: #d32f27; }
+    .b2-count { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text); font-variant-numeric: tabular-nums; }
+    .b2-count-u { display: block; margin-top: 2px; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); }
 
-    /* Error bar: a range spanning the 95% interval with a tick at the estimate. */
-    .b2-bar { margin-top: 2px; }
+    /* Error bar: a range spanning the 95% interval with a tick at the estimate,
+       on a shared 0–100% domain so overlap between rows is visible by eye. */
+    .b2-c-bar { min-width: 190px; width: 30%; }
+    .b2-bar { margin-top: 4px; }
     .b2-bar-track {
       position: relative; height: 10px;
       border: 1px solid var(--border); border-radius: var(--radius-pill);
@@ -174,16 +135,241 @@
       font-family: var(--font-mono); font-variant-numeric: tabular-nums;
       font-size: 0.56rem; letter-spacing: 0.06em; color: var(--text-faint);
     }
-    .b2-detail { display: flex; flex-wrap: wrap; gap: 5px; }
-    .b2-detail .chip { text-transform: none; letter-spacing: 0.01em; }
-    .b2-mcard-missing { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
 
-    /* ── Gates ───────────────────────────────────────────────────────────── */
-    .b2-gate-scroll { overflow-x: auto; margin-top: calc(var(--space) * 2.5); }
-    .b2-gates { width: 100%; }
-    .b2-gates th { white-space: nowrap; }
-    .b2-gates td { white-space: nowrap; }
-    .b2-gates td.b2-gate-model { white-space: normal; font-weight: 600; letter-spacing: -0.015em; }
+    /* ── Drill-down affordance ───────────────────────────────────────────── */
+    .b2-c-drill { white-space: nowrap; }
+    .b2-drillbtn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 12px; border-radius: var(--radius-pill);
+      border: 1px solid var(--border); background: var(--card); color: var(--accent);
+      font-family: var(--font-mono); font-size: 0.66rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+      transition: border-color 0.18s var(--ease), background 0.18s var(--ease);
+    }
+    .b2-drillbtn:hover { border-color: var(--accent-light); background: var(--accent-tint); }
+    .b2-drillbtn[aria-expanded="true"] { background: var(--accent-tint); border-color: var(--accent-light); color: var(--accent-ink); }
+    .b2-drillbtn-c { font-size: 0.7rem; }
+    .b2-nodrill {
+      font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-faint);
+    }
+    .b2-drillrow > td { background: var(--surface); padding: 0; }
+    /* Narrow viewports scroll the table sideways; the expansion sticks to the
+       left edge of the scroller so its text never scrolls out of reach. */
+    .b2-drillbox {
+      padding: clamp(16px, 2.2vw, 26px);
+      position: sticky; left: 0;
+      /* the scroller's visible width: viewport minus container + panel gutters */
+      max-width: min(100%, calc(100vw - 2 * (clamp(20px, 5vw, 40px) + clamp(14px, 1.8vw, 20px) + 1px)));
+      box-sizing: border-box;
+    }
+    .b2-drill-loading { color: var(--text-muted); font-size: 0.9rem; }
+    .b2-drill-err {
+      border: 1px solid color-mix(in srgb, var(--verdict-stop) 34%, var(--border));
+      border-left-width: 3px; border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--verdict-stop) 6%, var(--card));
+      padding: calc(var(--space) * 2);
+    }
+    .b2-drill-err p { margin-top: 6px; color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; }
+    .b2-drill-err code { font-family: var(--font-mono); font-size: 0.8em; }
+
+    /* ── Drill-down content: per-pair evidence ───────────────────────────── */
+    .b2-detail-head {
+      display: flex; flex-wrap: wrap; gap: calc(var(--space) * 2) clamp(20px, 3vw, 40px);
+      align-items: flex-start; justify-content: space-between;
+    }
+    .b2-detail-sum { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 1.5); }
+    .b2-detail-sum .chip { text-transform: none; letter-spacing: 0.01em; }
+    .b2-detail-facts { display: flex; flex-wrap: wrap; gap: calc(var(--space) * 2); }
+    .b2-pair-fact { display: flex; flex-direction: column; gap: 3px; }
+    .b2-pair-fact code, .b2-payload pre, .b2-call code {
+      font-family: var(--font-mono); font-size: 0.76rem; color: var(--text);
+      word-break: break-word;
+    }
+    .b2-fact-k {
+      display: block;
+      font-family: var(--font-mono); font-size: 0.56rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint);
+    }
+    .b2-fact-v {
+      display: block; margin-top: 4px;
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.9rem; color: var(--text);
+    }
+    .b2-detail-lede {
+      margin-top: calc(var(--space) * 2); padding-top: calc(var(--space) * 2);
+      border-top: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; max-width: 92ch;
+    }
+    .b2-pairs { margin-top: calc(var(--space) * 2); display: flex; flex-direction: column; gap: clamp(12px, 1.6vw, 18px); }
+    .b2-pair {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--card); padding: calc(var(--space) * 2);
+    }
+    .b2-pair-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: calc(var(--space) * 2); }
+    .b2-pair-id {
+      font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.04em; color: var(--text);
+      padding: 3px 9px; border-radius: var(--radius-sm);
+      background: var(--surface); border: 1px solid var(--border);
+    }
+    .b2-pair-verdict { margin-left: auto; }
+    .b2-payload {
+      margin-top: calc(var(--space) * 1.75);
+      border: 1px dashed var(--hairline); border-radius: var(--radius-md);
+      background: var(--surface); padding: calc(var(--space) * 1.5);
+    }
+    .b2-payload pre { margin-top: 6px; white-space: pre-wrap; line-height: 1.55; color: var(--text-muted); }
+    .b2-arms {
+      margin-top: calc(var(--space) * 1.75);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: clamp(12px, 1.6vw, 18px);
+    }
+    .b2-arm {
+      border: 1px solid var(--border); border-left: 3px solid var(--hairline);
+      border-radius: var(--radius-md); background: var(--surface);
+      padding: calc(var(--space) * 1.75);
+    }
+    .b2-arm--attack { border-left-color: var(--verdict-warn); }
+    .b2-arm--benign { border-left-color: var(--accent-mid); }
+    .b2-arm-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space); }
+    .b2-arm-h { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .b2-outcome { text-transform: none; letter-spacing: 0.01em; }
+    .b2-arm-legend { margin-top: var(--space); color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; }
+    /* called_tools is the load-bearing field: the axis is whether the
+       forbidden call was emitted at all. It gets the most weight in the card. */
+    .b2-calls {
+      margin-top: calc(var(--space) * 1.75);
+      padding: calc(var(--space) * 1.25) calc(var(--space) * 1.5);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--card);
+    }
+    .b2-calls-list { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .b2-calls-none { margin-top: 7px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-faint); letter-spacing: 0.02em; }
+    .b2-call {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: var(--radius-pill);
+      border: 1px solid var(--border); background: var(--surface);
+    }
+    .b2-call--forbidden {
+      border-color: color-mix(in srgb, var(--verdict-stop) 55%, var(--border));
+      background: color-mix(in srgb, var(--verdict-stop) 12%, #fff);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--verdict-stop) 10%, transparent);
+    }
+    .b2-call--forbidden code { color: #d32f27; font-weight: 600; }
+    .b2-call-warn { color: #d32f27; font-size: 0.8rem; line-height: 1; }
+    .b2-call-tag {
+      font-family: var(--font-mono); font-size: 0.55rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: #d32f27;
+    }
+    .b2-arm-exp { margin-top: calc(var(--space) * 1.5); font-size: 0.82rem; line-height: 1.5; color: var(--text-muted); }
+    .b2-excerpt {
+      margin-top: calc(var(--space) * 1.5);
+      border-left: 2px solid var(--border); padding-left: calc(var(--space) * 1.5);
+      color: var(--text); font-size: 0.86rem; line-height: 1.6;
+    }
+    .b2-legend { margin-top: calc(var(--space) * 2.5); }
+    .b2-legend > summary {
+      cursor: pointer;
+      font-family: var(--font-mono); font-size: 0.64rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .b2-legend dl { margin-top: calc(var(--space) * 1.5); display: grid; grid-template-columns: auto 1fr; gap: 6px calc(var(--space) * 2); }
+    .b2-legend dt { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text); white-space: nowrap; }
+    .b2-legend dd { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
+
+    /* ── Notes: demoted methodology, collapsed, below the results ────────── */
+    .b2-notes-sec { margin-top: clamp(28px, 4vw, 52px); }
+    .b2-notes { padding: clamp(16px, 2.2vw, 26px) clamp(18px, 2.6vw, 30px); }
+    .b2-notes > summary,
+    .b2-note > summary,
+    .b2-rules > summary {
+      cursor: pointer; list-style: none;
+      display: flex; align-items: center; gap: calc(var(--space) * 1.5);
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+    }
+    .b2-notes > summary::-webkit-details-marker,
+    .b2-note > summary::-webkit-details-marker,
+    .b2-rules > summary::-webkit-details-marker { display: none; }
+    .b2-notes > summary::after,
+    .b2-note > summary::after,
+    .b2-rules > summary::after { content: "＋"; margin-left: auto; color: var(--text-faint); font-size: 0.85rem; }
+    .b2-notes[open] > summary::after,
+    .b2-note[open] > summary::after,
+    .b2-rules[open] > summary::after { content: "－"; }
+    .b2-notes-hint { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-faint); }
+    .b2-notes-body { margin-top: calc(var(--space) * 2); display: flex; flex-direction: column; }
+    .b2-note {
+      border-top: 1px solid var(--border);
+      padding: calc(var(--space) * 2) 0;
+    }
+    .b2-note > summary { color: var(--text); text-transform: none; letter-spacing: 0.01em; font-family: var(--font-sans); font-size: 0.95rem; }
+    .b2-note-body { margin-top: calc(var(--space) * 2); }
+    .b2-note-body > * + * { margin-top: calc(var(--space) * 2); }
+    .b2-note-bands { list-style: none; display: flex; flex-direction: column; gap: calc(var(--space) * 1.5); }
+    .b2-note-bands li { border-left: 2px solid var(--border); padding-left: calc(var(--space) * 1.75); }
+    .b2-note-bands p { margin-top: 4px; color: var(--text-muted); font-size: 0.86rem; line-height: 1.55; }
+    .b2-note-bands .b2-mkey { margin-left: var(--space); }
+
+    .b2-claim-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+      gap: clamp(18px, 2.6vw, 32px);
+    }
+    .b2-claim-col h4 { font-size: 0.95rem; font-weight: 600; }
+    .b2-claim-col ul {
+      list-style: none;
+      margin-top: calc(var(--space) * 1.5);
+      display: flex; flex-direction: column; gap: var(--space);
+      font-size: 0.9rem; line-height: 1.5;
+    }
+    .b2-claim-col li { display: flex; gap: calc(var(--space) * 1.25); align-items: flex-start; }
+    .b2-claim-col li::before {
+      content: "✓"; flex: none;
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+      line-height: 1.6; color: var(--accent);
+    }
+    .b2-claim-col--not li::before { content: "✕"; color: var(--verdict-stop); }
+    .b2-claim-col--not li { color: var(--text-muted); }
+    .b2-claim-note {
+      padding-top: calc(var(--space) * 2);
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem; line-height: 1.6; max-width: 78ch;
+    }
+
+    .b2-note-axis + .b2-note-axis { border-top: 1px solid var(--border); padding-top: calc(var(--space) * 2); }
+    .b2-axis-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 2); }
+    .b2-axis-head h4 { font-size: 1.05rem; font-weight: 600; }
+    .b2-axis-job { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-top: var(--space); max-width: 70ch; }
+    .b2-axis-facts {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+      gap: calc(var(--space) * 1.5);
+      margin-top: calc(var(--space) * 2.5);
+    }
+    .b2-fact {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--surface); padding: calc(var(--space) * 1.5) calc(var(--space) * 1.75);
+    }
+    /* The unit note is load-bearing — without it the number reads as a safety score. */
+    .b2-unitnote {
+      margin-top: calc(var(--space) * 2.5);
+      padding: calc(var(--space) * 2) calc(var(--space) * 2.25);
+      border: 1px solid var(--accent-light);
+      border-left-width: 3px;
+      border-radius: var(--radius-md);
+      background: var(--accent-tint);
+      color: var(--accent-ink);
+      font-size: 0.95rem; line-height: 1.6;
+    }
+    .b2-unitnote b {
+      display: block; margin-bottom: 5px;
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase; opacity: 0.85;
+    }
+
+    /* ── Method: separation tests + multiplicity ──────────────────────────── */
     .b2-badge {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 3px 10px; border-radius: var(--radius-pill);
@@ -195,22 +381,7 @@
     .b2-badge--pass { color: #1f8f3e; background: color-mix(in srgb, var(--verdict-go) 14%, #fff); border-color: color-mix(in srgb, var(--verdict-go) 36%, var(--border)); }
     .b2-badge--fail { color: #d32f27; background: color-mix(in srgb, var(--verdict-stop) 12%, #fff); border-color: color-mix(in srgb, var(--verdict-stop) 34%, var(--border)); }
     .b2-badge--unrun { color: var(--text-faint); background: var(--bg); border-style: dashed; }
-
-    /* ── Excluded ────────────────────────────────────────────────────────── */
-    .b2-excluded { display: flex; flex-direction: column; gap: clamp(12px, 1.6vw, 18px); margin-top: calc(var(--space) * 2.5); list-style: none; }
-    .b2-exc {
-      border: 1px solid var(--border); border-left: 3px solid var(--verdict-warn);
-      border-radius: var(--radius-md); background: var(--card);
-      padding: calc(var(--space) * 2) calc(var(--space) * 2.25);
-      display: flex; flex-direction: column; gap: var(--space);
-    }
-    .b2-exc-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: calc(var(--space) * 1.5); }
-    .b2-exc-head h3 { font-size: 1rem; font-weight: 600; }
-    .b2-exc p { font-size: 0.9rem; line-height: 1.55; color: var(--text-muted); max-width: 82ch; }
-    .b2-exc-note { border-top: 1px dashed var(--border); padding-top: var(--space); }
-
-    /* ── Method: separation tests + multiplicity ──────────────────────────── */
-    .b2-sep-scroll { overflow-x: auto; margin-top: calc(var(--space) * 2.5); }
+    .b2-sep-scroll { overflow-x: auto; }
     .b2-sep { width: 100%; font-size: 0.9rem; }
     .b2-sep td.num, .b2-sep td.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .b2-sep th { white-space: nowrap; }
@@ -238,15 +409,6 @@
 
     /* ── Reporting rules (collapsed footer block) ─────────────────────────── */
     .b2-rules { margin-top: clamp(16px, 2vw, 24px); }
-    .b2-rules > summary {
-      cursor: pointer; list-style: none;
-      display: flex; align-items: center; gap: calc(var(--space) * 1.25);
-      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
-    }
-    .b2-rules > summary::-webkit-details-marker { display: none; }
-    .b2-rules > summary::after { content: "＋"; margin-left: auto; color: var(--text-faint); font-size: 0.85rem; }
-    .b2-rules[open] > summary::after { content: "－"; }
     .b2-rules ol {
       margin-top: calc(var(--space) * 2); padding-left: 1.5em;
       display: flex; flex-direction: column; gap: var(--space);
@@ -265,9 +427,9 @@
       border-radius: 4px; padding: 1px 5px;
     }
 
-    @media (max-width: 720px) {
-      .b2-band-count { margin-left: 0; width: 100%; text-align: left; }
-      .b2-gates { min-width: 520px; }
+    @media (max-width: 900px) {
+      .b2-results { min-width: 780px; }
+      .b2-res-jump { margin-left: 0; width: 100%; }
       .b2-sep { min-width: 600px; }
     }
   </style>

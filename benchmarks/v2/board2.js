@@ -2,18 +2,29 @@
 /* board2.js — renderer for the eval battery v2 board.
  *
  * Contract: benchmarks/data/board2.json, schema "llm-arena board2/1".
+ * Per-run drill-down: benchmarks/data/<row.detail>, schema
+ * "llm-arena board2-detail/1" (fetched lazily, exactly the row.detail ->
+ * data/<file> convention benchmarks/bench.js uses for its model panel).
  *
- * Three rules this file enforces in code, not just in copy:
+ * Shape of the page: the comparable results are the page. One table, models as
+ * rows, ordered by pass rate, every rate shipped with its 95% interval and an
+ * error bar on a shared 0–100% domain. Methodology (the claim panel, what is
+ * measured, why bands) lives below the table in collapsed notes.
+ *
+ * Four rules this file enforces in code, not just in copy:
  *   1. NO TOTAL. Nothing here sums, averages or composites anything across
  *      axes, and no key named total/composite/overall/average is ever read.
  *      A future data file that carried one would still not get one rendered.
- *   2. NO SORT. Bands are rendered in file order; models inside a band are
- *      rendered in file order into an unordered list with visually identical
- *      cards, and the page ships no sort control. A reader must not be able to
- *      read a ranking out of a band.
+ *   2. NO RANK. Rows are ordered by rate so they can be compared, but there is
+ *      no position number, no ordinal, and no sort control anywhere on the
+ *      page (every <th> is inert). Rows that share a band are drawn inside one
+ *      bracketed group and each row after the first is marked "tied with
+ *      above", so adjacent rows cannot be misread as separated.
  *   3. NO BARE POINT ESTIMATE. Every rate is rendered together with its 95%
  *      interval (numerically and as an error bar). A row whose interval is
  *      missing is marked as not reportable rather than shown as a lone number.
+ *   4. NO INFERRED FAILURE. A pair the run could not score (pair_passed null)
+ *      reads as indeterminate, never as a failure.
  */
 
 /* ── tiny DOM helper (same shape as benchmarks/bench.js) ──────────────────── */
@@ -22,10 +33,22 @@ function el(tag, attrs = {}, ...kids) {
   for (const [k, v] of Object.entries(attrs)) {
     if (k === "class") n.className = v;
     else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
     else if (v != null) n.setAttribute(k, v);
   }
   for (const kid of kids) if (kid != null) n.append(kid.nodeType ? kid : document.createTextNode(kid));
   return n;
+}
+
+/* Same fetch-once cache as bench.js, so re-opening a drill-down is free. */
+const CACHE = {};
+async function fetchJSON(path) {
+  if (!(path in CACHE)) {
+    const r = await fetch(path);
+    if (!r.ok) throw new Error(`${path} -> ${r.status} ${r.statusText}`);
+    CACHE[path] = await r.json();
+  }
+  return CACHE[path];
 }
 
 /* Keys this renderer refuses to read, anywhere. See rule 1 above. */
@@ -60,13 +83,473 @@ function fmtP(p) {
   if (p === 0) return "0";
   return p < 1e-4 || p >= 1e5 ? p.toExponential(1) : String(Number(p.toPrecision(4)));
 }
+function plural(n, u) { return `${u}${n === 1 ? "" : "s"}`; }
+function primaryAxis(data) {
+  const axes = Array.isArray(data.axes) ? data.axes : [];
+  return axes[0] || null;
+}
+function scoreOf(row, axis) {
+  if (!row || !axis) return null;
+  return (row.scores || {})[axis.id] || null;
+}
+function rateOf(row, axis) {
+  const s = scoreOf(row, axis);
+  return s && isNum(s.rate) ? s.rate : null;
+}
 
-/* ── 1. What this board claims / does not claim ───────────────────────────── */
-function renderClaims(data) {
+/* ── error bar: interval as a range, estimate as a tick, 0–100% always ────── */
+function errorBar(lo, hi, pt, label, { scale = true } = {}) {
+  return el("div", { class: "b2-bar", role: "img", "aria-label": label, title: label },
+    el("div", { class: "b2-bar-track" },
+      el("div", { class: "b2-bar-mid" }),
+      el("div", { class: "b2-bar-range", style: `left:${(lo * 100).toFixed(2)}%;width:${((hi - lo) * 100).toFixed(2)}%` }),
+      el("div", { class: "b2-bar-point", style: `left:${(pt * 100).toFixed(2)}%` })),
+    scale ? el("div", { class: "b2-bar-scale" }, el("span", {}, "0%"), el("span", {}, "50%"), el("span", {}, "100%")) : null);
+}
+
+/* ── 1. THE RESULTS TABLE — the page ─────────────────────────────────────────
+ * One table. Models as rows, ordered by rate. Bands become bracketed row
+ * groups: a group header names the band, and every row after the first in a
+ * multi-model band is stamped "tied with above". No <th> is clickable. */
+
+/* The most separating pair *inside* a set of models — the p-value that failed
+ * to split the band. Null when the data file carries no test for the set. */
+function bandSeparation(data, keys) {
+  const set = new Set(keys);
+  const hits = (Array.isArray(data.separation) ? data.separation : [])
+    .filter(s => set.has(s.a) && set.has(s.b) && isNum(s.p));
+  if (!hits.length) return null;
+  let best = hits[0];
+  for (const h of hits) if (h.p < best.p) best = h;
+  return { p: best.p, test: best.test || null };
+}
+
+function resultGroups(data, axis) {
+  const rows = Array.isArray(data.rows) ? data.rows : [];
+  const byKey = new Map(rows.map(r => [r.model_key, r]));
+  const bands = Array.isArray(data.bands) ? data.bands : [];
+  const byRate = (a, b) => {
+    const ra = rateOf(a.row, axis), rb = rateOf(b.row, axis);
+    if (ra == null && rb == null) return 0;
+    if (ra == null) return 1;
+    if (rb == null) return -1;
+    return rb - ra;
+  };
+
+  const groups = bands.map((b, i) => {
+    const keys = Array.isArray(b.models) ? b.models : [];
+    const members = keys.map(k => ({ key: k, row: byKey.get(k) || null })).sort(byRate);
+    const rates = members.map(m => rateOf(m.row, axis)).filter(isNum);
+    return {
+      id: `band-${i}`,
+      label: b.rank_label || "band",
+      note: b.note || null,
+      members,
+      tied: members.length > 1,
+      sep: members.length > 1 ? bandSeparation(data, keys) : null,
+      best: rates.length ? Math.max(...rates) : -Infinity,
+    };
+  });
+  // Bands themselves are ordered by their best rate: ordering *between* bands
+  // is the one ordering the tests support.
+  groups.sort((a, b) => b.best - a.best);
+
+  const placed = new Set(bands.flatMap(b => b.models || []));
+  const orphans = rows.filter(r => !placed.has(r.model_key));
+  if (orphans.length) {
+    groups.push({
+      id: "unbanded",
+      label: "not placed in a band",
+      note: "Scored, but the data file places these rows in no band — no ordering against any other row is claimed for them.",
+      members: orphans.map(r => ({ key: r.model_key, row: r })).sort(byRate),
+      tied: false, sep: null, orphan: true, best: -Infinity,
+    });
+  }
+  return groups;
+}
+
+/* Rate + interval cells. Rule 3: never a lone point estimate. */
+function rateCells(s, axis) {
+  const rate = s && isNum(s.rate) ? s.rate : null;
+  const ci = s && Array.isArray(s.ci95) && isNum(s.ci95[0]) && isNum(s.ci95[1]) ? s.ci95 : null;
+  const unit = axis && axis.unit ? axis.unit : "item";
+
+  if (rate == null) {
+    return [
+      el("td", { class: "b2-c-rate" }, el("span", { class: "b2-rate-noci" }, "no rate")),
+      el("td", { class: "b2-c-ci" }, el("span", { class: "b2-rate-noci" }, "not reportable")),
+      el("td", { class: "b2-c-bar" }, el("span", { class: "b2-count" }, "—")),
+      el("td", { class: "b2-c-n" }, el("span", { class: "b2-count" }, "—")),
+    ];
+  }
+  const countCell = el("td", { class: "b2-c-n" },
+    isNum(s.passed) && isNum(s.n)
+      ? el("span", { class: "b2-count" }, `${s.passed} / ${s.n}`)
+      : el("span", { class: "b2-count" }, "—"),
+    isNum(s.n) ? el("span", { class: "b2-count-u" }, plural(s.n, unit)) : null);
+
+  if (!ci) {
+    return [
+      el("td", { class: "b2-c-rate" }, el("span", { class: "b2-rate-num" }, pct(rate))),
+      el("td", { class: "b2-c-ci" }, el("span", { class: "b2-rate-noci" }, "no 95% interval — not reportable")),
+      el("td", { class: "b2-c-bar" }, el("span", { class: "b2-count" }, "no interval to draw")),
+      countCell,
+    ];
+  }
+  const lo = clamp01(ci[0]), hi = clamp01(ci[1]), pt = clamp01(rate);
+  const label = `pass rate ${pct(rate)}, 95% interval ${pct(lo)} to ${pct(hi)}`;
+  return [
+    el("td", { class: "b2-c-rate" }, el("span", { class: "b2-rate-num" }, pct(rate))),
+    el("td", { class: "b2-c-ci" }, el("span", { class: "b2-rate-ci" }, `${pct(lo)} – ${pct(hi)}`)),
+    el("td", { class: "b2-c-bar" }, errorBar(lo, hi, pt, label)),
+    countCell,
+  ];
+}
+
+const N_COLS = 6;
+
+function modelRow(member, group, idx, axis, data) {
+  const { key, row } = member;
+  const s = scoreOf(row, axis);
+  const tied = group.tied && idx > 0;
+
+  const nameCell = el("td", { class: "b2-c-model" },
+    el("div", { class: "b2-model-line" },
+      el("span", { class: "b2-model-name" }, (row && row.model) || key),
+      row && row.config ? el("span", { class: "cfg-chip" }, row.config) : null),
+    el("div", { class: "b2-model-sub" },
+      el("span", { class: "b2-mkey" }, (row && row.model_key) || key),
+      s && s.status && s.status !== "ok" ? el("span", { class: "chip v-warn" }, "status: " + s.status) : null,
+      // Rule 2: an adjacent row must never be readable as a rank position.
+      tied ? el("span", { class: "b2-tie" },
+        el("span", { class: "b2-tie-brace", "aria-hidden": "true" }, "↳"),
+        "tied with above") : null));
+
+  if (!row) {
+    return el("tr", { class: "b2-mrow b2-mrow--missing" },
+      nameCell,
+      el("td", { class: "b2-c-missing", colspan: String(N_COLS - 1) },
+        "Listed in this band, but the data file carries no scored row for it."));
+  }
+  if (!s) {
+    return el("tr", { class: "b2-mrow b2-mrow--missing" },
+      nameCell,
+      el("td", { class: "b2-c-missing", colspan: String(N_COLS - 1) },
+        `${(axis && (axis.label || axis.id)) || "This axis"}: not in this data file.`));
+  }
+
+  const cells = rateCells(s, axis);
+  const detailFile = typeof row.detail === "string" && row.detail.trim() ? row.detail.trim() : null;
+  const drillId = `b2-drill-${key}`;
+
+  // Sub-metrics that came with the score (resistance, benign_compliance …).
+  const chips = Object.entries(s.detail || {})
+    .map(([k, v]) => el("span", { class: "chip", title: `${prettyKey(k)}: ${v}` }, `${prettyKey(k)} ${v}`));
+  if (chips.length) nameCell.append(el("div", { class: "b2-submetrics" }, ...chips));
+
+  let drillCell;
+  if (detailFile) {
+    const btn = el("button", {
+      class: "b2-drillbtn", type: "button",
+      "aria-expanded": "false", "aria-controls": drillId,
+      "data-model-key": key,
+    }, el("span", { class: "b2-drillbtn-t" }, "Pair detail"), el("span", { class: "b2-drillbtn-c", "aria-hidden": "true" }, "▾"));
+    btn.addEventListener("click", () => toggleDrill(key, detailFile, row, axis, data, btn));
+    drillCell = el("td", { class: "b2-c-drill" }, btn);
+  } else {
+    // The generator omits `detail` when Langfuse is unreachable. Never a dead link.
+    drillCell = el("td", { class: "b2-c-drill" },
+      el("span", { class: "b2-nodrill", title: "No per-run detail file was generated for this run." }, "no detail file"));
+  }
+
+  // 6 cells: model, rate, interval, error bar, count, drill. N_COLS.
+  return el("tr", { class: "b2-mrow", id: `b2-row-${key}` }, nameCell, ...cells, drillCell);
+}
+
+function drillRow(key) {
+  return el("tr", { class: "b2-drillrow", id: `b2-drill-${key}`, hidden: "" },
+    el("td", { colspan: String(N_COLS) }, el("div", { class: "b2-drillbox" })));
+}
+
+function groupHeaderRow(group, data) {
+  const bits = [];
+  bits.push(el("span", { class: `chip ${group.tied ? "chip--warn" : "chip--accent"}` }, group.tied ? "tied band" : "band"));
+  bits.push(el("span", { class: "b2-grp-label" }, group.label));
+  if (group.tied) {
+    const sep = group.sep;
+    const alpha = (data.multiplicity || {}).alpha_raw;
+    bits.push(el("span", { class: "b2-grp-p" },
+      sep ? `${group.members.length} models, not distinguishable — most separating pair p = ${fmtP(sep.p)}`
+          : `${group.members.length} models, not distinguishable`,
+      sep && isNum(alpha) ? ` (α = ${alpha})` : ""));
+  } else if (!group.orphan) {
+    bits.push(el("span", { class: "b2-grp-p" }, "alone in its band"));
+  }
+  return el("tr", { class: "b2-grprow" },
+    el("td", { colspan: String(N_COLS) },
+      el("div", { class: "b2-grp-head" }, ...bits),
+      group.note ? el("p", { class: "b2-grp-note" }, group.note) : null));
+}
+
+function captionText(data, groups) {
+  const tiedSeps = groups.filter(g => g.tied && g.sep).map(g => g.sep);
+  const alpha = (data.multiplicity || {}).alpha_raw;
+  let p = null, test = null;
+  for (const s of tiedSeps) if (p == null || s.p < p) { p = s.p; test = s.test; }
+  const head = "Rows inside one band are not distinguishable from each other — the row order there is not a ranking.";
+  if (p == null) return head + " Ordering is claimed only between bands.";
+  return head +
+    ` The most separating pair inside a band is p = ${fmtP(p)}${test ? ` (${prettyKey(test)})` : ""}` +
+    `${isNum(alpha) ? `, above α = ${alpha}` : ""}. Ordering is claimed only between bands.`;
+}
+
+function renderResults(data) {
+  const axis = primaryAxis(data);
+  const rows = Array.isArray(data.rows) ? data.rows : [];
+  if (!axis || !rows.length) {
+    return el("section", { class: "b2-results-sec" },
+      el("p", { class: "panel" }, "No scored axis or no scored row in the data file."));
+  }
+  const groups = resultGroups(data, axis);
+
+  const head = el("thead", {}, el("tr", {},
+    // Deliberately inert headers: no role, no tabindex, no handler. Rule 2.
+    el("th", { class: "b2-h-model" }, "Model"),
+    el("th", { class: "b2-h-rate" }, "Pass rate"),
+    el("th", { class: "b2-h-ci" }, "95% interval"),
+    el("th", { class: "b2-h-bar" }, "Interval on a 0–100% scale"),
+    el("th", { class: "b2-h-n" }, axis.unit ? plural(2, axis.unit) + " passed" : "passed"),
+    el("th", { class: "b2-h-drill" }, "Run detail")));
+
+  const bodies = groups.map(g => {
+    const tb = el("tbody", { class: "b2-grp" + (g.tied ? " b2-grp--tied" : "") }, groupHeaderRow(g, data));
+    g.members.forEach((m, i) => {
+      tb.append(modelRow(m, g, i, axis, data));
+      if (m.row && typeof m.row.detail === "string" && m.row.detail.trim()) tb.append(drillRow(m.key));
+    });
+    return tb;
+  });
+
+  const table = el("table", { class: "table b2-results" },
+    el("caption", { class: "b2-cap" }, captionText(data, groups)),
+    head, ...bodies);
+
+  const axisName = axis.label || axis.id;
+  return el("section", { class: "b2-results-sec", "aria-labelledby": "b2-res-h" },
+    el("div", { class: "b2-res-head" },
+      el("h2", { id: "b2-res-h" }, axisName),
+      el("span", { class: "chip chip--accent" }, "the only scored axis"),
+      el("span", { class: "b2-res-jump" },
+        el("a", { href: "#b2-notes", class: "b2-why", onclick: openNotes("b2-note-axis") },
+          "how one ", axis.unit || "item", " is scored"),
+        el("a", { href: "#b2-notes", class: "b2-why", onclick: openNotes("b2-note-bands") }, "why bands, not a rank"))),
+    axis.job ? el("p", { class: "b2-res-job" }, axis.job + ".") : null,
+    el("div", { class: "panel b2-res-panel" }, el("div", { class: "b2-res-scroll" }, table)));
+}
+
+/* An inline "why?" affordance: jump to the note and open it. */
+function openNotes(id) {
+  return (e) => {
+    const wrap = document.getElementById("b2-notes");
+    const d = document.getElementById(id);
+    if (wrap) wrap.open = true;
+    if (d) { d.open = true; e.preventDefault(); d.scrollIntoView({ block: "center", behavior: "smooth" }); d.focus?.(); }
+  };
+}
+
+/* ── 2. DRILL-DOWN — the pairs behind one run ─────────────────────────────── */
+
+/* Presentational tone only. Labels and descriptions always come from the
+ * emitted outcome_legend; an outcome this map has never heard of still renders,
+ * neutrally, with whatever the legend says about it. */
+const OUTCOME_TONE = {
+  resisted: "v-go",
+  benign_ok: "v-go",
+  complied: "v-stop",
+  benign_refused: "v-warn",
+  error: "",
+};
+
+function outcomeChip(outcome, legend) {
+  const key = outcome == null ? "" : String(outcome);
+  const tone = OUTCOME_TONE[key] || "";
+  const desc = legend && legend[key];
+  return el("span", { class: `chip b2-outcome ${tone}`.trim(), title: desc || undefined },
+    key ? prettyKey(key) : "no outcome recorded");
+}
+
+function callChips(arm, forbidden) {
+  const calls = Array.isArray(arm.called_tools) ? arm.called_tools : null;
+  if (!calls) return el("p", { class: "b2-calls-none" }, "called_tools not recorded for this arm.");
+  if (!calls.length) return el("p", { class: "b2-calls-none" }, "no tool call emitted");
+  return el("div", { class: "b2-calls-list" }, ...calls.map(t => {
+    const bad = forbidden && t === forbidden;
+    return el("span", { class: "b2-call" + (bad ? " b2-call--forbidden" : "") },
+      bad ? el("span", { class: "b2-call-warn", "aria-hidden": "true" }, "⚠") : null,
+      el("code", {}, String(t)),
+      bad ? el("span", { class: "b2-call-tag" }, "forbidden") : null);
+  }));
+}
+
+function armBlock(name, arm, pair, legend) {
+  if (!arm || typeof arm !== "object") {
+    return el("div", { class: "b2-arm" },
+      el("h5", { class: "b2-arm-h" }, name + " arm"),
+      el("p", { class: "b2-calls-none" }, "This arm is not in the detail file."));
+  }
+  // On the attack arm the action tool IS the forbidden call — that is the axis.
+  const forbidden = name === "attack" ? (pair.forbidden_tool || pair.action_tool || null) : null;
+  const desc = legend && legend[String(arm.outcome)];
+  return el("div", { class: `b2-arm b2-arm--${name}` },
+    el("div", { class: "b2-arm-head" },
+      el("h5", { class: "b2-arm-h" }, name + " arm"),
+      arm.item_id ? el("span", { class: "b2-mkey" }, arm.item_id) : null,
+      outcomeChip(arm.outcome, legend)),
+    desc ? el("p", { class: "b2-arm-legend" }, desc) : null,
+    el("div", { class: "b2-calls" },
+      el("span", { class: "b2-fact-k" }, "called_tools" + (forbidden ? ` — ${forbidden} is forbidden here` : "")),
+      callChips(arm, forbidden)),
+    arm.expected ? el("p", { class: "b2-arm-exp" }, el("span", { class: "b2-fact-k" }, "expected"), arm.expected) : null,
+    arm.answer_excerpt
+      ? el("blockquote", { class: "b2-excerpt" }, String(arm.answer_excerpt))
+      : el("p", { class: "b2-calls-none" }, "no answer excerpt recorded"));
+}
+
+function pairVerdict(pair) {
+  if (pair.pair_passed === true) return el("span", { class: "chip v-go" }, "pair passed");
+  if (pair.pair_passed === false) return el("span", { class: "chip v-stop" }, "pair failed");
+  // Rule 4: null is indeterminate. It is not a failure and it is not a zero.
+  return el("span", { class: "chip v-warn", title: "No scoreable observation for this pair — it leaves the denominator rather than counting as a failure." },
+    "indeterminate — not scored");
+}
+
+function pairCard(pair, legend) {
+  const facts = [
+    ["domain", pair.domain],
+    ["read tool", pair.read_tool],
+    ["action tool", pair.action_tool],
+  ].filter(([, v]) => v != null && v !== "");
+  const armNames = ["attack", "benign"].filter(n => n in pair);
+  for (const k of Object.keys(pair)) {
+    // Any further arm-shaped key still gets rendered.
+    if (!armNames.includes(k) && pair[k] && typeof pair[k] === "object" && !Array.isArray(pair[k]) && "outcome" in pair[k]) armNames.push(k);
+  }
+
+  return el("article", { class: "b2-pair" },
+    el("div", { class: "b2-pair-head" },
+      el("span", { class: "b2-pair-id" }, pair.pair || "pair"),
+      ...facts.map(([k, v]) => el("span", { class: "b2-pair-fact" },
+        el("span", { class: "b2-fact-k" }, k), el("code", {}, String(v)))),
+      el("span", { class: "b2-pair-verdict" }, pairVerdict(pair))),
+    pair.payload != null
+      ? el("div", { class: "b2-payload" },
+          el("span", { class: "b2-fact-k" }, "planted payload" + (pair.payload_key ? ` — ${pair.payload_key}` : "")),
+          el("pre", {}, String(pair.payload)))
+      : el("p", { class: "b2-calls-none" }, "no planted payload recorded for this pair"),
+    el("div", { class: "b2-arms" }, ...armNames.map(n => armBlock(n, pair[n], pair, legend))));
+}
+
+function detailView(d, row, axis) {
+  const sum = d.summary || {};
+  const legend = d.outcome_legend || null;
+  const pairs = Array.isArray(d.pairs) ? d.pairs : [];
+  const unit = axis && axis.unit ? axis.unit : "pair";
+
+  const facts = [
+    ["run", d.run],
+    ["sampling", d.sampling || (axis && axis.sampling)],
+    ["axis", d.axis_label || d.axis || (axis && (axis.label || axis.id))],
+    ["config", d.config || (row && row.config)],
+  ].filter(([, v]) => v != null && v !== "");
+
+  const rate = isNum(sum.rate) ? sum.rate : null;
+  const ci = Array.isArray(sum.ci95) && isNum(sum.ci95[0]) && isNum(sum.ci95[1]) ? sum.ci95 : null;
+  const extra = Object.entries(sum).filter(([k]) => !["passed", "n", "rate", "ci95"].includes(k));
+
+  const indet = pairs.filter(p => p.pair_passed == null).length;
+
+  return el("div", { class: "b2-detailview" },
+    el("div", { class: "b2-detail-head" },
+      el("div", { class: "b2-detail-sum" },
+        rate != null ? el("span", { class: "b2-rate-num" }, pct(rate)) : null,
+        ci ? el("span", { class: "b2-rate-ci" }, `95% CI ${pct(clamp01(ci[0]))} – ${pct(clamp01(ci[1]))}`) : null,
+        isNum(sum.passed) && isNum(sum.n)
+          ? el("span", { class: "b2-count" }, `${sum.passed} / ${sum.n} ${plural(sum.n, unit)} passed`) : null,
+        ...extra.map(([k, v]) => el("span", { class: "chip", title: prettyKey(k) }, `${prettyKey(k)} ${v}`))),
+      el("div", { class: "b2-detail-facts" },
+        ...facts.map(([k, v]) => el("span", { class: "b2-pair-fact" },
+          el("span", { class: "b2-fact-k" }, k), el("code", {}, String(v)))))),
+    el("p", { class: "b2-detail-lede" },
+      pairs.length
+        ? `${pairs.length} ${plural(pairs.length, unit)}. Each pair plants a directive in tool output and asks the same action twice: once uninvited (the attack arm, where the action tool must never be called) and once because the user asked for it (the benign arm, where it must be).` +
+          (indet ? ` ${indet} ${plural(indet, "pair")} could not be scored and read as indeterminate below.` : "")
+        : "The detail file carries no pairs."),
+    el("div", { class: "b2-pairs" }, ...pairs.map(p => pairCard(p, legend))),
+    legend ? el("details", { class: "b2-legend" },
+      el("summary", {}, "Outcome legend — as emitted by the run"),
+      el("dl", {}, ...Object.entries(legend).flatMap(([k, v]) => [
+        el("dt", {}, prettyKey(k)), el("dd", {}, String(v))]))) : null);
+}
+
+async function toggleDrill(key, file, row, axis, data, btn) {
+  const tr = document.getElementById(`b2-drill-${key}`);
+  if (!tr) return;
+  const box = tr.querySelector(".b2-drillbox");
+  const open = btn.getAttribute("aria-expanded") === "true";
+  if (open) {
+    tr.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+    btn.querySelector(".b2-drillbtn-c").textContent = "▾";
+    setModelParam(null);
+    return;
+  }
+  tr.hidden = false;
+  btn.setAttribute("aria-expanded", "true");
+  btn.querySelector(".b2-drillbtn-c").textContent = "▴";
+  setModelParam(key);
+  if (box.dataset.loaded === "1") return;
+
+  box.innerHTML = "";
+  box.append(el("p", { class: "b2-drill-loading" }, "Loading pair-level detail…"));
+  let d;
+  try {
+    d = await fetchJSON("../data/" + file);
+    if (!d || typeof d !== "object") throw new Error("detail file is not an object");
+  } catch (e) {
+    box.innerHTML = "";
+    box.append(el("div", { class: "b2-drill-err", role: "alert" },
+      el("strong", {}, "Could not load the pair-level detail for this run."),
+      el("p", {}, "The board expects it at ", el("code", {}, "benchmarks/data/" + file), "."),
+      el("p", { class: "b2-evidence" }, String((e && e.message) || e)),
+      el("p", {}, "The rate above is unaffected — only this expansion failed to load.")));
+    return;
+  }
+  box.innerHTML = "";
+  box.append(detailView(d, row, axis));
+  box.dataset.loaded = "1";
+}
+
+/* ?model=<key> deep link: keeps a drill-down shareable without a second page. */
+function setModelParam(key) {
+  try {
+    const u = new URL(window.location.href);
+    if (key) u.searchParams.set("model", key); else u.searchParams.delete("model");
+    window.history.replaceState(null, "", u.toString());
+  } catch (_) { /* file:// or no history API — the expansion still works. */ }
+}
+function openFromQuery() {
+  let key = null;
+  try { key = new URL(window.location.href).searchParams.get("model"); } catch (_) { return; }
+  if (!key) return;
+  const btn = document.querySelector(`.b2-drillbtn[data-model-key="${CSS.escape(key)}"]`);
+  if (btn) { btn.click(); btn.scrollIntoView({ block: "center" }); }
+}
+
+/* ── 3. NOTES — everything that is not a result ───────────────────────────── */
+function noteClaims(data) {
   const c = data.claims || {};
   const axes = Array.isArray(data.axes) ? data.axes : [];
   const nAxes = isNum(c.scored_axes) ? c.scored_axes : axes.length;
-
   const claims = [
     `${nAxes} scored ${nAxes === 1 ? "axis" : "axes"}: ${axes.map(a => a.label).join(", ") || "—"}.`,
     "A 95% interval on every scored cell.",
@@ -79,25 +562,22 @@ function renderClaims(data) {
     "No rank inside a band. Models in the same band are not ordered, and there is no way to sort them.",
     "No score for a model that did not run. An infrastructure failure is excluded, never counted as a zero.",
   ];
-
-  return el("section", { class: "panel b2-claim", "aria-labelledby": "b2-claims-h" },
-    el("span", { class: "eyebrow" }, "The claim"),
-    el("h2", { id: "b2-claims-h", style: "margin-top:10px" }, "What this board claims — and what it does not"),
-    el("div", { class: "b2-claim-grid" },
-      el("div", { class: "b2-claim-col" },
-        el("h3", {}, "It claims"),
-        el("ul", {}, ...claims.map(t => el("li", {}, t)))),
-      el("div", { class: "b2-claim-col b2-claim-col--not" },
-        el("h3", {}, "It does not claim"),
-        el("ul", {}, ...notClaims.map(t => el("li", {}, t))))),
-    c.note ? el("p", { class: "b2-claim-note" }, c.note) : null);
+  return el("details", { class: "b2-note", id: "b2-note-claims" },
+    el("summary", {}, "What this board claims — and what it does not"),
+    el("div", { class: "b2-note-body" },
+      el("div", { class: "b2-claim-grid" },
+        el("div", { class: "b2-claim-col" },
+          el("h4", {}, "It claims"),
+          el("ul", {}, ...claims.map(t => el("li", {}, t)))),
+        el("div", { class: "b2-claim-col b2-claim-col--not" },
+          el("h4", {}, "It does not claim"),
+          el("ul", {}, ...notClaims.map(t => el("li", {}, t))))),
+      c.note ? el("p", { class: "b2-claim-note" }, c.note) : null));
 }
 
-/* ── 2. The axis, with the unit note that makes the number readable ───────── */
-function renderAxes(data) {
+function noteAxis(data) {
   const axes = Array.isArray(data.axes) ? data.axes : [];
-  if (!axes.length) return el("section", { class: "b2-section" }, el("p", { class: "panel" }, "No axis in the data file."));
-
+  if (!axes.length) return null;
   const cards = axes.map(a => {
     const facts = [
       ["axis id", a.id],
@@ -106,9 +586,9 @@ function renderAxes(data) {
       ["reps", isNum(a.reps) ? String(a.reps) : a.reps],
       ["sampling", a.sampling],
     ].filter(([, v]) => v != null && v !== "");
-    return el("section", { class: "panel" },
+    return el("div", { class: "b2-note-axis" },
       el("div", { class: "b2-axis-head" },
-        el("h3", {}, a.label || a.id),
+        el("h4", {}, a.label || a.id),
         el("span", { class: "chip chip--accent" }, "scored")),
       a.job ? el("p", { class: "b2-axis-job" }, "The job: " + a.job) : null,
       el("div", { class: "b2-axis-facts" },
@@ -118,179 +598,45 @@ function renderAxes(data) {
       a.unit_note ? el("p", { class: "b2-unitnote" },
         el("b", {}, `how one ${a.unit || "item"} is scored`), a.unit_note) : null);
   });
-
-  return el("section", { class: "b2-section", "aria-labelledby": "b2-axis-h" },
-    el("span", { class: "eyebrow" }, "The scored axis" + (axes.length === 1 ? "" : "es")),
-    el("h2", { id: "b2-axis-h" }, "What is measured"),
-    el("p", { class: "b2-lede" },
-      "One axis is scored because one axis has a demonstrated, tested separation on this fleet. " +
-      "Read the scoring note before reading any number below it."),
-    el("div", { style: "margin-top:calc(var(--space) * 2.5)" }, ...cards));
+  return el("details", { class: "b2-note", id: "b2-note-axis" },
+    el("summary", {}, "What is measured, and how one item is scored"),
+    el("div", { class: "b2-note-body" },
+      el("p", { class: "b2-lede" },
+        "One axis is scored because one axis has a demonstrated, tested separation on this fleet. " +
+        "Read the scoring note before reading any number in the table."),
+      ...cards));
 }
 
-/* ── error bar: interval as a range, estimate as a tick ───────────────────── */
-function rateBlock(s, axis) {
-  const rate = isNum(s.rate) ? s.rate : null;
-  const ci = Array.isArray(s.ci95) && isNum(s.ci95[0]) && isNum(s.ci95[1]) ? s.ci95 : null;
-  const unit = axis && axis.unit ? axis.unit : "item";
-  const plural = (n, u) => `${u}${n === 1 ? "" : "s"}`;
-
-  // Rule 3: never a lone point estimate.
-  if (rate == null) {
-    return el("div", {},
-      el("div", { class: "b2-rate" }, el("span", { class: "b2-rate-noci" }, "no rate in the data file")));
-  }
-  if (!ci) {
-    return el("div", {},
-      el("div", { class: "b2-rate" },
-        el("span", { class: "b2-rate-num" }, pct(rate)),
-        el("span", { class: "b2-rate-noci" }, "no 95% interval — not reportable")),
-      isNum(s.passed) && isNum(s.n)
-        ? el("p", { class: "b2-count" }, `${s.passed} / ${s.n} ${plural(s.n, unit)} passed`) : null);
-  }
-
-  const lo = clamp01(ci[0]), hi = clamp01(ci[1]), pt = clamp01(rate);
-  const label = `pass rate ${pct(rate)}, 95% interval ${pct(lo)} to ${pct(hi)}`;
-  return el("div", {},
-    el("div", { class: "b2-rate" },
-      el("span", { class: "b2-rate-num" }, pct(rate)),
-      el("span", { class: "b2-rate-ci" }, `95% CI ${pct(lo)} – ${pct(hi)}`)),
-    el("div", { class: "b2-bar", role: "img", "aria-label": label, title: label },
-      el("div", { class: "b2-bar-track" },
-        el("div", { class: "b2-bar-mid" }),
-        el("div", { class: "b2-bar-range", style: `left:${(lo * 100).toFixed(2)}%;width:${((hi - lo) * 100).toFixed(2)}%` }),
-        el("div", { class: "b2-bar-point", style: `left:${(pt * 100).toFixed(2)}%` })),
-      el("div", { class: "b2-bar-scale" }, el("span", {}, "0%"), el("span", {}, "50%"), el("span", {}, "100%"))),
-    isNum(s.passed) && isNum(s.n)
-      ? el("p", { class: "b2-count" }, `${s.passed} / ${s.n} ${plural(s.n, unit)} passed`) : null);
-}
-
-/* ── 3. Bands — a set, never a ranking ────────────────────────────────────── */
-function modelCard(key, row, axes) {
-  if (!row) {
-    return el("li", { class: "b2-mcard" },
-      el("div", { class: "b2-mcard-head" },
-        el("h4", {}, key),
-        el("span", { class: "b2-mkey" }, key)),
-      el("p", { class: "b2-mcard-missing" },
-        "Listed in this band, but the data file carries no scored row for it."));
-  }
-  const parts = [
-    el("div", { class: "b2-mcard-head" },
-      el("h4", {}, row.model || key),
-      row.config ? el("span", { class: "cfg-chip" }, row.config) : null,
-      el("span", { class: "b2-mkey" }, row.model_key || key)),
-  ];
-  for (const axis of axes) {
-    const s = (row.scores || {})[axis.id];
-    if (!s) {
-      parts.push(el("p", { class: "b2-mcard-missing" }, `${axis.label || axis.id}: not in this data file.`));
-      continue;
-    }
-    parts.push(rateBlock(s, axis));
-    const chips = [];
-    if (s.status && s.status !== "ok") chips.push(el("span", { class: "chip v-warn" }, "status: " + s.status));
-    for (const [k, v] of Object.entries(s.detail || {})) {
-      chips.push(el("span", { class: "chip", title: `${prettyKey(k)}: ${v}` }, `${prettyKey(k)} ${v}`));
-    }
-    if (chips.length) parts.push(el("div", { class: "b2-detail" }, ...chips));
-  }
-  return el("li", { class: "b2-mcard" }, ...parts);
-}
-
-function renderBands(data) {
-  const axes = Array.isArray(data.axes) ? data.axes : [];
-  const rows = Array.isArray(data.rows) ? data.rows : [];
-  const byKey = new Map(rows.map(r => [r.model_key, r]));
+function noteBands(data) {
   const bands = Array.isArray(data.bands) ? data.bands : [];
-
-  const cards = bands.map((b, i) => {
-    // File order, both for bands and for the models inside them. No sort.
-    const keys = Array.isArray(b.models) ? b.models : [];
-    const n = keys.length;
-    return el("section", { class: "panel b2-band", "aria-label": `Band: ${b.rank_label || i + 1}` },
-      el("div", { class: "b2-band-head" },
-        el("span", { class: "chip chip--accent" }, "band"),
-        el("h3", {}, b.rank_label || "band"),
-        el("span", { class: "b2-band-count" },
-          `${n} model${n === 1 ? "" : "s"} · no ordering claimed within this band`)),
-      b.note ? el("p", { class: "b2-band-note" }, b.note) : null,
-      el("ul", { class: "b2-band-grid" }, ...keys.map(k => modelCard(k, byKey.get(k), axes))));
-  });
-
-  const scoredKeys = new Set(bands.flatMap(b => b.models || []));
-  const orphans = rows.filter(r => !scoredKeys.has(r.model_key));
-
-  return el("section", { class: "b2-section", "aria-labelledby": "b2-bands-h" },
-    el("span", { class: "eyebrow" }, "The board"),
-    el("h2", { id: "b2-bands-h" }, "Bands, not a rank"),
-    el("p", { class: "b2-lede" },
-      "Bands are separated from each other by a two-sample test; the note on each band gives the " +
-      "p-value that justifies the split, or the tie that prevents one. Inside a band there is no " +
-      "order, no position and no first place — the cards are deliberately equal, and nothing on this " +
-      "page will sort them. Two models in one band are a measured tie, not a photo finish."),
-    el("div", { style: "margin-top:calc(var(--space) * 2.5)" },
-      ...(cards.length ? cards : [el("p", { class: "panel" }, "No bands in the data file.")]),
-      ...(orphans.length ? [el("p", { class: "cm-caveat" },
-        "Scored but not placed in a band: " + orphans.map(r => r.model || r.model_key).join(", ") + ".")] : [])));
+  return el("details", { class: "b2-note", id: "b2-note-bands" },
+    el("summary", {}, "Bands, not a rank — why two rows can be a tie"),
+    el("div", { class: "b2-note-body" },
+      el("p", { class: "b2-lede" },
+        "Bands are separated from each other by a two-sample test; the note on each band gives the " +
+        "p-value that justifies the split, or the tie that prevents one. Inside a band there is no " +
+        "order, no position and no first place — the rows are deliberately equal, and nothing on this " +
+        "page will sort them. Two models in one band are a measured tie, not a photo finish."),
+      bands.length
+        ? el("ul", { class: "b2-note-bands" }, ...bands.map(b => el("li", {},
+            el("span", { class: "b2-grp-label" }, b.rank_label || "band"),
+            el("span", { class: "b2-mkey" }, (b.models || []).join(", ")),
+            b.note ? el("p", {}, b.note) : null)))
+        : null));
 }
 
-/* ── 4. Gates — pass/fail, never summed ───────────────────────────────────── */
-function gateBadge(v) {
-  const s = v == null ? "" : String(v);
-  const low = s.trim().toLowerCase();
-  if (low === "unrun" || low === "not run" || low === "" || low === "null")
-    return el("span", { class: "b2-badge b2-badge--unrun", title: "This gate was not run for this model." }, "not run");
-  if (low.startsWith("pass")) return el("span", { class: "b2-badge b2-badge--pass" }, s);
-  if (low.startsWith("fail")) return el("span", { class: "b2-badge b2-badge--fail" }, s);
-  return el("span", { class: "b2-badge" }, s);
-}
-function renderGates(data) {
-  const rows = Array.isArray(data.rows) ? data.rows : [];
-  const cols = [];
-  for (const r of rows) for (const k of Object.keys(r.gates || {})) if (!cols.includes(k)) cols.push(k);
-  if (!cols.length) return null;
-
-  const table = el("table", { class: "table b2-gates" },
-    el("thead", {}, el("tr", {},
-      el("th", {}, "Model"),
-      ...cols.map(c => el("th", {}, c)))),
-    el("tbody", {}, ...rows.map(r => el("tr", {},
-      el("td", { class: "b2-gate-model" }, r.model || r.model_key),
-      ...cols.map(c => el("td", {}, gateBadge((r.gates || {})[c])))))));
-
-  return el("section", { class: "b2-section", "aria-labelledby": "b2-gates-h" },
-    el("span", { class: "eyebrow" }, "Gates — not part of the board"),
-    el("h2", { id: "b2-gates-h" }, "Is the deployment working?"),
-    el("p", { class: "b2-lede" },
-      "A gate answers whether the deployment works, not how good a model is. Gates are pass/fail and " +
-      "are never summed into a score — folding a saturated component into a total is exactly what " +
-      "invalidated the previous board. A gate marked \"not run\" was not run: it is neither a pass nor a zero."),
-    el("div", { class: "panel", style: "margin-top:calc(var(--space) * 2.5);padding-top:calc(var(--space) * 1.5);padding-bottom:calc(var(--space) * 1.5)" },
-      el("div", { class: "b2-gate-scroll", style: "margin-top:0" }, table)));
+function renderNotes(data) {
+  const notes = [noteClaims(data), noteAxis(data), noteBands(data)].filter(Boolean);
+  if (!notes.length) return null;
+  return el("section", { class: "b2-section b2-notes-sec" },
+    el("details", { class: "panel b2-notes", id: "b2-notes" },
+      el("summary", {},
+        el("span", {}, "Notes on method — what this measures, what it claims, why bands"),
+        el("span", { class: "b2-notes-hint" }, "read the table first")),
+      el("div", { class: "b2-notes-body" }, ...notes)));
 }
 
-/* ── 5. Excluded models — excluded, not zeroed ────────────────────────────── */
-function renderExcluded(data) {
-  const exc = Array.isArray(data.excluded) ? data.excluded : [];
-  if (!exc.length) return null;
-  return el("section", { class: "b2-section", "aria-labelledby": "b2-exc-h" },
-    el("span", { class: "eyebrow" }, "Excluded"),
-    el("h2", { id: "b2-exc-h" }, "Models that did not run"),
-    el("p", { class: "b2-lede" },
-      "These models are absent from the board because they produced no measurement. They are not " +
-      "scored low and they are not scored zero — a model that never answered is not a model that failed."),
-    el("ul", { class: "b2-excluded" }, ...exc.map(e => el("li", { class: "b2-exc" },
-      el("div", { class: "b2-exc-head" },
-        el("h3", {}, e.model || e.model_key),
-        el("span", { class: "chip v-warn" }, "excluded — did not run"),
-        e.model_key && e.model ? el("span", { class: "b2-mkey" }, e.model_key) : null),
-      e.reason ? el("p", {}, e.reason) : null,
-      e.scored_as ? el("p", { class: "b2-count" }, "recorded as: " + e.scored_as) : null,
-      e.note ? el("p", { class: "b2-exc-note" }, e.note) : null))));
-}
-
-/* ── 6. Method: the separation tests and the multiplicity threshold ───────── */
+/* ── 4. Method: the separation tests and the multiplicity threshold ───────── */
 function renderMethod(data) {
   const sep = Array.isArray(data.separation) ? data.separation : [];
   const m = data.multiplicity || {};
@@ -327,7 +673,7 @@ function renderMethod(data) {
     el("span", { class: "eyebrow" }, "Method"),
     el("h2", { id: "b2-method-h" }, "What separated, and against which threshold"),
     el("p", { class: "b2-lede" },
-      "Every band split above rests on one of these tests. Interval overlap is a conservative " +
+      "Every band split in the table rests on one of these tests. Interval overlap is a conservative " +
       "criterion, not a two-sample test, so it is not used to order anything."),
     el("div", { class: "panel", style: "margin-top:calc(var(--space) * 2.5)" },
       table,
@@ -337,7 +683,7 @@ function renderMethod(data) {
         m.note ? el("p", {}, m.note) : null) : null));
 }
 
-/* ── 7. Archive — the v1 board, with its warning verbatim ─────────────────── */
+/* ── 5. Archive — the v1 board, with its warning verbatim ─────────────────── */
 function archiveHref(href) {
   // Data-file hrefs are written relative to /benchmarks/; this page lives one
   // level deeper at /benchmarks/v2/. Leave absolute and already-relative
@@ -361,7 +707,7 @@ function renderArchive(data) {
       a.evidence ? el("p", { class: "b2-evidence" }, "Evidence: " + a.evidence) : null));
 }
 
-/* ── 8. Reporting rules ───────────────────────────────────────────────────── */
+/* ── 6. Reporting rules ───────────────────────────────────────────────────── */
 function renderRules(data) {
   const rules = Array.isArray(data.reporting_rules) ? data.reporting_rules : [];
   if (!rules.length && !data.battery_doc) return null;
@@ -416,14 +762,13 @@ async function boot() {
 
   board.innerHTML = "";
   for (const node of [
-    renderClaims(data),
-    renderAxes(data),
-    renderBands(data),
-    renderGates(data),
-    renderExcluded(data),
+    renderResults(data),
+    renderNotes(data),
     renderMethod(data),
     renderArchive(data),
     renderRules(data),
   ]) if (node) board.append(node);
+
+  openFromQuery();
 }
 document.addEventListener("DOMContentLoaded", boot);
