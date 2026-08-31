@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Board v2 — llm-arena</title>
-  <meta name="description" content="Eval battery v2: one scored axis, no total. Comparable pass rates with a 95% interval on every row, tied rows marked as tied, and a drill-down into every scored pair." />
+  <meta name="description" content="Eval battery v2: one section per scored axis, each on its own terms and never combined. Every cell carries an interval, tied rows are marked as tied, and every scored run drills down." />
   <link rel="stylesheet" href="../../assets/theme.css?v=20260827" />
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
   <script src="../../assets/chrome.js" defer></script>
-  <script src="board2.js?v=20260831c" defer></script>
+  <script src="board2.js?v=20260831d" defer></script>
   <style>
     /* ── board v2 (page-local) ────────────────────────────────────────────
        Extends the Field Notes system in assets/theme.css using its tokens
@@ -481,6 +481,79 @@
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 4px; padding: 1px 5px;
     }
+
+    /* ── board2/2: one section per axis ──────────────────────────────────────
+       Everything below is reached only by a shape board2/1 could not carry: a
+       second axis, a value_kind other than `proportion`, or a cell whose status
+       is not `ok`. A single-axis proportion board renders without any of it, so
+       the page it always was is the page it still is. */
+
+    /* Axis sections stack; the second onward gets a rule above it so two tables
+       cannot be misread as one. */
+    .b2-results-sec--next {
+      margin-top: clamp(30px, 4.4vw, 56px);
+      padding-top: clamp(22px, 3vw, 34px);
+      border-top: 1px solid var(--border);
+    }
+    /* Drawn only with 2+ axes: says out loud that this table stands alone. */
+    .b2-axis-sep {
+      margin-top: calc(var(--space) * 1.75);
+      padding-left: calc(var(--space) * 1.75);
+      border-left: 2px solid var(--accent-light);
+      color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; max-width: 84ch;
+    }
+
+    /* Reason copy inside a cell that has no number: not run, excluded,
+       unsupported kind. Never blank, never a zero. */
+    .b2-why-p {
+      margin-top: var(--space);
+      color: var(--text-muted); font-size: 0.86rem; line-height: 1.55; max-width: 78ch;
+    }
+    .b2-why-p--sub { color: var(--text-faint); font-size: 0.82rem; }
+    .b2-chip-sp { margin-left: 6px; text-transform: none; letter-spacing: 0.01em; }
+    /* "not run" must read as absent, not as low. Dashed and unfilled, so it is
+       visibly not on the same scale as a measured value. */
+    .b2-chip-notrun {
+      border-style: dashed; background: var(--bg); color: var(--text-faint);
+    }
+    .b2-mrow--notrun > td:first-child { opacity: 0.82; }
+    .b2-mrow--excluded > td:first-child { border-left: 3px solid color-mix(in srgb, var(--verdict-stop) 45%, var(--border)); }
+
+    /* ── value_kind: threshold ───────────────────────────────────────────────
+       A threshold has no rate and no 0–100% domain: the number IS the
+       measurement, and its interval is a bracket between two MEASURED levels.
+       So the "scale" column is the level ladder rather than an error bar. */
+    .b2-c-crit { min-width: 200px; max-width: 34ch; }
+    .b2-criterion { color: var(--text); font-size: 0.86rem; line-height: 1.5; }
+    .b2-lvl-below {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.02em;
+      color: var(--text-muted); white-space: normal; display: inline-block; max-width: 16ch;
+    }
+    .b2-lvl-bracket { display: inline-flex; align-items: baseline; gap: 3px; }
+    .b2-lvl-brace {
+      font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600;
+      line-height: 1; color: var(--accent);
+    }
+    .b2-ladder { min-width: 190px; }
+    .b2-ladder-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .b2-lvl {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 0.66rem; letter-spacing: 0.01em; color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .b2-lvl--met {
+      border-color: var(--accent-light);
+      background: color-mix(in srgb, var(--accent) 16%, var(--card));
+      color: var(--accent-ink);
+    }
+    .b2-lvl--unmet { border-style: dashed; color: var(--text-faint); }
+    /* The two levels the threshold sits between — the bracket, drawn on the
+       ladder so it reads as an interval and not as a point. */
+    .b2-lvl--edge { box-shadow: 0 0 0 2px var(--accent-tint); border-color: var(--accent); }
+    .b2-lvl-mark { font-size: 0.62rem; line-height: 1; }
 
     @media (max-width: 900px) {
       .b2-results { min-width: 780px; }
