@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../../assets/theme.css?v=20260827" />
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
   <script src="../../assets/chrome.js" defer></script>
-  <script src="board2.js?v=20260831d" defer></script>
+  <script src="board2.js?v=20260831e" defer></script>
   <style>
     /* ── board v2 (page-local) ────────────────────────────────────────────
        Extends the Field Notes system in assets/theme.css using its tokens
@@ -554,6 +554,82 @@
        ladder so it reads as an interval and not as a point. */
     .b2-lvl--edge { box-shadow: 0 0 0 2px var(--accent-tint); border-color: var(--accent); }
     .b2-lvl-mark { font-size: 0.62rem; line-height: 1; }
+
+    /* ── no supported partition ─────────────────────────────────────────────
+       When the pairwise tests do not support cutting the models into bands,
+       the section says so ABOVE the table and the table grows a per-row
+       "distinguishable from" column carrying the claim instead. The callout is
+       a warning colour on purpose: "we cannot order these" is a limitation of
+       the evidence, not a result to celebrate. */
+    .b2-nopart {
+      margin-top: calc(var(--space) * 2.5);
+      padding: clamp(12px, 1.6vw, 18px);
+      border-left: 3px solid color-mix(in srgb, var(--verdict-warn) 55%, var(--border));
+    }
+    .b2-nopart-h {
+      display: flex; flex-wrap: wrap; align-items: center;
+      gap: calc(var(--space) * 1.5); font-weight: 600;
+    }
+    .b2-nopart-p {
+      margin-top: var(--space);
+      color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; max-width: 88ch;
+    }
+    .b2-nopart-p--sub { color: var(--text-faint); font-size: 0.84rem; }
+
+    /* The distinguishable-from cell: a count, the corrected count beside it,
+       and the list of models behind a disclosure. */
+    /* Two classes on purpose: `.b2-results th { white-space: nowrap }` is more
+       specific than a bare `.b2-h-dist`, and an unwrapped header overflows into
+       the Run detail column. */
+    .b2-results--dist .b2-h-dist { white-space: normal; max-width: 14ch; }
+    .b2-c-dist { min-width: 130px; max-width: 24ch; }
+    /* The extra column has to fit beside everything the axis already shows, so
+       the table tightens rather than pushing the new claim off-screen: the two
+       widest columns give up their slack and the count stacks over its
+       corrected figure. It still scrolls on a narrow viewport. */
+    .b2-results--dist .b2-c-model { min-width: 200px; }
+    .b2-results--dist .b2-c-bar { min-width: 130px; width: 18%; }
+    .b2-results--dist .b2-h-bar,
+    .b2-results--dist .b2-h-n { white-space: normal; max-width: 13ch; }
+    .b2-dist-head { display: flex; flex-direction: column; gap: 2px; }
+    .b2-dist-count {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+    .b2-dist-sub {
+      font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.03em;
+      color: var(--text-muted);
+    }
+    .b2-distbox > summary {
+      cursor: pointer; list-style: none;
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+    }
+    .b2-distbox > summary::-webkit-details-marker { display: none; }
+    .b2-distbox > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .b2-dist-toggle {
+      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--accent); border-bottom: 1px dotted var(--accent-light);
+    }
+    .b2-distbox[open] .b2-dist-toggle { border-bottom-style: solid; }
+    .b2-dist-list {
+      margin: calc(var(--space) * 1.25) 0 0; padding: 0; list-style: none;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .b2-dist-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+    .b2-dist-name { font-size: 0.84rem; color: var(--text); }
+    .b2-dist-flag {
+      font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-faint);
+    }
+    .b2-dist-flag--strong {
+      color: var(--accent-ink); background: var(--accent-tint);
+      border-radius: var(--radius-sm); padding: 1px 5px;
+    }
+    .b2-dist-none {
+      margin-top: var(--space);
+      color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; max-width: 32ch;
+    }
 
     @media (max-width: 900px) {
       .b2-results { min-width: 780px; }
